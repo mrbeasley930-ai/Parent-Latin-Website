@@ -1,0 +1,997 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Spell School · Ludi Romani</title>
+<meta name="description" content="Find the Latin hidden inside wizard spells, then make a real Latin spell of your own. A Latin at Five Ways open evening game.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Cinzel:wght@700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --red:#7a1810; --red-2:#9c2416; --red-3:#4a0d07;
+  --gold:#e8b64a; --gold-2:#c9922a; --gold-3:#f5d68a;
+  --cream:#f6ead0; --cream-2:#eadbb8; --ink:#2a140c; --ink-2:#5a3a2a;
+  --ok:#2f6b3a; --ok-bg:#dcebd5; --bad:#9c2416; --bad-bg:#f6d9d2;
+  --shadow:#2a0805;
+  --meander:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='24' viewBox='0 0 32 24'%3E%3Cpath d='M-6 20H6V4H22V12H14V20H38' fill='none' stroke='%23e8b64a' stroke-width='3' stroke-linecap='square'/%3E%3C/svg%3E");
+  --meander-red:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='24' viewBox='0 0 32 24'%3E%3Cpath d='M-6 20H6V4H22V12H14V20H38' fill='none' stroke='%237a1810' stroke-width='3' stroke-linecap='square'/%3E%3C/svg%3E");
+  --display:Cinzel,"Trajan Pro",Georgia,serif;
+  --body:"Atkinson Hyperlegible",Verdana,system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+html{background:var(--red-3)}
+body{margin:0;min-height:100vh;display:flex;flex-direction:column;font-family:var(--body);color:var(--ink);
+  background:radial-gradient(120% 90% at 50% 0%,var(--red-2) 0%,var(--red) 45%,var(--red-3) 100%) no-repeat var(--red-3);-webkit-font-smoothing:antialiased}
+button{font-family:inherit}
+.band{height:18px;flex:none;background:#2a120b var(--meander) repeat-x center/24px 18px;border-bottom:3px solid var(--gold-2)}
+
+/* top bar */
+.bar{display:flex;align-items:center;gap:12px;padding:10px clamp(12px,2vw,24px);color:var(--cream)}
+.homebtn{background:var(--ink);color:var(--gold-3);border:2px solid var(--gold-2);border-radius:999px;padding:8px 15px;font-weight:700;font-size:.95rem;cursor:pointer;box-shadow:0 3px 0 #000;white-space:nowrap}
+.homebtn:hover{background:#000}
+.title{font-family:var(--display);font-weight:900;color:var(--gold);font-size:clamp(1.05rem,2.4vw,1.45rem);letter-spacing:.05em;text-shadow:0 2px 0 var(--shadow);white-space:nowrap}
+.pips{display:flex;gap:6px;margin-left:auto;margin-right:auto}
+.pip{font-family:var(--display);font-weight:900;font-size:.8rem;min-width:34px;height:30px;padding:0 6px;border-radius:8px;display:flex;align-items:center;justify-content:center;
+  border:2px solid rgba(232,182,74,.45);color:rgba(245,214,138,.6)}
+.pip.done{background:var(--gold-2);border-color:var(--gold-2);color:var(--ink)}
+.pip.now{border-color:var(--gold);color:var(--gold-3);box-shadow:0 0 0 2px var(--gold)}
+.det{display:flex;align-items:center;gap:8px;font-weight:700;font-size:.9rem;white-space:nowrap}
+.det .gems{display:flex;gap:4px}
+.gem{width:13px;height:13px;transform:rotate(45deg);border:2px solid var(--gold);border-radius:3px}
+.gem.on{background:var(--gold)}
+.gem.off{border-color:rgba(232,182,74,.4);background:rgba(0,0,0,.25)}
+
+/* stage */
+main{flex:1;display:flex;align-items:flex-start;justify-content:center;padding:4px clamp(12px,2vw,24px) 24px}
+.panel{width:100%;max-width:1100px;background:var(--cream);border:3px solid var(--ink);border-radius:16px;padding:clamp(16px,3vh,28px) clamp(16px,3vw,34px);
+  box-shadow:0 8px 0 var(--shadow),inset 0 0 0 4px var(--cream),inset 0 0 0 6px var(--gold-2)}
+.panel:focus{outline:none}
+h1,h2,h3{font-family:var(--display);font-weight:900;color:var(--red-3);margin:0 0 .35em;line-height:1.12}
+h1{font-size:clamp(1.9rem,4.6vw,2.9rem)}
+h2{font-size:clamp(1.35rem,3vw,1.9rem)}
+h3{font-size:clamp(1.05rem,2.2vw,1.3rem)}
+.step{font-family:var(--display);font-weight:900;color:var(--gold-2);letter-spacing:.1em;font-size:.95rem;margin-bottom:4px}
+p{margin:0 0 .8em;font-size:clamp(1rem,1.9vw,1.15rem);line-height:1.45}
+.lead{color:var(--ink-2)}
+.small{font-size:.9rem;color:var(--ink-2)}
+.la{font-family:var(--display);font-weight:700}
+
+.big{background:var(--red);color:var(--gold-3);border:3px solid var(--ink);border-radius:999px;padding:12px 28px;font-family:var(--display);font-weight:900;font-size:1.15rem;letter-spacing:.06em;cursor:pointer;box-shadow:0 5px 0 var(--shadow)}
+.big:hover{background:var(--red-2)}
+.big:active{transform:translateY(3px);box-shadow:0 2px 0 var(--shadow)}
+.big:focus-visible,.choice:focus-visible,.opt:focus-visible,.link:focus-visible,.hw:focus-visible,.ghost:focus-visible{outline:3px solid var(--gold);outline-offset:3px}
+.ghost{background:transparent;color:var(--red);border:2px solid var(--red);border-radius:999px;padding:10px 20px;font-weight:700;font-size:1rem;cursor:pointer}
+.ghost:hover{background:#fff}
+.link{background:none;border:0;color:var(--red);text-decoration:underline;font-weight:700;font-size:.95rem;cursor:pointer;padding:6px 0}
+.next{margin-top:14px;display:flex;justify-content:flex-end;gap:12px;flex-wrap:wrap;align-items:center}
+
+/* start */
+.example{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:10px 14px;margin:18px 0 20px}
+.example .sp{font-family:var(--display);font-weight:900;font-size:clamp(1.6rem,4vw,2.4rem);color:var(--gold);background:var(--ink);border:3px solid var(--gold-2);border-radius:12px;padding:6px 20px;letter-spacing:.08em}
+.example .sp u{text-decoration:none;color:var(--gold-3);border-bottom:4px solid var(--gold);text-shadow:0 0 12px rgba(232,182,74,.7)}
+.example .arrow{font-size:1.8rem;color:var(--ink-2)}
+.example .w{text-align:center;background:#fff;border:2px solid var(--cream-2);border-radius:12px;padding:8px 18px}
+.example .w b{display:block;font-family:var(--display);font-weight:900;font-size:1.5rem;color:var(--red)}
+.example .w span{font-size:.95rem;color:var(--ink-2)}
+.howto{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:0 0 18px;padding:0;list-style:none;counter-reset:h}
+.howto li{background:#fff;border:2px solid var(--cream-2);border-radius:12px;padding:10px 14px;font-size:1rem;line-height:1.4;counter-increment:h}
+.howto li::before{content:counter(h,upper-roman);display:block;font-family:var(--display);font-weight:900;color:var(--gold-2);font-size:1.1rem}
+
+/* spell screen */
+.spellgrid{display:grid;grid-template-columns:1.15fr 1fr;gap:clamp(14px,2.4vw,28px);align-items:start}
+.book{background:var(--ink);color:var(--cream);border:3px solid var(--gold-2);border-radius:14px;padding:14px 18px 16px;box-shadow:0 6px 0 #000}
+.book .step{color:var(--gold)}
+.spell{font-family:var(--display);font-weight:900;font-size:clamp(1.6rem,3.9vw,2.9rem);letter-spacing:.07em;line-height:1.15;text-align:center;margin:4px 0 12px;
+  color:rgba(246,234,208,.6);display:flex;flex-wrap:wrap;justify-content:center;gap:0 .5em;overflow-wrap:anywhere}
+.spell .wd{white-space:nowrap}
+.spell .ch{display:inline-block;border-bottom:4px solid transparent;transition:color .3s,border-color .3s}
+.spell .ch.hl{color:var(--gold-3);border-bottom-color:var(--gold);text-shadow:0 0 14px rgba(232,182,74,.85)}
+.spell.cast{color:var(--cream)}
+.task{font-weight:700;font-size:1.08rem;color:var(--cream);margin:0 0 10px}
+.task .n{color:var(--gold-3)}
+.hoard{display:grid;grid-template-columns:repeat(auto-fill,minmax(122px,1fr));gap:9px}
+.hw{background:var(--cream);color:var(--ink);border:3px solid var(--cream-2);border-radius:12px;padding:8px 8px 9px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:1px;box-shadow:0 4px 0 #000;text-align:center;font-size:1rem}
+.hw b{font-family:var(--display);font-weight:900;font-size:1.25rem;color:var(--red-3);line-height:1.15}
+.hw span{font-size:.92rem;color:var(--ink-2);line-height:1.2}
+.hw:hover:not(:disabled){border-color:var(--gold);transform:translateY(-2px)}
+.hw:disabled{cursor:default}
+.hw.hit{background:var(--ok-bg);border-color:#58a36a}
+.hw.hit b{color:var(--ok)}
+.hw.miss{background:var(--bad-bg);border-color:var(--bad);opacity:.75}
+.hw.miss b{color:var(--bad);text-decoration:line-through}
+.hw.off{opacity:.28}
+.fb{min-height:1.5em;margin-top:12px;font-size:1rem;line-height:1.4}
+.fb b{color:var(--gold-3)}
+.fb i{color:var(--gold-3)}
+.fb.y{color:#bfe6c6}
+.fb.n{color:#f6bcb0}
+.nudge{color:var(--gold-3);font-size:.92rem}
+.nudgebox{margin-top:8px;background:rgba(245,214,138,.12);border-left:4px solid var(--gold);border-radius:6px;padding:7px 10px;font-size:.98rem}
+.nudgebox b{color:var(--gold-3);font-family:var(--display);letter-spacing:.05em}
+
+.doq{background:#fff;border:3px solid var(--ink);border-radius:14px;padding:14px 18px 16px;box-shadow:0 6px 0 var(--ink-2)}
+.doq .qh{font-family:var(--display);font-weight:900;color:var(--gold-2);letter-spacing:.08em;font-size:.9rem;margin-bottom:4px}
+.doq .qq{font-size:1.18rem;font-weight:700;margin-bottom:10px}
+.doq .qq .la{color:var(--red)}
+.found{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 12px}
+.found div{background:var(--cream);border:2px solid var(--cream-2);border-radius:10px;padding:4px 12px}
+.found b{font-family:var(--display);font-weight:900;color:var(--red)}
+.opts{display:grid;gap:9px}
+.opt{text-align:left;background:var(--cream);color:var(--ink);border:3px solid var(--cream-2);border-radius:10px;padding:11px 14px;font-size:1.08rem;font-weight:700;cursor:pointer;line-height:1.3}
+.opt:hover:not(:disabled){border-color:var(--gold)}
+.opt:disabled{cursor:default}
+.opt.right{background:var(--ok-bg);border-color:#58a36a;color:var(--ok)}
+.opt.wrong{background:var(--bad-bg);border-color:var(--bad);color:var(--bad)}
+.opt.fade{opacity:.5}
+.explain{margin-top:12px;background:var(--cream);border-left:5px solid var(--gold-2);border-radius:8px;padding:10px 13px;font-size:1rem;line-height:1.45}
+.explain p{font-size:1rem;margin:0 0 .5em}
+.explain p:last-child{margin:0}
+.verdict{font-family:var(--display);font-weight:900;font-size:1.1rem;margin-bottom:4px}
+.verdict.y{color:var(--ok)}.verdict.n{color:var(--bad)}
+.locked{color:var(--ink-2);text-align:center;padding:34px 16px;border:3px dashed var(--cream-2);border-radius:14px;background:rgba(255,255,255,.5)}
+.locked svg{width:42px;height:42px;display:block;margin:0 auto 8px;color:var(--gold-2)}
+.locked p{font-size:1.02rem;margin:0}
+
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
+@keyframes glow{0%{text-shadow:0 0 0 rgba(232,182,74,0)}40%{text-shadow:0 0 26px rgba(245,214,138,1)}100%{text-shadow:0 0 14px rgba(232,182,74,.85)}}
+@keyframes pop{0%{transform:scale(.9);opacity:0}100%{transform:scale(1);opacity:1}}
+@media (prefers-reduced-motion:no-preference){
+  .hw.shake{animation:shake .4s}
+  .spell.cast .ch.hl{animation:glow 1s ease-out}
+  .doq.open,.pop{animation:pop .25s ease-out}
+}
+
+/* builder */
+.tip{background:#fff;border:2px solid var(--cream-2);border-left:6px solid var(--gold-2);border-radius:10px;padding:10px 14px;margin:0 0 16px;font-size:1.05rem;line-height:1.45}
+.tip b.la{color:var(--red)}
+.choices{display:grid;gap:10px;margin-top:10px;grid-template-columns:repeat(auto-fill,minmax(170px,1fr))}
+.choices.nouns{grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}
+.choice{text-align:left;background:#fff;border:3px solid var(--ink);border-radius:14px;padding:10px 14px;cursor:pointer;box-shadow:0 5px 0 var(--ink-2);color:var(--ink);font-size:1rem;display:flex;flex-direction:column;gap:2px;transition:transform .1s}
+.choice:hover{transform:translateY(-2px);border-color:var(--red)}
+.choice:active{transform:translateY(3px);box-shadow:0 2px 0 var(--ink-2)}
+.choice .c1{font-family:var(--display);font-weight:900;font-size:1.25rem;color:var(--red-3);line-height:1.1;letter-spacing:.03em}
+.choice .c2{color:var(--ink-2);font-size:.98rem;line-height:1.3}
+.choice.sel{background:var(--ink);border-color:var(--gold-2)}
+.choice.sel .c1{color:var(--gold)}.choice.sel .c2{color:var(--cream-2)}
+.choice.none{border-style:dashed;box-shadow:none;background:transparent;justify-content:center}
+.brew{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:6px 14px;background:var(--ink);border:3px solid var(--gold-2);border-radius:14px;padding:12px 16px;margin:4px 0 16px;min-height:74px}
+.brew .bw{font-family:var(--display);font-weight:900;font-size:clamp(1.4rem,3.4vw,2.2rem);color:var(--gold);letter-spacing:.07em}
+.brew .bw.blank{color:rgba(232,182,74,.35)}
+.brew .bw.newend{color:var(--gold-3)}
+.brew .bw u{text-decoration:none;border-bottom:4px solid var(--gold);color:#fff}
+.endbox{background:#fff;border:3px solid var(--ink);border-radius:14px;padding:14px 18px 16px;margin-top:16px;box-shadow:0 6px 0 var(--ink-2)}
+.pat{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 12px}
+.pat div{background:var(--cream);border:2px solid var(--cream-2);border-radius:10px;padding:6px 12px;font-size:1rem}
+.pat b{font-family:var(--display);font-weight:900;color:var(--red-3)}
+.pat .to{color:var(--ink-2);margin:0 4px}
+.pat u{text-decoration:none;color:var(--red);border-bottom:3px solid var(--gold)}
+.opts.row3{grid-template-columns:repeat(3,1fr);max-width:560px}
+.opts.row3 .opt{text-align:center;font-family:var(--display);font-weight:900;font-size:1.25rem}
+
+/* result */
+.result{text-align:center}
+.result .castline{display:inline-flex;flex-wrap:wrap;justify-content:center;gap:4px 16px;background:var(--ink);border:3px solid var(--gold-2);border-radius:14px;padding:12px 22px;margin:4px 0 10px;box-shadow:0 6px 0 #000}
+.result .castline span{font-family:var(--display);font-weight:900;font-size:clamp(1.6rem,4.4vw,2.8rem);color:var(--gold);letter-spacing:.07em;text-shadow:0 0 14px rgba(232,182,74,.6)}
+.result .mean{font-size:clamp(1.1rem,2.4vw,1.35rem);font-weight:700;margin:0 0 4px}
+.result .say{font-size:1rem;color:var(--ink-2);margin:0 0 4px}
+.result .say b{color:var(--ink);letter-spacing:.03em}
+.result .shufnote{font-size:.98rem;color:var(--ink-2);max-width:720px;margin:6px auto 0;min-height:1.4em}
+.namerow{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:center;margin:14px 0 6px}
+.namerow label{font-weight:700}
+input[type=text]{font:inherit;font-size:1.1rem;padding:10px 12px;border:2px solid var(--ink-2);border-radius:10px;background:#fff;min-width:0;width:min(300px,100%)}
+input[type=text]:focus{outline:3px solid var(--gold);outline-offset:1px}
+.cardbtns{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin:10px 0 18px}
+.cardwrap{display:flex;flex-direction:column;align-items:center}
+
+/* printable card */
+.card{width:min(100%,max(600px,min(900px,calc((100vh - 330px) * 1.414))));aspect-ratio:297/210;background:#fffdf7;color:var(--ink);position:relative;border-radius:6px;text-align:left;
+  box-shadow:0 10px 30px rgba(0,0,0,.35);-webkit-print-color-adjust:exact;print-color-adjust:exact;container-type:inline-size}
+.card .frame{position:absolute;inset:2.2cqw;border:.5cqw solid var(--red);outline:.2cqw solid var(--red);outline-offset:.5cqw}
+.card .mband{position:absolute;left:2.9cqw;right:2.9cqw;height:2.6cqw;background:var(--meander-red) repeat-x center/3.4cqw 2.6cqw}
+.card .mband.t{top:2.9cqw}.card .mband.b{bottom:2.9cqw}
+.card .inner{position:absolute;inset:6.6cqw 6cqw 6.4cqw;display:flex;flex-direction:column;justify-content:space-between}
+.card .top{display:flex;justify-content:space-between;align-items:flex-start;gap:2cqw}
+.card .civ{font-family:var(--display);font-weight:900;font-size:3.2cqw;letter-spacing:.14em;color:var(--red);line-height:1}
+.card .civ small{display:block;font-family:var(--body);font-weight:700;font-size:1.45cqw;letter-spacing:.02em;color:var(--ink-2);margin-top:.6cqw}
+.card .date{text-align:right;font-family:var(--display);font-weight:700;font-size:1.7cqw;color:var(--ink);line-height:1.25}
+.card .date small{display:block;font-family:var(--body);font-weight:400;font-size:1.35cqw;color:var(--ink-2);max-width:32cqw;margin-left:auto}
+.card .intro{margin:0 0 .5cqw;text-align:center;font-size:1.75cqw;color:var(--ink-2)}
+.card .intro b{color:var(--ink)}
+.card .full{text-align:center;font-family:var(--display);font-weight:900;font-size:5.6cqw;line-height:1.05;color:var(--red-3);letter-spacing:.04em;overflow-wrap:anywhere}
+.card .full.l{font-size:4.6cqw}
+.card .full.xl{font-size:3.9cqw}
+.card .cmean{text-align:center;font-size:2.1cqw;font-weight:700;margin-top:.6cqw}
+.card .csay{text-align:center;font-size:1.45cqw;color:var(--ink-2);margin-top:.3cqw}
+.card .parts{display:flex;justify-content:center;gap:2cqw;margin:1.6cqw 0 0}
+.card .part{flex:1;max-width:26cqw;text-align:center;border-top:.3cqw solid var(--gold-2);padding-top:.9cqw}
+.card .part .pl{font-family:var(--display);font-weight:900;font-size:2.2cqw;color:var(--red)}
+.card .part .pm{font-size:1.6cqw;margin-top:.2cqw}
+.card .part .pe{font-size:1.35cqw;color:var(--ink-2);margin-top:.2cqw;line-height:1.3}
+.card .foot{display:flex;align-items:flex-end;justify-content:space-between;gap:2cqw}
+.card .cracked{font-size:1.35cqw;color:var(--ink-2);line-height:1.35}
+.card .cracked b.h{display:block;font-family:var(--display);font-weight:900;font-size:1.5cqw;color:var(--red-3);letter-spacing:.06em;margin-bottom:.2cqw}
+.card .cracked .sn{font-family:var(--display);font-weight:900;color:var(--ink)}
+.card .score{font-size:1.4cqw;color:var(--ink-2);margin-top:.5cqw}
+.card .score b{font-family:var(--display);color:var(--red)}
+.card .qrb{display:flex;align-items:center;gap:1.2cqw;text-align:right;font-size:1.4cqw;color:var(--ink-2);line-height:1.3;flex:none}
+.card .qrb b{display:block;color:var(--ink);font-size:1.4cqw}
+.card .qr{width:9.5cqw;height:9.5cqw;flex:none}
+.card .qr svg{width:100%;height:100%;display:block}
+
+/* idle (only used when this page is opened on its own, not inside the hub) */
+#idle{position:fixed;inset:0;z-index:80;display:flex;align-items:center;justify-content:center;background:rgba(26,8,4,.78);cursor:pointer}
+#idle[hidden]{display:none}
+#idle .box{background:var(--cream);border:4px solid var(--ink);border-radius:18px;padding:28px 34px;text-align:center;max-width:440px;margin:16px;box-shadow:0 8px 0 var(--shadow),inset 0 0 0 4px var(--cream),inset 0 0 0 7px var(--gold-2)}
+#idle .count{font-family:var(--display);font-weight:900;font-size:3rem;color:var(--red-3);line-height:1.1}
+
+@media (max-width:900px){
+  .spellgrid{grid-template-columns:1fr}
+  .pips{display:none}
+  .title{margin-right:auto}
+}
+@media (max-width:640px){
+  .howto{grid-template-columns:1fr}
+  .opts.row3{grid-template-columns:1fr}
+  .det .lbl{display:none}
+  .title{font-size:1rem}
+  .bar{flex-wrap:wrap;row-gap:8px}
+  .det{margin-left:auto}
+}
+
+@media print{ body{display:none !important} }
+</style>
+</head>
+<body>
+<div class="band" aria-hidden="true"></div>
+<div class="bar">
+  <button class="homebtn" id="home" type="button">&#8962; All games</button>
+  <div class="title">Spell School</div>
+  <div class="pips" id="pips" aria-hidden="true"></div>
+  <div class="det" id="det"></div>
+</div>
+<main><div class="panel" id="screen" tabindex="-1"></div></main>
+
+<div id="idle" hidden role="alertdialog" aria-labelledby="idleh">
+  <div class="box">
+    <h2 id="idleh">Still playing?</h2>
+    <p>Tap anywhere to keep going.</p>
+    <div class="count" id="idlecount">15</div>
+    <p class="small">Otherwise the game goes back to the start for the next family.</p>
+  </div>
+</div>
+
+<script>
+/* QR Code Generator for JavaScript. Copyright (c) 2009 Kazuhiko Arase. MIT licence. https://github.com/kazuhikoarase/qrcode-generator */
+var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],f={},c=function(t,r){o=function(t){for(var r=new Array(t),e=0;e<t;e+=1){r[e]=new Array(t);for(var n=0;n<t;n+=1)r[e][n]=null}return r}(i=4*e+17),l(0,0),l(i-7,0),l(0,i-7),s(),h(),d(t,r),e>=7&&v(t),null==a&&(a=p(e,n,u)),w(a,r)},l=function(t,r){for(var e=-1;e<=7;e+=1)if(!(t+e<=-1||i<=t+e))for(var n=-1;n<=7;n+=1)r+n<=-1||i<=r+n||(o[t+e][r+n]=0<=e&&e<=6&&(0==n||6==n)||0<=n&&n<=6&&(0==e||6==e)||2<=e&&e<=4&&2<=n&&n<=4)},h=function(){for(var t=8;t<i-8;t+=1)null==o[t][6]&&(o[t][6]=t%2==0);for(var r=8;r<i-8;r+=1)null==o[6][r]&&(o[6][r]=r%2==0)},s=function(){for(var t=B.getPatternPosition(e),r=0;r<t.length;r+=1)for(var n=0;n<t.length;n+=1){var i=t[r],a=t[n];if(null==o[i][a])for(var u=-2;u<=2;u+=1)for(var f=-2;f<=2;f+=1)o[i+u][a+f]=-2==u||2==u||-2==f||2==f||0==u&&0==f}},v=function(t){for(var r=B.getBCHTypeNumber(e),n=0;n<18;n+=1){var a=!t&&1==(r>>n&1);o[Math.floor(n/3)][n%3+i-8-3]=a}for(n=0;n<18;n+=1){a=!t&&1==(r>>n&1);o[n%3+i-8-3][Math.floor(n/3)]=a}},d=function(t,r){for(var e=n<<3|r,a=B.getBCHTypeInfo(e),u=0;u<15;u+=1){var f=!t&&1==(a>>u&1);u<6?o[u][8]=f:u<8?o[u+1][8]=f:o[i-15+u][8]=f}for(u=0;u<15;u+=1){f=!t&&1==(a>>u&1);u<8?o[8][i-u-1]=f:u<9?o[8][15-u-1+1]=f:o[8][15-u-1]=f}o[i-8][8]=!t},w=function(t,r){for(var e=-1,n=i-1,a=7,u=0,f=B.getMaskFunction(r),c=i-1;c>0;c-=2)for(6==c&&(c-=1);;){for(var g=0;g<2;g+=1)if(null==o[n][c-g]){var l=!1;u<t.length&&(l=1==(t[u]>>>a&1)),f(n,c-g)&&(l=!l),o[n][c-g]=l,-1==(a-=1)&&(u+=1,a=7)}if((n+=e)<0||i<=n){n-=e,e=-e;break}}},p=function(t,r,e){for(var n=A.getRSBlocks(t,r),o=b(),i=0;i<e.length;i+=1){var a=e[i];o.put(a.getMode(),4),o.put(a.getLength(),B.getLengthInBits(a.getMode(),t)),a.write(o)}var u=0;for(i=0;i<n.length;i+=1)u+=n[i].dataCount;if(o.getLengthInBits()>8*u)throw"code length overflow. ("+o.getLengthInBits()+">"+8*u+")";for(o.getLengthInBits()+4<=8*u&&o.put(0,4);o.getLengthInBits()%8!=0;)o.putBit(!1);for(;!(o.getLengthInBits()>=8*u||(o.put(236,8),o.getLengthInBits()>=8*u));)o.put(17,8);return function(t,r){for(var e=0,n=0,o=0,i=new Array(r.length),a=new Array(r.length),u=0;u<r.length;u+=1){var f=r[u].dataCount,c=r[u].totalCount-f;n=Math.max(n,f),o=Math.max(o,c),i[u]=new Array(f);for(var g=0;g<i[u].length;g+=1)i[u][g]=255&t.getBuffer()[g+e];e+=f;var l=B.getErrorCorrectPolynomial(c),h=k(i[u],l.getLength()-1).mod(l);for(a[u]=new Array(l.getLength()-1),g=0;g<a[u].length;g+=1){var s=g+h.getLength()-a[u].length;a[u][g]=s>=0?h.getAt(s):0}}var v=0;for(g=0;g<r.length;g+=1)v+=r[g].totalCount;var d=new Array(v),w=0;for(g=0;g<n;g+=1)for(u=0;u<r.length;u+=1)g<i[u].length&&(d[w]=i[u][g],w+=1);for(g=0;g<o;g+=1)for(u=0;u<r.length;u+=1)g<a[u].length&&(d[w]=a[u][g],w+=1);return d}(o,n)};f.addData=function(t,r){var e=null;switch(r=r||"Byte"){case"Numeric":e=M(t);break;case"Alphanumeric":e=x(t);break;case"Byte":e=m(t);break;case"Kanji":e=L(t);break;default:throw"mode:"+r}u.push(e),a=null},f.isDark=function(t,r){if(t<0||i<=t||r<0||i<=r)throw t+","+r;return o[t][r]},f.getModuleCount=function(){return i},f.make=function(){if(e<1){for(var t=1;t<40;t++){for(var r=A.getRSBlocks(t,n),o=b(),i=0;i<u.length;i++){var a=u[i];o.put(a.getMode(),4),o.put(a.getLength(),B.getLengthInBits(a.getMode(),t)),a.write(o)}var g=0;for(i=0;i<r.length;i++)g+=r[i].dataCount;if(o.getLengthInBits()<=8*g)break}e=t}c(!1,function(){for(var t=0,r=0,e=0;e<8;e+=1){c(!0,e);var n=B.getLostPoint(f);(0==e||t>n)&&(t=n,r=e)}return r}())},f.createTableTag=function(t,r){t=t||2;var e="";e+='<table style="',e+=" border-width: 0px; border-style: none;",e+=" border-collapse: collapse;",e+=" padding: 0px; margin: "+(r=void 0===r?4*t:r)+"px;",e+='">',e+="<tbody>";for(var n=0;n<f.getModuleCount();n+=1){e+="<tr>";for(var o=0;o<f.getModuleCount();o+=1)e+='<td style="',e+=" border-width: 0px; border-style: none;",e+=" border-collapse: collapse;",e+=" padding: 0px; margin: 0px;",e+=" width: "+t+"px;",e+=" height: "+t+"px;",e+=" background-color: ",e+=f.isDark(n,o)?"#000000":"#ffffff",e+=";",e+='"/>';e+="</tr>"}return e+="</tbody>",e+="</table>"},f.createSvgTag=function(t,r,e,n){var o={};"object"==typeof arguments[0]&&(t=(o=arguments[0]).cellSize,r=o.margin,e=o.alt,n=o.title),t=t||2,r=void 0===r?4*t:r,(e="string"==typeof e?{text:e}:e||{}).text=e.text||null,e.id=e.text?e.id||"qrcode-description":null,(n="string"==typeof n?{text:n}:n||{}).text=n.text||null,n.id=n.text?n.id||"qrcode-title":null;var i,a,u,c,g=f.getModuleCount()*t+2*r,l="";for(c="l"+t+",0 0,"+t+" -"+t+",0 0,-"+t+"z ",l+='<svg version="1.1" xmlns="http://www.w3.org/2000/svg"',l+=o.scalable?"":' width="'+g+'px" height="'+g+'px"',l+=' viewBox="0 0 '+g+" "+g+'" ',l+=' preserveAspectRatio="xMinYMin meet"',l+=n.text||e.text?' role="img" aria-labelledby="'+y([n.id,e.id].join(" ").trim())+'"':"",l+=">",l+=n.text?'<title id="'+y(n.id)+'">'+y(n.text)+"</title>":"",l+=e.text?'<description id="'+y(e.id)+'">'+y(e.text)+"</description>":"",l+='<rect width="100%" height="100%" fill="white" cx="0" cy="0"/>',l+='<path d="',a=0;a<f.getModuleCount();a+=1)for(u=a*t+r,i=0;i<f.getModuleCount();i+=1)f.isDark(a,i)&&(l+="M"+(i*t+r)+","+u+c);return l+='" stroke="transparent" fill="black"/>',l+="</svg>"},f.createDataURL=function(t,r){t=t||2,r=void 0===r?4*t:r;var e=f.getModuleCount()*t+2*r,n=r,o=e-r;return I(e,e,function(r,e){if(n<=r&&r<o&&n<=e&&e<o){var i=Math.floor((r-n)/t),a=Math.floor((e-n)/t);return f.isDark(a,i)?0:1}return 1})},f.createImgTag=function(t,r,e){t=t||2,r=void 0===r?4*t:r;var n=f.getModuleCount()*t+2*r,o="";return o+="<img",o+=' src="',o+=f.createDataURL(t,r),o+='"',o+=' width="',o+=n,o+='"',o+=' height="',o+=n,o+='"',e&&(o+=' alt="',o+=y(e),o+='"'),o+="/>"};var y=function(t){for(var r="",e=0;e<t.length;e+=1){var n=t.charAt(e);switch(n){case"<":r+="&lt;";break;case">":r+="&gt;";break;case"&":r+="&amp;";break;case'"':r+="&quot;";break;default:r+=n}}return r};return f.createASCII=function(t,r){if((t=t||1)<2)return function(t){t=void 0===t?2:t;var r,e,n,o,i,a=1*f.getModuleCount()+2*t,u=t,c=a-t,g={"██":"█","█ ":"▀"," █":"▄","  ":" "},l={"██":"▀","█ ":"▀"," █":" ","  ":" "},h="";for(r=0;r<a;r+=2){for(n=Math.floor((r-u)/1),o=Math.floor((r+1-u)/1),e=0;e<a;e+=1)i="█",u<=e&&e<c&&u<=r&&r<c&&f.isDark(n,Math.floor((e-u)/1))&&(i=" "),u<=e&&e<c&&u<=r+1&&r+1<c&&f.isDark(o,Math.floor((e-u)/1))?i+=" ":i+="█",h+=t<1&&r+1>=c?l[i]:g[i];h+="\n"}return a%2&&t>0?h.substring(0,h.length-a-1)+Array(a+1).join("▀"):h.substring(0,h.length-1)}(r);t-=1,r=void 0===r?2*t:r;var e,n,o,i,a=f.getModuleCount()*t+2*r,u=r,c=a-r,g=Array(t+1).join("██"),l=Array(t+1).join("  "),h="",s="";for(e=0;e<a;e+=1){for(o=Math.floor((e-u)/t),s="",n=0;n<a;n+=1)i=1,u<=n&&n<c&&u<=e&&e<c&&f.isDark(o,Math.floor((n-u)/t))&&(i=0),s+=i?g:l;for(o=0;o<t;o+=1)h+=s+"\n"}return h.substring(0,h.length-1)},f.renderTo2dContext=function(t,r){r=r||2;for(var e=f.getModuleCount(),n=0;n<e;n++)for(var o=0;o<e;o++)t.fillStyle=f.isDark(n,o)?"black":"white",t.fillRect(o*r,n*r,r,r)},f};t.stringToBytes=(t.stringToBytesFuncs={default:function(t){for(var r=[],e=0;e<t.length;e+=1){var n=t.charCodeAt(e);r.push(255&n)}return r}}).default,t.createStringToBytes=function(t,r){var e=function(){for(var e=S(t),n=function(){var t=e.read();if(-1==t)throw"eof";return t},o=0,i={};;){var a=e.read();if(-1==a)break;var u=n(),f=n()<<8|n();i[String.fromCharCode(a<<8|u)]=f,o+=1}if(o!=r)throw o+" != "+r;return i}(),n="?".charCodeAt(0);return function(t){for(var r=[],o=0;o<t.length;o+=1){var i=t.charCodeAt(o);if(i<128)r.push(i);else{var a=e[t.charAt(o)];"number"==typeof a?(255&a)==a?r.push(a):(r.push(a>>>8),r.push(255&a)):r.push(n)}}return r}};var r,e,n,o,i,a=1,u=2,f=4,c=8,g={L:1,M:0,Q:3,H:2},l=0,h=1,s=2,v=3,d=4,w=5,p=6,y=7,B=(r=[[],[6,18],[6,22],[6,26],[6,30],[6,34],[6,22,38],[6,24,42],[6,26,46],[6,28,50],[6,30,54],[6,32,58],[6,34,62],[6,26,46,66],[6,26,48,70],[6,26,50,74],[6,30,54,78],[6,30,56,82],[6,30,58,86],[6,34,62,90],[6,28,50,72,94],[6,26,50,74,98],[6,30,54,78,102],[6,28,54,80,106],[6,32,58,84,110],[6,30,58,86,114],[6,34,62,90,118],[6,26,50,74,98,122],[6,30,54,78,102,126],[6,26,52,78,104,130],[6,30,56,82,108,134],[6,34,60,86,112,138],[6,30,58,86,114,142],[6,34,62,90,118,146],[6,30,54,78,102,126,150],[6,24,50,76,102,128,154],[6,28,54,80,106,132,158],[6,32,58,84,110,136,162],[6,26,54,82,110,138,166],[6,30,58,86,114,142,170]],e=1335,n=7973,i=function(t){for(var r=0;0!=t;)r+=1,t>>>=1;return r},(o={}).getBCHTypeInfo=function(t){for(var r=t<<10;i(r)-i(e)>=0;)r^=e<<i(r)-i(e);return 21522^(t<<10|r)},o.getBCHTypeNumber=function(t){for(var r=t<<12;i(r)-i(n)>=0;)r^=n<<i(r)-i(n);return t<<12|r},o.getPatternPosition=function(t){return r[t-1]},o.getMaskFunction=function(t){switch(t){case l:return function(t,r){return(t+r)%2==0};case h:return function(t,r){return t%2==0};case s:return function(t,r){return r%3==0};case v:return function(t,r){return(t+r)%3==0};case d:return function(t,r){return(Math.floor(t/2)+Math.floor(r/3))%2==0};case w:return function(t,r){return t*r%2+t*r%3==0};case p:return function(t,r){return(t*r%2+t*r%3)%2==0};case y:return function(t,r){return(t*r%3+(t+r)%2)%2==0};default:throw"bad maskPattern:"+t}},o.getErrorCorrectPolynomial=function(t){for(var r=k([1],0),e=0;e<t;e+=1)r=r.multiply(k([1,C.gexp(e)],0));return r},o.getLengthInBits=function(t,r){if(1<=r&&r<10)switch(t){case a:return 10;case u:return 9;case f:case c:return 8;default:throw"mode:"+t}else if(r<27)switch(t){case a:return 12;case u:return 11;case f:return 16;case c:return 10;default:throw"mode:"+t}else{if(!(r<41))throw"type:"+r;switch(t){case a:return 14;case u:return 13;case f:return 16;case c:return 12;default:throw"mode:"+t}}},o.getLostPoint=function(t){for(var r=t.getModuleCount(),e=0,n=0;n<r;n+=1)for(var o=0;o<r;o+=1){for(var i=0,a=t.isDark(n,o),u=-1;u<=1;u+=1)if(!(n+u<0||r<=n+u))for(var f=-1;f<=1;f+=1)o+f<0||r<=o+f||0==u&&0==f||a==t.isDark(n+u,o+f)&&(i+=1);i>5&&(e+=3+i-5)}for(n=0;n<r-1;n+=1)for(o=0;o<r-1;o+=1){var c=0;t.isDark(n,o)&&(c+=1),t.isDark(n+1,o)&&(c+=1),t.isDark(n,o+1)&&(c+=1),t.isDark(n+1,o+1)&&(c+=1),0!=c&&4!=c||(e+=3)}for(n=0;n<r;n+=1)for(o=0;o<r-6;o+=1)t.isDark(n,o)&&!t.isDark(n,o+1)&&t.isDark(n,o+2)&&t.isDark(n,o+3)&&t.isDark(n,o+4)&&!t.isDark(n,o+5)&&t.isDark(n,o+6)&&(e+=40);for(o=0;o<r;o+=1)for(n=0;n<r-6;n+=1)t.isDark(n,o)&&!t.isDark(n+1,o)&&t.isDark(n+2,o)&&t.isDark(n+3,o)&&t.isDark(n+4,o)&&!t.isDark(n+5,o)&&t.isDark(n+6,o)&&(e+=40);var g=0;for(o=0;o<r;o+=1)for(n=0;n<r;n+=1)t.isDark(n,o)&&(g+=1);return e+=Math.abs(100*g/r/r-50)/5*10},o),C=function(){for(var t=new Array(256),r=new Array(256),e=0;e<8;e+=1)t[e]=1<<e;for(e=8;e<256;e+=1)t[e]=t[e-4]^t[e-5]^t[e-6]^t[e-8];for(e=0;e<255;e+=1)r[t[e]]=e;var n={glog:function(t){if(t<1)throw"glog("+t+")";return r[t]},gexp:function(r){for(;r<0;)r+=255;for(;r>=256;)r-=255;return t[r]}};return n}();function k(t,r){if(void 0===t.length)throw t.length+"/"+r;var e=function(){for(var e=0;e<t.length&&0==t[e];)e+=1;for(var n=new Array(t.length-e+r),o=0;o<t.length-e;o+=1)n[o]=t[o+e];return n}(),n={getAt:function(t){return e[t]},getLength:function(){return e.length},multiply:function(t){for(var r=new Array(n.getLength()+t.getLength()-1),e=0;e<n.getLength();e+=1)for(var o=0;o<t.getLength();o+=1)r[e+o]^=C.gexp(C.glog(n.getAt(e))+C.glog(t.getAt(o)));return k(r,0)},mod:function(t){if(n.getLength()-t.getLength()<0)return n;for(var r=C.glog(n.getAt(0))-C.glog(t.getAt(0)),e=new Array(n.getLength()),o=0;o<n.getLength();o+=1)e[o]=n.getAt(o);for(o=0;o<t.getLength();o+=1)e[o]^=C.gexp(C.glog(t.getAt(o))+r);return k(e,0).mod(t)}};return n}var A=function(){var t=[[1,26,19],[1,26,16],[1,26,13],[1,26,9],[1,44,34],[1,44,28],[1,44,22],[1,44,16],[1,70,55],[1,70,44],[2,35,17],[2,35,13],[1,100,80],[2,50,32],[2,50,24],[4,25,9],[1,134,108],[2,67,43],[2,33,15,2,34,16],[2,33,11,2,34,12],[2,86,68],[4,43,27],[4,43,19],[4,43,15],[2,98,78],[4,49,31],[2,32,14,4,33,15],[4,39,13,1,40,14],[2,121,97],[2,60,38,2,61,39],[4,40,18,2,41,19],[4,40,14,2,41,15],[2,146,116],[3,58,36,2,59,37],[4,36,16,4,37,17],[4,36,12,4,37,13],[2,86,68,2,87,69],[4,69,43,1,70,44],[6,43,19,2,44,20],[6,43,15,2,44,16],[4,101,81],[1,80,50,4,81,51],[4,50,22,4,51,23],[3,36,12,8,37,13],[2,116,92,2,117,93],[6,58,36,2,59,37],[4,46,20,6,47,21],[7,42,14,4,43,15],[4,133,107],[8,59,37,1,60,38],[8,44,20,4,45,21],[12,33,11,4,34,12],[3,145,115,1,146,116],[4,64,40,5,65,41],[11,36,16,5,37,17],[11,36,12,5,37,13],[5,109,87,1,110,88],[5,65,41,5,66,42],[5,54,24,7,55,25],[11,36,12,7,37,13],[5,122,98,1,123,99],[7,73,45,3,74,46],[15,43,19,2,44,20],[3,45,15,13,46,16],[1,135,107,5,136,108],[10,74,46,1,75,47],[1,50,22,15,51,23],[2,42,14,17,43,15],[5,150,120,1,151,121],[9,69,43,4,70,44],[17,50,22,1,51,23],[2,42,14,19,43,15],[3,141,113,4,142,114],[3,70,44,11,71,45],[17,47,21,4,48,22],[9,39,13,16,40,14],[3,135,107,5,136,108],[3,67,41,13,68,42],[15,54,24,5,55,25],[15,43,15,10,44,16],[4,144,116,4,145,117],[17,68,42],[17,50,22,6,51,23],[19,46,16,6,47,17],[2,139,111,7,140,112],[17,74,46],[7,54,24,16,55,25],[34,37,13],[4,151,121,5,152,122],[4,75,47,14,76,48],[11,54,24,14,55,25],[16,45,15,14,46,16],[6,147,117,4,148,118],[6,73,45,14,74,46],[11,54,24,16,55,25],[30,46,16,2,47,17],[8,132,106,4,133,107],[8,75,47,13,76,48],[7,54,24,22,55,25],[22,45,15,13,46,16],[10,142,114,2,143,115],[19,74,46,4,75,47],[28,50,22,6,51,23],[33,46,16,4,47,17],[8,152,122,4,153,123],[22,73,45,3,74,46],[8,53,23,26,54,24],[12,45,15,28,46,16],[3,147,117,10,148,118],[3,73,45,23,74,46],[4,54,24,31,55,25],[11,45,15,31,46,16],[7,146,116,7,147,117],[21,73,45,7,74,46],[1,53,23,37,54,24],[19,45,15,26,46,16],[5,145,115,10,146,116],[19,75,47,10,76,48],[15,54,24,25,55,25],[23,45,15,25,46,16],[13,145,115,3,146,116],[2,74,46,29,75,47],[42,54,24,1,55,25],[23,45,15,28,46,16],[17,145,115],[10,74,46,23,75,47],[10,54,24,35,55,25],[19,45,15,35,46,16],[17,145,115,1,146,116],[14,74,46,21,75,47],[29,54,24,19,55,25],[11,45,15,46,46,16],[13,145,115,6,146,116],[14,74,46,23,75,47],[44,54,24,7,55,25],[59,46,16,1,47,17],[12,151,121,7,152,122],[12,75,47,26,76,48],[39,54,24,14,55,25],[22,45,15,41,46,16],[6,151,121,14,152,122],[6,75,47,34,76,48],[46,54,24,10,55,25],[2,45,15,64,46,16],[17,152,122,4,153,123],[29,74,46,14,75,47],[49,54,24,10,55,25],[24,45,15,46,46,16],[4,152,122,18,153,123],[13,74,46,32,75,47],[48,54,24,14,55,25],[42,45,15,32,46,16],[20,147,117,4,148,118],[40,75,47,7,76,48],[43,54,24,22,55,25],[10,45,15,67,46,16],[19,148,118,6,149,119],[18,75,47,31,76,48],[34,54,24,34,55,25],[20,45,15,61,46,16]],r=function(t,r){var e={};return e.totalCount=t,e.dataCount=r,e},e={};return e.getRSBlocks=function(e,n){var o=function(r,e){switch(e){case g.L:return t[4*(r-1)+0];case g.M:return t[4*(r-1)+1];case g.Q:return t[4*(r-1)+2];case g.H:return t[4*(r-1)+3];default:return}}(e,n);if(void 0===o)throw"bad rs block @ typeNumber:"+e+"/errorCorrectionLevel:"+n;for(var i=o.length/3,a=[],u=0;u<i;u+=1)for(var f=o[3*u+0],c=o[3*u+1],l=o[3*u+2],h=0;h<f;h+=1)a.push(r(c,l));return a},e}(),b=function(){var t=[],r=0,e={getBuffer:function(){return t},getAt:function(r){var e=Math.floor(r/8);return 1==(t[e]>>>7-r%8&1)},put:function(t,r){for(var n=0;n<r;n+=1)e.putBit(1==(t>>>r-n-1&1))},getLengthInBits:function(){return r},putBit:function(e){var n=Math.floor(r/8);t.length<=n&&t.push(0),e&&(t[n]|=128>>>r%8),r+=1}};return e},M=function(t){var r=a,e=t,n={getMode:function(){return r},getLength:function(t){return e.length},write:function(t){for(var r=e,n=0;n+2<r.length;)t.put(o(r.substring(n,n+3)),10),n+=3;n<r.length&&(r.length-n==1?t.put(o(r.substring(n,n+1)),4):r.length-n==2&&t.put(o(r.substring(n,n+2)),7))}},o=function(t){for(var r=0,e=0;e<t.length;e+=1)r=10*r+i(t.charAt(e));return r},i=function(t){if("0"<=t&&t<="9")return t.charCodeAt(0)-"0".charCodeAt(0);throw"illegal char :"+t};return n},x=function(t){var r=u,e=t,n={getMode:function(){return r},getLength:function(t){return e.length},write:function(t){for(var r=e,n=0;n+1<r.length;)t.put(45*o(r.charAt(n))+o(r.charAt(n+1)),11),n+=2;n<r.length&&t.put(o(r.charAt(n)),6)}},o=function(t){if("0"<=t&&t<="9")return t.charCodeAt(0)-"0".charCodeAt(0);if("A"<=t&&t<="Z")return t.charCodeAt(0)-"A".charCodeAt(0)+10;switch(t){case" ":return 36;case"$":return 37;case"%":return 38;case"*":return 39;case"+":return 40;case"-":return 41;case".":return 42;case"/":return 43;case":":return 44;default:throw"illegal char :"+t}};return n},m=function(r){var e=f,n=t.stringToBytes(r),o={getMode:function(){return e},getLength:function(t){return n.length},write:function(t){for(var r=0;r<n.length;r+=1)t.put(n[r],8)}};return o},L=function(r){var e=c,n=t.stringToBytesFuncs.SJIS;if(!n)throw"sjis not supported.";!function(){var t=n("友");if(2!=t.length||38726!=(t[0]<<8|t[1]))throw"sjis not supported."}();var o=n(r),i={getMode:function(){return e},getLength:function(t){return~~(o.length/2)},write:function(t){for(var r=o,e=0;e+1<r.length;){var n=(255&r[e])<<8|255&r[e+1];if(33088<=n&&n<=40956)n-=33088;else{if(!(57408<=n&&n<=60351))throw"illegal char at "+(e+1)+"/"+n;n-=49472}n=192*(n>>>8&255)+(255&n),t.put(n,13),e+=2}if(e<r.length)throw"illegal char at "+(e+1)}};return i},D=function(){var t=[],r={writeByte:function(r){t.push(255&r)},writeShort:function(t){r.writeByte(t),r.writeByte(t>>>8)},writeBytes:function(t,e,n){e=e||0,n=n||t.length;for(var o=0;o<n;o+=1)r.writeByte(t[o+e])},writeString:function(t){for(var e=0;e<t.length;e+=1)r.writeByte(t.charCodeAt(e))},toByteArray:function(){return t},toString:function(){var r="";r+="[";for(var e=0;e<t.length;e+=1)e>0&&(r+=","),r+=t[e];return r+="]"}};return r},S=function(t){var r=t,e=0,n=0,o=0,i={read:function(){for(;o<8;){if(e>=r.length){if(0==o)return-1;throw"unexpected end of file./"+o}var t=r.charAt(e);if(e+=1,"="==t)return o=0,-1;t.match(/^\s$/)||(n=n<<6|a(t.charCodeAt(0)),o+=6)}var i=n>>>o-8&255;return o-=8,i}},a=function(t){if(65<=t&&t<=90)return t-65;if(97<=t&&t<=122)return t-97+26;if(48<=t&&t<=57)return t-48+52;if(43==t)return 62;if(47==t)return 63;throw"c:"+t};return i},I=function(t,r,e){for(var n=function(t,r){var e=t,n=r,o=new Array(t*r),i={setPixel:function(t,r,n){o[r*e+t]=n},write:function(t){t.writeString("GIF87a"),t.writeShort(e),t.writeShort(n),t.writeByte(128),t.writeByte(0),t.writeByte(0),t.writeByte(0),t.writeByte(0),t.writeByte(0),t.writeByte(255),t.writeByte(255),t.writeByte(255),t.writeString(","),t.writeShort(0),t.writeShort(0),t.writeShort(e),t.writeShort(n),t.writeByte(0);var r=a(2);t.writeByte(2);for(var o=0;r.length-o>255;)t.writeByte(255),t.writeBytes(r,o,255),o+=255;t.writeByte(r.length-o),t.writeBytes(r,o,r.length-o),t.writeByte(0),t.writeString(";")}},a=function(t){for(var r=1<<t,e=1+(1<<t),n=t+1,i=u(),a=0;a<r;a+=1)i.add(String.fromCharCode(a));i.add(String.fromCharCode(r)),i.add(String.fromCharCode(e));var f,c,g,l=D(),h=(f=l,c=0,g=0,{write:function(t,r){if(t>>>r!=0)throw"length over";for(;c+r>=8;)f.writeByte(255&(t<<c|g)),r-=8-c,t>>>=8-c,g=0,c=0;g|=t<<c,c+=r},flush:function(){c>0&&f.writeByte(g)}});h.write(r,n);var s=0,v=String.fromCharCode(o[s]);for(s+=1;s<o.length;){var d=String.fromCharCode(o[s]);s+=1,i.contains(v+d)?v+=d:(h.write(i.indexOf(v),n),i.size()<4095&&(i.size()==1<<n&&(n+=1),i.add(v+d)),v=d)}return h.write(i.indexOf(v),n),h.write(e,n),h.flush(),l.toByteArray()},u=function(){var t={},r=0,e={add:function(n){if(e.contains(n))throw"dup key:"+n;t[n]=r,r+=1},size:function(){return r},indexOf:function(r){return t[r]},contains:function(r){return void 0!==t[r]}};return e};return i}(t,r),o=0;o<r;o+=1)for(var i=0;i<t;i+=1)n.setPixel(i,o,e(i,o));var a=D();n.write(a);for(var u=function(){var t=0,r=0,e=0,n="",o={},i=function(t){n+=String.fromCharCode(a(63&t))},a=function(t){if(t<0);else{if(t<26)return 65+t;if(t<52)return t-26+97;if(t<62)return t-52+48;if(62==t)return 43;if(63==t)return 47}throw"n:"+t};return o.writeByte=function(n){for(t=t<<8|255&n,r+=8,e+=1;r>=6;)i(t>>>r-6),r-=6},o.flush=function(){if(r>0&&(i(t<<6-r),t=0,r=0),e%3!=0)for(var o=3-e%3,a=0;a<o;a+=1)n+="="},o.toString=function(){return n},o}(),f=a.toByteArray(),c=0;c<f.length;c+=1)u.writeByte(f[c]);return u.flush(),"data:image/gif;base64,"+u};return t}();qrcode.stringToBytesFuncs["UTF-8"]=function(t){return function(t){for(var r=[],e=0;e<t.length;e++){var n=t.charCodeAt(e);n<128?r.push(n):n<2048?r.push(192|n>>6,128|63&n):n<55296||n>=57344?r.push(224|n>>12,128|n>>6&63,128|63&n):(e++,n=65536+((1023&n)<<10|1023&t.charCodeAt(e)),r.push(240|n>>18,128|n>>12&63,128|n>>6&63,128|63&n))}return r}(t)},function(t){"function"==typeof define&&define.amd?define([],t):"object"==typeof exports&&(module.exports=t())}(function(){return qrcode});
+</script>
+<script>
+/* ============================================================
+   LUDI kiosk snippet (shared by every open-evening game)
+   Inside the hub: tells the hub it is ready, reports taps, asks to go home.
+   On its own: runs its own idle timer and goes back to ../play/.
+   ============================================================ */
+(function(){
+  var embedded = window.parent !== window;
+  var IDLE = 90, WARN = 15, HUB = "../play/index.html";
+  function post(m){ try { parent.postMessage({ludi:m}, "*"); } catch(e){} }
+  window.LUDI = {
+    embedded: embedded,
+    home: function(){ if (embedded) post("home"); else location.href = HUB; }
+  };
+  if (embedded) {
+    post("ready");
+    var lastPost = 0;
+    var act = function(){ var n = Date.now(); if (n - lastPost > 1000) { lastPost = n; post("activity"); } };
+    ["pointerdown","pointermove","keydown","wheel","touchstart"].forEach(function(t){ document.addEventListener(t, act, {capture:true, passive:true}); });
+    window.addEventListener("afterprint", function(){ lastPost = 0; act(); });
+    return;
+  }
+  var last = Date.now(), box = null, cnt = null;
+  function poke(){ last = Date.now(); if (box && !box.hidden) box.hidden = true; }
+  ["pointerdown","pointermove","keydown","wheel","touchstart"].forEach(function(t){ document.addEventListener(t, poke, {capture:true, passive:true}); });
+  window.addEventListener("afterprint", poke);
+  document.addEventListener("DOMContentLoaded", function(){
+    box = document.getElementById("idle"); cnt = document.getElementById("idlecount");
+    if (box) box.addEventListener("pointerdown", function(e){ e.stopPropagation(); poke(); });
+  });
+  setInterval(function(){
+    if (!box) return;
+    var idle = (Date.now() - last) / 1000;
+    if (idle > IDLE + WARN) { location.href = HUB; last = Date.now(); return; }
+    if (idle > IDLE) { box.hidden = false; cnt.textContent = Math.max(1, Math.ceil(IDLE + WARN - idle)); }
+  }, 250);
+})();
+</script>
+<script>
+(function(){
+"use strict";
+var PARENT_URL = "https://mrbeasley930-ai.github.io/Parent-Latin-Website/";
+var ROUNDS = 5;
+
+/* ============================================================
+   SPELLS
+   hoard: the Latin word-hoard shown for this spell, [latin, meaning].
+   parts: the hoard words the spell is built from; hl = the letters
+          of the spell to light up when that word is found.
+   opts:  [what it might do, note shown if picked wrongly]; a = right one.
+   tier:  1 = warm-up, 2 = harder look-alikes, 3 = two words.
+   group: spells that share a group never come up in the same game.
+   realO: the spell is a real Latin "I ..." verb ending in -o.
+   ============================================================ */
+var SPELLS = [
+ {id:"lumos", spell:"LUMOS", tier:1, group:"light",
+  hoard:[["lumen","light"],["luna","moon"],["ludus","game"],["lupus","wolf"],["nox","night"]],
+  parts:[{w:"lumen", hl:"LUM"}],
+  opts:[["lights up the tip of your wand"],
+        ["makes the moon come out","That would need <i>luna</i>, moon."],
+        ["puts out every light in the room","That would need <i>nox</i>, night."]], a:0,
+  x:"LUMOS is built from <i>lumen</i>, light. English gets <b>illuminate</b> and <b>luminous</b> from the same word.",
+  card:"lumen, light"},
+ {id:"nox", spell:"NOX", tier:1, group:"light",
+  hoard:[["nox","night"],["nux","nut"],["novus","new"],["lux","light"],["non","not"]],
+  parts:[{w:"nox", hl:"NOX"}],
+  opts:[["puts out the light on your wand"],
+        ["cracks open a nut","That would need <i>nux</i>, nut. One letter makes all the difference."],
+        ["makes something old look new","That would need <i>novus</i>, new."]], a:0,
+  x:"<i>nox</i> is the Latin for night, so this spell is a real Latin word. <b>Nocturnal</b> animals come out at night, and at an <b>equinox</b> day and night are the same length.",
+  card:"nox, night"},
+ {id:"riddikulus", spell:"RIDDIKULUS", tier:1,
+  hoard:[["rideo","I laugh"],["rota","wheel"],["rivus","stream"],["rex","king"],["ruo","I rush"]],
+  parts:[{w:"rideo", hl:"RID"}],
+  opts:[["makes something scary look silly"],
+        ["floods the room with a stream","That would need <i>rivus</i>, stream."],
+        ["sends your enemy rushing away","That would need <i>ruo</i>, I rush."]], a:0,
+  x:"In Latin <i>ridiculus</i> means laughable, from <i>rideo</i>, I laugh. English has <b>ridiculous</b>, and <b>deride</b>, to laugh at someone.",
+  card:"rideo, I laugh"},
+ {id:"silencio", spell:"SILENCIO", tier:1,
+  hoard:[["silentium","silence"],["silva","wood, forest"],["sidus","star"],["sol","sun"],["salus","safety"]],
+  parts:[{w:"silentium", hl:"SILEN"}],
+  opts:[["makes someone go quiet"],
+        ["makes a forest grow around you","That would need <i>silva</i>, forest."],
+        ["fills the sky with stars","That would need <i>sidus</i>, star."]], a:0,
+  x:"SILENCIO comes from <i>silentium</i>, silence. <i>silva</i> was a close call: it means a wood, which is why Pennsylvania means &lsquo;Penn&rsquo;s woods&rsquo;.",
+  card:"silentium, silence"},
+ {id:"aguamenti", spell:"AGUAMENTI", tier:1,
+  hoard:[["aqua","water"],["aquila","eagle"],["ager","field"],["agnus","lamb"],["amo","I love"]],
+  parts:[{w:"aqua", hl:"AGUA"}],
+  opts:[["shoots a jet of water from your wand"],
+        ["calls an eagle down to you","That would need <i>aquila</i>, eagle."],
+        ["turns your enemy into a lamb","That would need <i>agnus</i>, lamb."]], a:0,
+  x:"The first part is <i>aqua</i>, water. Spanish grew out of Latin and spells it <i>agua</i>. English has <b>aquarium</b> and <b>aquatic</b>. Nobody is sure where the -menti comes from.",
+  card:"aqua, water"},
+ {id:"reparo", spell:"REPARO", tier:1, realO:true,
+  hoard:[["reparo","I mend"],["rapio","I snatch"],["porto","I carry"],["parvus","small"],["rego","I rule"]],
+  parts:[{w:"reparo", hl:"REPARO"}],
+  opts:[["mends something that is broken"],
+        ["snatches something out of someone&rsquo;s hand","That would need <i>rapio</i>, I snatch."],
+        ["shrinks something","That would need <i>parvus</i>, small."]], a:0,
+  x:"<i>reparo</i> is a real Latin word: I mend, I restore. It gives us <b>repair</b>. The -o on the end means &lsquo;I&rsquo;.",
+  card:"reparo, I mend"},
+ {id:"protego", spell:"PROTEGO", tier:1, realO:true,
+  hoard:[["protego","I protect"],["proelium","battle"],["porta","gate"],["pugno","I fight"],["tardus","slow"]],
+  parts:[{w:"protego", hl:"PROTEGO"}],
+  opts:[["puts up an invisible shield"],
+        ["starts a battle","That would need <i>proelium</i>, battle."],
+        ["slams a gate shut","That would need <i>porta</i>, gate."]], a:0,
+  x:"<i>protego</i> is real Latin: <i>pro</i> (in front) + <i>tego</i> (I cover). It means I protect, and gives us <b>protect</b>.",
+  card:"protego, I protect"},
+ {id:"incendio", spell:"INCENDIO", tier:1,
+  hoard:[["incendium","fire"],["insula","island"],["ingens","huge"],["invenio","I find"],["iter","journey"]],
+  parts:[{w:"incendium", hl:"INCENDI"}],
+  opts:[["sets something on fire"],
+        ["finds something you have lost","That would need <i>invenio</i>, I find."],
+        ["makes something huge","That would need <i>ingens</i>, huge."]], a:0,
+  x:"INCENDIO comes from <i>incendium</i>, a fire. An <b>incendiary</b> starts fires, and <b>incense</b> is something you burn.",
+  card:"incendium, fire"},
+
+ {id:"accio", spell:"ACCIO", tier:2, realO:true,
+  hoard:[["accio","I summon"],["audio","I hear"],["cado","I fall"],["acer","sharp"],["aqua","water"]],
+  parts:[{w:"accio", hl:"ACCIO"}],
+  opts:[["makes an object fly to you"],
+        ["lets you hear sounds far away","That would need <i>audio</i>, I hear."],
+        ["makes an object fall to the ground","That would need <i>cado</i>, I fall."]], a:0,
+  x:"<i>accio</i> is real Latin: I summon, I send for. The -o on the end means &lsquo;I&rsquo;. A Roman would say it &lsquo;AK-kee-oh&rsquo;, because Latin C is always hard, like K.",
+  card:"accio, I summon"},
+ {id:"tergeo", spell:"TERGEO", tier:2, realO:true,
+  hoard:[["tergeo","I wipe clean"],["terreo","I frighten"],["tergum","back"],["terra","earth"],["tego","I cover"]],
+  parts:[{w:"tergeo", hl:"TERGEO"}],
+  opts:[["cleans up a mess"],
+        ["gives someone a fright","That would need <i>terreo</i>, I frighten. It is only one letter different."],
+        ["spins someone round so their back is to you","That would need <i>tergum</i>, back."]], a:0,
+  x:"<i>tergeo</i> is real Latin: I wipe clean. <b>Detergent</b> means &lsquo;something that wipes away&rsquo;. Watch out for <i>terreo</i>, I frighten, which gives us <b>terrify</b>.",
+  card:"tergeo, I wipe clean"},
+ {id:"obliviate", spell:"OBLIVIATE", tier:2,
+  hoard:[["oblivio","forgetting"],["oliva","olive"],["ovis","sheep"],["bellum","war"],["oculus","eye"]],
+  parts:[{w:"oblivio", hl:"OBLIVI"}],
+  opts:[["wipes someone&rsquo;s memory"],
+        ["turns someone into a sheep","That would need <i>ovis</i>, sheep."],
+        ["starts a war","That would need <i>bellum</i>, war."]], a:0,
+  x:"OBLIVIATE comes from <i>oblivio</i>, forgetting. If you are <b>oblivious</b> you haven&rsquo;t noticed something, and <b>oblivion</b> is being completely forgotten.",
+  card:"oblivio, forgetting"},
+ {id:"leviosa", spell:"WINGARDIUM LEVIOSA", tier:2,
+  hoard:[["levo","I lift"],["lavo","I wash"],["lego","I read"],["leo","lion"],["lex","law"]],
+  parts:[{w:"levo", hl:"LEV"}],
+  opts:[["makes an object float up into the air"],
+        ["gives an object a good wash","That would need <i>lavo</i>, I wash."],
+        ["reads a book out loud","That would need <i>lego</i>, I read."]], a:0,
+  x:"LEVIOSA comes from <i>levo</i>, I lift (<i>levis</i> means light, not heavy). English has <b>levitate</b>, <b>elevator</b> and <b>lever</b>. WINGARDIUM probably starts with the English word &lsquo;wing&rsquo;.",
+  card:"levo, I lift"},
+ {id:"impedimenta", spell:"IMPEDIMENTA", tier:2,
+  hoard:[["impedimenta","things in your way"],["impetus","a charge, an attack"],["imperium","power"],["ignis","fire"],["insula","island"]],
+  parts:[{w:"impedimenta", hl:"IMPEDIMENTA"}],
+  opts:[["slows down someone who is coming at you"],
+        ["makes someone charge at you","That would need <i>impetus</i>, a charge."],
+        ["gives you power over someone","That would need <i>imperium</i>, power."]], a:0,
+  x:"<i>impedimenta</i> is a real Latin word: things that get in your way. Julius Caesar used it for his army&rsquo;s baggage, which slowed his soldiers down. English has <b>impede</b> and <b>impediment</b>.",
+  card:"impedimenta, things in your way"},
+ {id:"confundo", spell:"CONFUNDO", tier:2, realO:true,
+  hoard:[["confundo","I mix up"],["condo","I build"],["contra","against"],["fons","fountain"],["cura","care"]],
+  parts:[{w:"confundo", hl:"CONFUNDO"}],
+  opts:[["muddles someone&rsquo;s mind"],
+        ["builds a wall in front of you","That would need <i>condo</i>, I build."],
+        ["makes a fountain spring up","That would need <i>fons</i>, fountain."]], a:0,
+  x:"<i>confundo</i> is real Latin: <i>con</i> (together) + <i>fundo</i> (I pour). Pour things together and they get mixed up. English has <b>confuse</b> and <b>confound</b>.",
+  card:"confundo, I mix up"},
+ {id:"evanesco", spell:"EVANESCO", tier:2, realO:true,
+  hoard:[["evanesco","I vanish"],["evado","I escape"],["venio","I come"],["video","I see"],["ventus","wind"]],
+  parts:[{w:"evanesco", hl:"EVANESCO"}],
+  opts:[["makes something disappear"],
+        ["helps you escape","That would need <i>evado</i>, I escape."],
+        ["makes something come to you","That would need <i>venio</i>, I come."]], a:0,
+  x:"<i>evanesco</i> is real Latin: I vanish. English has <b>vanish</b>, and <b>evanescent</b>, fading away fast like a rainbow.",
+  card:"evanesco, I vanish"},
+ {id:"diffindo", spell:"DIFFINDO", tier:2, realO:true,
+  hoard:[["diffindo","I split apart"],["difficilis","difficult"],["defendo","I defend"],["fundo","I pour"],["do","I give"]],
+  parts:[{w:"diffindo", hl:"DIFFINDO"}],
+  opts:[["splits or rips something apart"],
+        ["makes a job much harder","That would need <i>difficilis</i>, difficult."],
+        ["guards you from an attack","That would need <i>defendo</i>, I defend."]], a:0,
+  x:"<i>diffindo</i> is real Latin: <i>dis</i> (apart) + <i>findo</i> (I split). A <b>fissure</b>, a crack in rock, comes from the same word.",
+  card:"diffindo, I split apart"},
+ {id:"sonorus", spell:"SONORUS", tier:2,
+  hoard:[["sonus","sound"],["somnus","sleep"],["sol","sun"],["senex","old man"],["signum","sign"]],
+  parts:[{w:"sonus", hl:"SON"}],
+  opts:[["makes your voice very loud"],
+        ["sends someone to sleep","That would need <i>somnus</i>, sleep."],
+        ["turns someone into an old man","That would need <i>senex</i>, old man."]], a:0,
+  x:"<i>sonorus</i> is a Latin word meaning loud, from <i>sonus</i>, sound. English has <b>sonic</b> and <b>sonorous</b>, a deep, loud voice.",
+  card:"sonus, sound"},
+
+ {id:"expelliarmus", spell:"EXPELLIARMUS", tier:3,
+  hoard:[["expello","I drive out"],["expecto","I wait for"],["arma","weapons"],["amicus","friend"],["aqua","water"]],
+  parts:[{w:"expello", hl:"EXPELL"},{w:"arma", hl:"ARM"}],
+  opts:[["knocks the wand out of your enemy&rsquo;s hand"],
+        ["throws your friend out of the room","That would need <i>amicus</i>, friend, not <i>arma</i>."],
+        ["makes your enemy stand still and wait","That would need <i>expecto</i>, I wait for."]], a:0,
+  x:"<i>expello</i> (I drive out) + <i>arma</i> (weapons): drive out the weapon. English has <b>expel</b>, <b>army</b>, and <b>alarm</b>, from the Italian <i>all&rsquo;arme!</i>, &lsquo;to arms!&rsquo;.",
+  card:"expello + arma, drive out the weapon"},
+ {id:"patronum", spell:"EXPECTO PATRONUM", tier:3,
+  hoard:[["expecto","I look out for"],["expello","I drive out"],["patronus","protector"],["porta","gate"],["pax","peace"]],
+  parts:[{w:"expecto", hl:"EXPECTO"},{w:"patronus", hl:"PATRON"}],
+  opts:[["calls up a silver guardian to protect you"],
+        ["drives your protector away","That would need <i>expello</i>, I drive out."],
+        ["opens a gate to safety","That would need <i>porta</i>, gate."]], a:0,
+  x:"<i>expecto</i> (I look out for) + <i>patronum</i> (a protector): &lsquo;I look out for a protector&rsquo;. <i>patronus</i> comes from <i>pater</i>, father. English has <b>expect</b> and <b>patron</b>.",
+  card:"expecto + patronus, I look out for a protector"},
+ {id:"petrificus", spell:"PETRIFICUS TOTALUS", tier:3,
+  hoard:[["petra","rock"],["totus","whole"],["pater","father"],["tempus","time"],["tuba","trumpet"]],
+  parts:[{w:"petra", hl:"PETR"},{w:"totus", hl:"TOT"}],
+  opts:[["turns your whole body stiff as a rock"],
+        ["turns just your feet to rock","Close, but <i>totus</i> means the whole thing, not just the feet."],
+        ["makes time stand still","That would need <i>tempus</i>, time."]], a:0,
+  x:"<i>petra</i> (rock) + -<i>ficus</i> (from <i>facio</i>, I make) + <i>totus</i> (whole): make the whole thing rock. English has <b>petrify</b> and <b>total</b>. The name Peter means rock.",
+  card:"petra + totus, whole rock"}
+];
+
+/* ============================================================
+   SPELL BUILDER
+   Verbs are in the "I ..." form. Nouns: nom = dictionary form,
+   acc = the form for the thing a spell is cast on.
+   pat "us"/"a" = regular pattern the child can predict; "x" = changes more.
+   say = how a Roman would say it (C hard, V like W).
+   ============================================================ */
+var VERBS = [
+ {la:"accio",    en:"I summon",     tpl:"I summon {x}",       say:"AK-kee-oh"},
+ {la:"levo",     en:"I lift",       tpl:"I lift {x}",         say:"LEH-woh",      cousin:"levitate"},
+ {la:"protego",  en:"I protect",    tpl:"I protect {x}",      say:"PRO-teh-go",   cousin:"protect"},
+ {la:"confundo", en:"I confuse",    tpl:"I confuse {x}",      say:"kon-FOON-doh", cousin:"confuse"},
+ {la:"tergeo",   en:"I wipe clean", tpl:"I wipe {x} clean",   say:"TER-geh-oh",   cousin:"detergent"},
+ {la:"reparo",   en:"I mend",       tpl:"I mend {x}",         say:"REH-pa-roh",   cousin:"repair"},
+ {la:"occulto",  en:"I hide",       tpl:"I hide {x}",         say:"ok-KOOL-toh"},
+ {la:"terreo",   en:"I frighten",   tpl:"I frighten {x}",     say:"TER-reh-oh",   cousin:"terrify"}
+];
+var NOUNS = [
+ {nom:"lupus",    acc:"lupum",     lab:"wolf",           en:"the wolf",    pat:"us", say:"LOO-poom"},
+ {nom:"equus",    acc:"equum",     lab:"horse",          en:"the horse",   pat:"us", say:"EH-kwoom"},
+ {nom:"amicus",   acc:"amicum",    lab:"friend",         en:"my friend",   pat:"us", say:"a-MEE-koom"},
+ {nom:"rana",     acc:"ranam",     lab:"frog",           en:"the frog",    pat:"a",  say:"RAH-nam"},
+ {nom:"schola",   acc:"scholam",   lab:"school",         en:"the school",  pat:"a",  say:"SKOH-lam"},
+ {nom:"magistra", acc:"magistram", lab:"teacher (woman)",en:"the teacher", pat:"a",  say:"ma-GIS-tram"},
+ {nom:"magister", acc:"magistrum", lab:"teacher (man)",  en:"the teacher", pat:"x",  say:"ma-GIS-troom"},
+ {nom:"liber",    acc:"librum",    lab:"book",           en:"the book",    pat:"x",  say:"LIB-room"},
+ {nom:"canis",    acc:"canem",     lab:"dog",            en:"the dog",     pat:"x",  say:"KA-nem"},
+ {nom:"feles",    acc:"felem",     lab:"cat",            en:"the cat",     pat:"x",  say:"FAY-lem"},
+ {nom:"draco",    acc:"draconem",  lab:"dragon",         en:"the dragon",  pat:"x",  say:"dra-KOH-nem"},
+ {nom:"frater",   acc:"fratrem",   lab:"brother",        en:"my brother",  pat:"x",  say:"FRAH-trem"},
+ {nom:"soror",    acc:"sororem",   lab:"sister",         en:"my sister",   pat:"x",  say:"so-ROH-rem"},
+ {nom:"pater",    acc:"patrem",    lab:"father",         en:"my father",   pat:"x",  say:"PA-trem"},
+ {nom:"mater",    acc:"matrem",    lab:"mother",         en:"my mother",   pat:"x",  say:"MAH-trem"}
+];
+var ADVS = [
+ {la:"statim",    en:"at once",  say:"STAH-tim",       note:"Doctors on TV shout &lsquo;stat!&rsquo;: it is short for <i>statim</i>."},
+ {la:"celeriter", en:"quickly",  say:"keh-LEH-ri-ter", note:"From <i>celer</i>, fast, which gives us <b>accelerate</b>."},
+ {la:"lente",     en:"slowly",   say:"LEN-teh"},
+ {la:"subito",    en:"suddenly", say:"SOO-bi-toh"},
+ {la:"iterum",    en:"again",    say:"IT-eh-room",     note:"To <b>reiterate</b> is to say something again."}
+];
+
+/* ============================================================
+   HELPERS
+   ============================================================ */
+function toRoman(n){
+  var v=[1000,900,500,400,100,90,50,40,10,9,5,4,1], s=["M","CM","D","CD","C","XC","L","XL","X","IX","V","IV","I"], r="";
+  for (var i=0;i<v.length;i++){ while(n>=v[i]){ r+=s[i]; n-=v[i]; } }
+  return r;
+}
+var MON = ["Ian.","Feb.","Mart.","Apr.","Mai.","Iun.","Iul.","Aug.","Sept.","Oct.","Nov.","Dec."];
+var MON_EN = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+function isLeap(y){ return (y%4===0 && y%100!==0) || y%400===0; }
+/* Date in the Roman style: counted (inclusively) back from the Kalends, Nones or Ides */
+function romanDate(d){
+  var day=d.getDate(), m=d.getMonth(), y=d.getFullYear();
+  var nones=[2,4,6,9].indexOf(m)>=0 ? 7 : 5, ides=nones+8;
+  var dim=[31,isLeap(y)?29:28,31,30,31,30,31,31,30,31,30,31][m];
+  var M=MON[m], N=MON[(m+1)%12];
+  if (day===1) return "Kal. "+M;
+  if (day<nones) return day===nones-1 ? "prid. Non. "+M : "a.d. "+toRoman(nones-day+1)+" Non. "+M;
+  if (day===nones) return "Non. "+M;
+  if (day<ides) return day===ides-1 ? "prid. Id. "+M : "a.d. "+toRoman(ides-day+1)+" Id. "+M;
+  if (day===ides) return "Id. "+M;
+  var n;
+  if (m===1 && dim===29) {
+    if (day===24) return "a.d. bis VI Kal. "+N;
+    n = day<24 ? (28-day+2) : (29-day+2);
+  } else n = dim-day+2;
+  return n===2 ? "prid. Kal. "+N : "a.d. "+toRoman(n)+" Kal. "+N;
+}
+function romanDateExplain(d){
+  var day=d.getDate(), m=d.getMonth();
+  var nones=[2,4,6,9].indexOf(m)>=0 ? 7 : 5, ides=nones+8, what;
+  if (day===1) return "the Kalends: Romans called the 1st of each month the Kalends.";
+  if (day<=nones) what="the Nones ("+nones+" "+MON_EN[m]+")";
+  else if (day<=ides) what="the Ides ("+ides+" "+MON_EN[m]+")";
+  else what="the Kalends (1 "+MON_EN[(m+1)%12]+")";
+  if (day===nones || day===ides) return "Romans called this day "+what.replace(/ \(.*\)/,"")+".";
+  return "Romans counted the days before "+what+", counting both ends.";
+}
+function shuffle(a){ a=a.slice(); for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;} return a; }
+function esc(s){ return String(s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];}); }
+function range(n){ var a=[]; for(var i=0;i<n;i++) a.push(i); return a; }
+function cap(s){ return s.charAt(0).toUpperCase()+s.slice(1); }
+
+/* five spells: two warm-ups, two harder, one two-word finale */
+function buildDeck(){
+  var t1=shuffle(SPELLS.filter(function(s){return s.tier===1;}));
+  var t2=shuffle(SPELLS.filter(function(s){return s.tier===2;}));
+  var t3=shuffle(SPELLS.filter(function(s){return s.tier===3;}));
+  var first=t1[0];
+  var second=t1.slice(1).filter(function(s){ return !(first.group && s.group===first.group); })[0];
+  return [first, second, t2[0], t2[1], t3[0]];
+}
+function newRound(sp){
+  return {hoard:shuffle(range(sp.hoard.length)), found:{}, wrong:{}, off:{}, wrongs:0, nudge:0,
+          opt:shuffle(range(sp.opts.length)), picked:null, last:null};
+}
+
+/* ============================================================
+   STATE
+   ============================================================ */
+var S;
+function fresh(){
+  S = {view:"start", name:"", deck:buildDeck(), i:0, rounds:[], verb:null, noun:null, pred:null, predOpts:null, adv:undefined, order:null};
+  S.rounds = S.deck.map(newRound);
+}
+fresh();
+
+function isPart(sp,w){ return sp.parts.some(function(p){ return p.w===w; }); }
+function allFound(sp,R){ return sp.parts.every(function(p){ return R.found[p.w]; }); }
+function findOk(i){ var R=S.rounds[i]; return allFound(S.deck[i],R) ? R.wrongs===0 : null; }
+function doOk(i){ var R=S.rounds[i]; return R.picked===null ? null : R.picked===S.deck[i].a; }
+function score(){ var c=0; for (var i=0;i<ROUNDS;i++){ if (findOk(i)===true) c++; if (doOk(i)===true) c++; } return c; }
+function maxScore(){ return ROUNDS*2; }
+
+var screen = document.getElementById("screen");
+function show(v){ S.view=v; render(); window.scrollTo(0,0); try{ screen.focus({preventScroll:true}); }catch(e){} }
+
+/* top bar */
+function renderBar(){
+  var pips=document.getElementById("pips"), det=document.getElementById("det");
+  if (S.view==="start"){ pips.innerHTML=""; det.innerHTML=""; return; }
+  var inSpells = S.view==="spell";
+  pips.innerHTML = range(ROUNDS).map(function(k){
+    var cls = (!inSpells || k<S.i) ? "done" : (k===S.i ? "now" : "");
+    return '<div class="pip '+cls+'">'+toRoman(k+1)+'</div>';
+  }).join("") + '<div class="pip '+(inSpells?"":"now")+'">&#9733;</div>';
+  var gems="";
+  for (var i=0;i<ROUNDS;i++){ [findOk(i),doOk(i)].forEach(function(v){ gems+='<span class="gem '+(v===true?"on":(v===false?"off":""))+'"></span>'; }); }
+  det.innerHTML = '<span class="lbl">Spell points</span><span class="gems">'+gems+'</span>';
+  det.setAttribute("aria-label","Spell points: "+score()+" of "+maxScore());
+}
+
+function render(){
+  renderBar();
+  ({start:rStart, spell:rSpell, verb:rVerb, noun:rNoun, adv:rAdv, card:rCard})[S.view]();
+}
+
+/* ============================================================
+   START
+   ============================================================ */
+function rStart(){
+  screen.innerHTML =
+   '<h1>Spell School</h1>'+
+   '<p class="lead">Lots of the spells in the Harry Potter books are built from Latin, the language of the Romans. Once you know the Latin, you can work out what a spell does.</p>'+
+   '<div class="example"><div class="sp"><u>LUM</u>OS</div><div class="arrow" aria-hidden="true">&rarr;</div><div class="w"><b>lumen</b><span>light</span></div><div class="arrow" aria-hidden="true">&rarr;</div><div class="w"><b>LUMOS</b><span>makes a light</span></div></div>'+
+   '<ol class="howto">'+
+     '<li>Each spell comes with a word-hoard of Latin words. Find the word the spell is built from. Some are look-alikes.</li>'+
+     '<li>Use what the Latin means to work out what the spell does.</li>'+
+     '<li>After five spells, make up a real Latin spell of your own.</li>'+
+   '</ol>'+
+   '<div class="next" style="justify-content:center"><button class="big" id="begin" type="button">Open the spell book &rarr;</button></div>';
+  document.getElementById("begin").onclick=function(){ S.i=0; show("spell"); };
+}
+
+/* ============================================================
+   SPELL ROUNDS
+   ============================================================ */
+function spellLetters(sp,R){
+  var s=sp.spell, lit=[];
+  sp.parts.forEach(function(p){ if (R.found[p.w]) { var at=s.indexOf(p.hl); for (var k=at;k<at+p.hl.length;k++) lit[k]=true; } });
+  var html="", pos=0;
+  s.split(" ").forEach(function(word){
+    html+='<span class="wd">';
+    for (var k=0;k<word.length;k++) html+='<span class="ch'+(lit[pos+k]?' hl':'')+'">'+word.charAt(k)+'</span>';
+    html+='</span>';
+    pos+=word.length+1;
+  });
+  return html;
+}
+
+var LOCK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>';
+
+function rSpell(){
+  var sp=S.deck[S.i], R=S.rounds[S.i], done=allFound(sp,R), n=sp.parts.length;
+  var left = n - sp.parts.filter(function(p){return R.found[p.w];}).length;
+
+  var cards = R.hoard.map(function(h){
+    var w=sp.hoard[h][0], m=sp.hoard[h][1];
+    var cls = R.found[w] ? " hit" : (R.wrong[w] ? " miss" : (R.off[w] ? " off" : ""));
+    if (R.last===w && R.wrong[w]) cls+=" shake";
+    var dis = done || R.found[w] || R.wrong[w] || R.off[w];
+    return '<button class="hw'+cls+'" type="button" data-w="'+w+'"'+(dis?" disabled":"")+' aria-pressed="'+(R.found[w]?"true":"false")+'"><b>'+w+'</b><span>'+m+'</span></button>';
+  }).join("");
+
+  var fb="", fbc="";
+  if (R.last){
+    var lw=R.last, lm=sp.hoard.filter(function(h){return h[0]===lw;})[0][1];
+    if (R.found[lw]){
+      fbc="y";
+      fb = done ? 'Yes! '+(n>1?'You found both words. ':'')+'<b>'+lw+'</b> means <i>'+lm+'</i>.' : 'Yes! <b>'+lw+'</b> means <i>'+lm+'</i>. Now find the other one.';
+    } else {
+      fbc="n";
+      fb = '<b>'+lw+'</b> ('+lm+') is not in this spell. Look at the letters again.';
+    }
+  }
+
+  var nudge="";
+  if (!done){
+    var target = sp.parts.filter(function(p){return !R.found[p.w];})[0];
+    if (R.nudge>=1) nudge += '<div class="nudgebox">Two wrong words have faded out.'+(R.nudge>=2 ? ' The word you need starts <b>'+uniquePrefix(sp,R,target.w).toUpperCase()+'&hellip;</b>' : '')+'</div>';
+    if (R.nudge<2) nudge += '<button class="link nudge" id="nudge" type="button">Need a nudge?</button>';
+  }
+
+  var rightCol;
+  if (!done){
+    rightCol = '<div class="locked">'+LOCK+'<p>Find the Latin first.<br>Then you can work out what the spell does.</p></div>';
+  } else {
+    var picked=R.picked!==null;
+    var found = sp.parts.map(function(p){ var m=sp.hoard.filter(function(h){return h[0]===p.w;})[0][1]; return '<div><b>'+p.w+'</b> = '+m+'</div>'; }).join("");
+    var opts = R.opt.map(function(k){
+      var cls="";
+      if (picked){ if (k===sp.a) cls=" right"; else if (k===R.picked) cls=" wrong"; else cls=" fade"; }
+      return '<button class="opt'+cls+'" type="button" data-k="'+k+'"'+(picked?" disabled":"")+'>'+cap(sp.opts[k][0])+'</button>';
+    }).join("");
+    var ex="";
+    if (picked){
+      var ok = R.picked===sp.a;
+      ex = '<div class="explain pop" aria-live="polite"><div class="verdict '+(ok?'y">Spell cracked!':'n">Not quite.')+'</div>'+
+           (ok ? '' : '<p>'+sp.opts[R.picked][1]+' '+sp.spell+' '+sp.opts[sp.a][0]+'.</p>')+
+           '<p>'+sp.x+'</p></div>'+
+           '<div class="next"><button class="big" id="nextbtn" type="button">'+(S.i<ROUNDS-1?'Next spell &rarr;':'Make your own spell &rarr;')+'</button></div>';
+    }
+    rightCol = '<div class="doq'+(picked?'':' open')+'"><div class="qh">NOW WORK IT OUT</div>'+
+      '<div class="found">'+found+'</div>'+
+      '<div class="qq">So what does <span class="la">'+sp.spell+'</span> do?</div>'+
+      '<div class="opts">'+opts+'</div>'+ex+'</div>';
+  }
+
+  screen.innerHTML =
+   '<div class="spellgrid">'+
+    '<section class="book" aria-label="Spell '+(S.i+1)+' of '+ROUNDS+'">'+
+      '<div class="step">SPELL '+toRoman(S.i+1)+' OF '+toRoman(ROUNDS)+'</div>'+
+      '<div class="spell'+(done?' cast':'')+'" aria-label="'+sp.spell+'">'+spellLetters(sp,R)+'</div>'+
+      '<p class="task">'+(done ? 'Found it.' : (n===1 ? 'Which Latin word is this spell built from?' : 'This spell is built from <span class="n">two</span> Latin words. '+(left===2?'Find them both.':'Find the other one.')))+'</p>'+
+      '<div class="hoard" role="group" aria-label="Latin word-hoard">'+cards+'</div>'+
+      '<div class="fb '+fbc+'" aria-live="polite">'+fb+'</div>'+nudge+
+    '</section>'+
+    '<section aria-label="What does it do?">'+rightCol+'</section>'+
+   '</div>';
+
+  Array.prototype.forEach.call(screen.querySelectorAll(".hw"),function(b){ b.onclick=function(){ pickWord(b.getAttribute("data-w")); }; });
+  Array.prototype.forEach.call(screen.querySelectorAll(".opt"),function(b){ b.onclick=function(){ pickOpt(+b.getAttribute("data-k")); }; });
+  var nb=document.getElementById("nudge"); if (nb) nb.onclick=doNudge;
+  var nx=document.getElementById("nextbtn"); if (nx) nx.onclick=nextSpell;
+}
+
+function pickWord(w){
+  var sp=S.deck[S.i], R=S.rounds[S.i];
+  if (allFound(sp,R) || R.found[w] || R.wrong[w]) return;
+  R.last=w;
+  if (isPart(sp,w)) R.found[w]=true; else { R.wrong[w]=true; R.wrongs++; }
+  render();
+  var focusEl = allFound(sp,R) ? screen.querySelector(".opt") : screen.querySelector('.hw:not(:disabled)');
+  if (focusEl) try{ focusEl.focus({preventScroll:true}); }catch(e){}
+}
+function uniquePrefix(sp,R,w){
+  var others = sp.hoard.map(function(h){return h[0];}).filter(function(x){ return x!==w && !R.wrong[x] && !R.off[x] && !R.found[x]; });
+  for (var n=2;n<=w.length;n++){
+    var p=w.slice(0,n);
+    if (!others.some(function(x){ return x.slice(0,n)===p; })) return p;
+  }
+  return w;
+}
+function doNudge(){
+  var sp=S.deck[S.i], R=S.rounds[S.i];
+  R.nudge++;
+  if (R.nudge===1){
+    var decoys = shuffle(sp.hoard.map(function(h){return h[0];}).filter(function(w){ return !isPart(sp,w) && !R.wrong[w]; }));
+    decoys.slice(0,2).forEach(function(w){ R.off[w]=true; });
+  }
+  R.last=null;
+  render();
+  var nb=document.getElementById("nudge"); if (nb) try{ nb.focus({preventScroll:true}); }catch(e){}
+}
+function pickOpt(k){
+  var R=S.rounds[S.i];
+  if (R.picked!==null) return;
+  R.picked=k;
+  render();
+  var nx=document.getElementById("nextbtn"); if (nx) try{ nx.focus({preventScroll:true}); }catch(e){}
+}
+function nextSpell(){
+  if (S.i<ROUNDS-1){ S.i++; show("spell"); }
+  else show("verb");
+}
+
+/* ============================================================
+   BUILDER
+   ============================================================ */
+function brew(){
+  var v=S.verb, n=S.noun, a=S.adv;
+  var h='<span class="bw'+(v?'':' blank')+'">'+(v?v.la.toUpperCase():'?????')+'</span>';
+  if (S.view!=="verb") h+='<span class="bw'+(n?'':' blank')+'">'+(n ? (endingKnown() ? n.acc.slice(0,-2).toUpperCase()+'<u>'+n.acc.slice(-2).toUpperCase()+'</u>' : n.nom.toUpperCase()) : '?????')+'</span>';
+  if (a) h+='<span class="bw">'+a.la.toUpperCase()+'</span>';
+  return '<div class="brew" aria-label="Your spell so far">'+h+'</div>';
+}
+function endingKnown(){ return S.noun && (S.noun.pat==="x" || S.pred!==null); }
+
+function rVerb(){
+  var met = S.deck.filter(function(s){ return s.realO; }).map(function(s){ return '<b class="la">'+s.spell+'</b>'; });
+  var intro = met.length
+    ? 'Did you spot it? '+(met.length===1 ? met[0]+' is a real Latin word' : met.slice(0,-1).join(", ")+' and '+met[met.length-1]+' are real Latin words')+' ending in -o. '
+    : 'Lots of spells are real Latin words ending in -o, like <b class="la">ACCIO</b> and <b class="la">REPARO</b>. ';
+  screen.innerHTML =
+   '<div class="step">YOUR TURN</div>'+
+   '<h2>Make a real Latin spell</h2>'+
+   '<div class="tip">'+intro+'In Latin, -o on the end of a verb means &lsquo;I&rsquo;: <i>accio</i> = I summon, <i>reparo</i> = I mend. So Latin needs just one word where English needs two.</div>'+
+   brew()+
+   '<h3>1. What does your spell do?</h3>'+
+   '<div class="choices">'+VERBS.map(function(v,i){
+     return '<button class="choice'+(S.verb===v?' sel':'')+'" type="button" data-i="'+i+'"><span class="c1">'+v.la.toUpperCase()+'</span><span class="c2">'+v.en+'</span></button>';
+   }).join("")+'</div>';
+  Array.prototype.forEach.call(screen.querySelectorAll(".choice"),function(b){ b.onclick=function(){ S.verb=VERBS[+b.getAttribute("data-i")]; show("noun"); }; });
+}
+
+function rNoun(){
+  var n=S.noun, v=S.verb;
+  var h =
+   '<div class="step">YOUR TURN</div>'+
+   '<h2>Who or what is it cast on?</h2>'+
+   brew();
+  if (!n){
+    h += '<h3>2. Choose a target for <span class="la" style="color:var(--red)">'+v.la.toUpperCase()+'</span> ('+v.en+')</h3>'+
+      '<div class="choices nouns">'+NOUNS.map(function(x,i){
+        return '<button class="choice" type="button" data-i="'+i+'"><span class="c1">'+x.nom+'</span><span class="c2">'+x.lab+'</span></button>';
+      }).join("")+'</div>'+
+      '<div class="next" style="justify-content:flex-start"><button class="link" id="back" type="button">&larr; Choose a different spell word</button></div>';
+    screen.innerHTML=h;
+    Array.prototype.forEach.call(screen.querySelectorAll(".choice"),function(b){ b.onclick=function(){ chooseNoun(NOUNS[+b.getAttribute("data-i")]); }; });
+    document.getElementById("back").onclick=function(){ show("verb"); };
+    return;
+  }
+  h += '<div class="endbox'+(S.pred===null?' pop':'')+'">'+
+       '<p><b>Latin changes the end of a word when a spell is cast on it.</b> The new ending shows which word is on the receiving end.</p>';
+  if (n.pat!=="x"){
+    var ex = patExamples(n);
+    h += '<p style="margin-bottom:4px">Spot the pattern:</p><div class="pat">'+ex.map(function(e){
+          return '<div><b>'+e.nom+'</b><span class="to">&rarr;</span><b>'+e.acc.slice(0,-2)+'<u>'+e.acc.slice(-2)+'</u></b> <span class="small">('+e.lab+')</span></div>';
+        }).join("")+'</div>';
+    if (S.pred===null){
+      h += '<p class="qq" style="font-weight:700">So what does <b class="la" style="color:var(--red)">'+n.nom+'</b> become?</p>'+
+           '<div class="opts row3">'+S.predOpts.map(function(o){ return '<button class="opt" type="button" data-o="'+o+'">'+o+'</button>'; }).join("")+'</div>';
+    } else {
+      h += '<div class="opts row3">'+S.predOpts.map(function(o){
+             var cls = o===n.acc ? " right" : (o===S.predPick ? " wrong" : " fade");
+             return '<button class="opt'+cls+'" type="button" disabled>'+o+'</button>';
+           }).join("")+'</div>'+
+           '<div class="explain"><div class="verdict '+(S.pred?'y">Well spotted!':'n">Not quite.')+'</div><p>'+
+           (n.pat==="us" ? 'Words ending -us change to -um' : 'Words ending -a change to -am')+', so <b>'+n.nom+'</b> becomes <b>'+n.acc+'</b>.</p></div>';
+    }
+  } else {
+    h += '<div class="pat"><div><b>'+n.nom+'</b><span class="to">&rarr;</span><b>'+n.acc+'</b> <span class="small">('+n.lab+')</span></div></div>'+
+         '<p style="margin:0">Some words change more than their last letter, like <b>'+n.nom+'</b>, which becomes <b>'+n.acc+'</b>. Part of learning Latin is learning these.</p>';
+  }
+  h += '</div>';
+  var ready = endingKnown();
+  h += '<div class="next" style="justify-content:space-between"><button class="link" id="other" type="button">&larr; Choose someone else</button>'+
+       (ready ? '<button class="big" id="nextbtn" type="button">Next &rarr;</button>' : '')+'</div>';
+  screen.innerHTML=h;
+  Array.prototype.forEach.call(screen.querySelectorAll(".opt:not(:disabled)"),function(b){ b.onclick=function(){ predict(b.getAttribute("data-o")); }; });
+  document.getElementById("other").onclick=function(){ S.noun=null; S.pred=null; render(); };
+  var nx=document.getElementById("nextbtn"); if (nx) nx.onclick=function(){ show("adv"); };
+}
+function patExamples(n){
+  var same = NOUNS.filter(function(x){ return x.pat===n.pat && x!==n; });
+  var other = NOUNS.filter(function(x){ return x.pat!==n.pat && x.pat!=="x"; });
+  return shuffle(shuffle(same).slice(0,2).concat(shuffle(other).slice(0,1)));
+}
+function predOptions(n){
+  var stem = n.nom.slice(0, n.pat==="us" ? -2 : -1);
+  var wrongEnd = n.pat==="us" ? stem+"am" : stem+"um";
+  return shuffle([n.acc, wrongEnd, n.nom]);
+}
+function chooseNoun(n){
+  S.noun=n; S.pred=null; S.predPick=null;
+  S.predOpts = n.pat==="x" ? null : predOptions(n);
+  S.patEx = null;
+  render();
+  var f=screen.querySelector(".opt:not(:disabled)") || document.getElementById("nextbtn");
+  if (f) try{ f.focus({preventScroll:true}); }catch(e){}
+}
+function predict(o){
+  S.predPick=o; S.pred = (o===S.noun.acc);
+  render();
+  var nx=document.getElementById("nextbtn"); if (nx) try{ nx.focus({preventScroll:true}); }catch(e){}
+}
+
+function rAdv(){
+  screen.innerHTML =
+   '<div class="step">YOUR TURN</div>'+
+   '<h2>Add a magic word?</h2>'+
+   brew()+
+   '<h3>3. Say how or when the spell works</h3>'+
+   '<p class="small">These Latin words never change their endings, so you can put them anywhere.</p>'+
+   '<div class="choices">'+ADVS.map(function(a,i){
+     return '<button class="choice" type="button" data-i="'+i+'"><span class="c1">'+a.la.toUpperCase()+'</span><span class="c2">'+a.en+'</span></button>';
+   }).join("")+'<button class="choice none" type="button" data-i="-1"><span class="c2" style="font-weight:700">No thanks</span></button></div>'+
+   '<div class="next" style="justify-content:flex-start"><button class="link" id="back" type="button">&larr; Back</button></div>';
+  Array.prototype.forEach.call(screen.querySelectorAll(".choice"),function(b){ b.onclick=function(){
+    var i=+b.getAttribute("data-i"); S.adv = i<0 ? null : ADVS[i]; S.order=null; show("card");
+  }; });
+  document.getElementById("back").onclick=function(){ S.adv=undefined; show("noun"); };
+}
+
+/* ============================================================
+   RESULT + CARD
+   ============================================================ */
+function words(){
+  var w=[{la:S.verb.la, say:S.verb.say, k:"v"},{la:S.noun.acc, say:S.noun.say, k:"n"}];
+  if (S.adv) w.push({la:S.adv.la, say:S.adv.say, k:"a"});
+  return w;
+}
+function ordered(){ var w=words(); if (!S.order || S.order.length!==w.length) S.order=range(w.length); return S.order.map(function(i){ return w[i]; }); }
+function meaning(){ return S.verb.tpl.replace("{x}", S.noun.en) + (S.adv ? " "+S.adv.en : "") + "!"; }
+function spellText(){ return ordered().map(function(w){ return w.la.toUpperCase(); }).join(" "); }
+function reshuffle(){
+  var n=words().length, cur=S.order.join(","), next=cur, guard=0;
+  while (next===cur && guard<20){ next=shuffle(range(n)).join(","); guard++; }
+  S.order=next.split(",").map(Number);
+}
+
+function cardHTML(){
+  var now=new Date(), txt=spellText(), len=txt.length;
+  var sizeCls = len>26 ? " xl" : (len>18 ? " l" : "");
+  var qrsvg="";
+  try { var q=qrcode(0,"M"); q.addData(PARENT_URL); q.make(); qrsvg=q.createSvgTag({cellSize:4, margin:0, scalable:true}); } catch(err){}
+  var who = S.name ? 'A new Latin spell, invented by <b>'+esc(S.name)+'</b>' : 'A new Latin spell';
+  var n=S.noun, v=S.verb, a=S.adv;
+  var parts = [
+    {l:v.la.toUpperCase(), m:v.en, e:'The -o on the end means &lsquo;I&rsquo;.'},
+    {l:n.acc.toUpperCase(), m:n.en, e:n.nom+' changes to '+n.acc+' because the spell is cast on it.'}
+  ];
+  if (a) parts.push({l:a.la.toUpperCase(), m:a.en, e:'This kind of word never changes.'});
+  var sc=score(), mx=maxScore();
+  return '<div class="frame"></div><div class="mband t"></div><div class="mband b"></div>'+
+   '<div class="inner">'+
+    '<div class="top">'+
+      '<div class="civ">SCHOLA MAGICA<small>Spell School &middot; Latin at King Edward VI Five Ways</small></div>'+
+      '<div class="date">'+romanDate(now)+' '+toRoman(now.getFullYear())+
+        '<small>'+now.getDate()+' '+MON_EN[now.getMonth()]+' '+now.getFullYear()+'. '+romanDateExplain(now)+'</small></div>'+
+    '</div>'+
+    '<div class="mid">'+
+      '<div class="intro">'+who+'</div>'+
+      '<div class="full'+sizeCls+'">'+txt+'</div>'+
+      '<div class="cmean">&ldquo;'+meaning()+'&rdquo;</div>'+
+      '<div class="csay">Say it like a Roman: '+ordered().map(function(w){return w.say;}).join(" &middot; ")+'</div>'+
+      '<div class="parts">'+parts.map(function(p){
+        return '<div class="part"><div class="pl">'+p.l+'</div><div class="pm">'+p.m+'</div><div class="pe">'+p.e+'</div></div>';
+      }).join("")+'</div>'+
+    '</div>'+
+    '<div class="foot">'+
+      '<div class="cracked"><b class="h">SPELLS CRACKED</b>'+S.deck.map(function(s){
+        return '<div><span class="sn">'+s.spell+'</span> &middot; '+s.card+'</div>';
+      }).join("")+
+      '<div class="score">Spell points: <b>'+(sc?toRoman(sc):"nihil")+'</b> of <b>'+toRoman(mx)+'</b> ('+sc+' out of '+mx+')</div></div>'+
+      '<div class="qrb"><div><b>Latin at King Edward VI Five Ways</b>Scan to find out about<br>Latin from Year 8</div><div class="qr">'+qrsvg+'</div></div>'+
+    '</div>'+
+   '</div>';
+}
+
+function rCard(){
+  var ow = ordered();
+  screen.innerHTML =
+   '<div class="cardwrap">'+
+    '<div class="result">'+
+      '<div class="step">YOUR SPELL</div>'+
+      '<div class="castline" id="castline">'+ow.map(function(w){ return '<span>'+w.la.toUpperCase()+'</span>'; }).join("")+'</div>'+
+      '<p class="mean">&ldquo;'+meaning()+'&rdquo;</p>'+
+      '<p class="say">Say it like a Roman: <b>'+ow.map(function(w){return w.say;}).join(" ")+'</b><br><span class="small">Romans said C like K, and V like W.</span></p>'+
+      '<div class="next" style="justify-content:center;margin-top:6px"><button class="ghost" id="shuf" type="button">&#8646; Shuffle the words</button></div>'+
+      '<p class="shufnote" id="shufnote" aria-live="polite"></p>'+
+      (S.adv && S.adv.note ? '<p class="small" style="margin:0">'+S.adv.note+'</p>' : '')+
+      '<div class="namerow"><label for="nm">Your name for the card (you can leave it blank)</label><input type="text" id="nm" maxlength="24" autocomplete="off" spellcheck="false" placeholder="e.g. Amira"></div>'+
+      '<div class="cardbtns">'+
+        '<button class="ghost" id="another" type="button">Make another spell</button>'+
+        '<button class="ghost" id="restart" type="button">Start again</button>'+
+        '<button class="ghost" id="allgames" type="button">All games</button>'+
+      '</div>'+
+    '</div>'+
+    '<div class="card" id="card">'+cardHTML()+'</div>'+
+   '</div>';
+  var nm=document.getElementById("nm");
+  nm.value=S.name;
+  nm.addEventListener("input",function(){ S.name=nm.value.trim().slice(0,24); document.getElementById("card").innerHTML=cardHTML(); });
+  document.getElementById("shuf").onclick=function(){
+    reshuffle();
+    var o=ordered();
+    document.getElementById("castline").innerHTML=o.map(function(w){ return '<span>'+w.la.toUpperCase()+'</span>'; }).join("");
+    document.querySelector(".result .say b").textContent=o.map(function(w){return w.say;}).join(" ");
+    document.getElementById("shufnote").innerHTML='Still means &ldquo;'+meaning()+'&rdquo; In English the order of the words tells you who does what. In Latin the endings do: <b>'+S.noun.acc+'</b> is on the receiving end wherever it goes.';
+    document.getElementById("card").innerHTML=cardHTML();
+  };
+  document.getElementById("another").onclick=function(){ S.verb=null; S.noun=null; S.pred=null; S.adv=undefined; S.order=null; show("verb"); };
+  document.getElementById("restart").onclick=function(){ fresh(); show("start"); };
+  document.getElementById("allgames").onclick=function(){ LUDI.home(); };
+}
+
+document.getElementById("home").onclick=function(){ LUDI.home(); };
+render();
+
+/* for testing */
+window.SS = {S:function(){return S;}, uniquePrefix:uniquePrefix, data:{SPELLS:SPELLS,VERBS:VERBS,NOUNS:NOUNS,ADVS:ADVS}, score:score, buildDeck:buildDeck,
+  meaning:function(){return meaning();}, spellText:function(){return spellText();}, romanDate:romanDate, toRoman:toRoman, predOptions:predOptions};
+})();
+</script>
+</body>
+</html>

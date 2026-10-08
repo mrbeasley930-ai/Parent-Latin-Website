@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Root Detective · Ludi Romani</title>
+<meta name="description" content="Find the Latin root shared by four English words and unmask the impostor. A Latin at Five Ways open evening game.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Cinzel:wght@700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --red:#7a1810; --red-2:#9c2416; --red-3:#4a0d07;
+  --gold:#e8b64a; --gold-2:#c9922a; --gold-3:#f5d68a;
+  --cream:#f6ead0; --cream-2:#eadbb8; --ink:#2a140c; --ink-2:#5a3a2a;
+  --ok:#2f6b3a; --ok-bg:#dcebd5; --bad:#9c2416; --bad-bg:#f6d9d2;
+  --shadow:#2a0805;
+  --meander:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='24' viewBox='0 0 32 24'%3E%3Cpath d='M-6 20H6V4H22V12H14V20H38' fill='none' stroke='%23e8b64a' stroke-width='3' stroke-linecap='square'/%3E%3C/svg%3E");
+  --meander-red:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='24' viewBox='0 0 32 24'%3E%3Cpath d='M-6 20H6V4H22V12H14V20H38' fill='none' stroke='%237a1810' stroke-width='3' stroke-linecap='square'/%3E%3C/svg%3E");
+  --display:Cinzel,"Trajan Pro",Georgia,serif;
+  --body:"Atkinson Hyperlegible",Verdana,system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+html{background:var(--red-3)}
+body{margin:0;min-height:100vh;display:flex;flex-direction:column;font-family:var(--body);color:var(--ink);
+  background:radial-gradient(120% 90% at 50% 0%,var(--red-2) 0%,var(--red) 45%,var(--red-3) 100%) no-repeat var(--red-3);-webkit-font-smoothing:antialiased}
+button{font-family:inherit}
+.band{height:18px;flex:none;background:#2a120b var(--meander) repeat-x center/24px 18px;border-bottom:3px solid var(--gold-2)}
+
+/* top bar */
+.bar{display:flex;align-items:center;gap:12px;padding:10px clamp(12px,2vw,24px);color:var(--cream)}
+.homebtn{background:var(--ink);color:var(--gold-3);border:2px solid var(--gold-2);border-radius:999px;padding:8px 15px;font-weight:700;font-size:.95rem;cursor:pointer;box-shadow:0 3px 0 #000;white-space:nowrap}
+.homebtn:hover{background:#000}
+.title{font-family:var(--display);font-weight:900;color:var(--gold);font-size:clamp(1.05rem,2.4vw,1.45rem);letter-spacing:.05em;text-shadow:0 2px 0 var(--shadow);white-space:nowrap}
+.pips{display:flex;gap:6px;margin-left:auto;margin-right:auto}
+.pip{font-family:var(--display);font-weight:900;font-size:.8rem;min-width:34px;height:30px;padding:0 6px;border-radius:8px;display:flex;align-items:center;justify-content:center;
+  border:2px solid rgba(232,182,74,.45);color:rgba(245,214,138,.6)}
+.pip.done{background:var(--gold-2);border-color:var(--gold-2);color:var(--ink)}
+.pip.now{border-color:var(--gold);color:var(--gold-3);box-shadow:0 0 0 2px var(--gold)}
+.det{display:flex;align-items:center;gap:8px;font-weight:700;font-size:.9rem;white-space:nowrap}
+.det .gems{display:flex;gap:4px}
+.gem{width:13px;height:13px;transform:rotate(45deg);border:2px solid var(--gold);border-radius:3px}
+.gem.on{background:var(--gold)}
+.gem.off{border-color:rgba(232,182,74,.4);background:rgba(0,0,0,.25)}
+
+/* stage */
+main{flex:1;display:flex;align-items:flex-start;justify-content:center;padding:4px clamp(12px,2vw,24px) 24px}
+.panel{width:100%;max-width:1100px;background:var(--cream);border:3px solid var(--ink);border-radius:16px;padding:clamp(16px,3vh,28px) clamp(16px,3vw,34px);
+  box-shadow:0 8px 0 var(--shadow),inset 0 0 0 4px var(--cream),inset 0 0 0 6px var(--gold-2)}
+.panel:focus{outline:none}
+h1,h2,h3{font-family:var(--display);font-weight:900;color:var(--red-3);margin:0 0 .35em;line-height:1.12}
+h1{font-size:clamp(1.9rem,4.6vw,2.9rem)}
+h2{font-size:clamp(1.35rem,3vw,1.9rem)}
+h3{font-size:clamp(1.05rem,2.2vw,1.3rem)}
+.step{font-family:var(--display);font-weight:900;color:var(--gold-2);letter-spacing:.1em;font-size:.95rem;margin-bottom:4px}
+p{margin:0 0 .8em;font-size:clamp(1rem,1.9vw,1.15rem);line-height:1.45}
+.lead{color:var(--ink-2)}
+.small{font-size:.9rem;color:var(--ink-2)}
+.la{font-family:var(--display);font-weight:700}
+
+.big{background:var(--red);color:var(--gold-3);border:3px solid var(--ink);border-radius:999px;padding:12px 28px;font-family:var(--display);font-weight:900;font-size:1.15rem;letter-spacing:.06em;cursor:pointer;box-shadow:0 5px 0 var(--shadow)}
+.big:hover{background:var(--red-2)}
+.big:active{transform:translateY(3px);box-shadow:0 2px 0 var(--shadow)}
+.big:focus-visible,.choice:focus-visible,.opt:focus-visible,.link:focus-visible,.hw:focus-visible,.ghost:focus-visible{outline:3px solid var(--gold);outline-offset:3px}
+.ghost{background:transparent;color:var(--red);border:2px solid var(--red);border-radius:999px;padding:10px 20px;font-weight:700;font-size:1rem;cursor:pointer}
+.ghost:hover{background:#fff}
+.link{background:none;border:0;color:var(--red);text-decoration:underline;font-weight:700;font-size:.95rem;cursor:pointer;padding:6px 0}
+.next{margin-top:14px;display:flex;justify-content:flex-end;gap:12px;flex-wrap:wrap;align-items:center}
+
+
+/* start */
+.example{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:10px 14px;margin:18px 0 20px}
+.example .exw{display:flex;flex-direction:column;gap:4px;background:var(--ink);border:3px solid var(--gold-2);border-radius:12px;padding:8px 20px}
+.example .exw span{font-family:var(--display);font-weight:900;font-size:clamp(1.2rem,2.8vw,1.6rem);color:rgba(246,234,208,.7);letter-spacing:.06em}
+.example .exw u{text-decoration:none;color:var(--gold-3);border-bottom:4px solid var(--gold)}
+.example .arrow{font-size:1.8rem;color:var(--ink-2)}
+.example .w{text-align:center;background:#fff;border:2px solid var(--cream-2);border-radius:12px;padding:8px 18px}
+.example .w b{display:block;font-family:var(--display);font-weight:900;font-size:1.5rem;color:var(--red)}
+.example .w span{font-size:.95rem;color:var(--ink-2)}
+.howto{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:0 0 14px;padding:0;list-style:none;counter-reset:h}
+.howto li{background:#fff;border:2px solid var(--cream-2);border-radius:12px;padding:10px 14px;font-size:1rem;line-height:1.4;counter-increment:h}
+.howto li::before{content:counter(h,upper-roman);display:block;font-family:var(--display);font-weight:900;color:var(--gold-2);font-size:1.1rem}
+
+/* case */
+.casehead{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:8px 16px;margin-bottom:12px}
+.casehead h2{margin:0}
+.root{font-family:var(--display);font-weight:900;color:var(--red);letter-spacing:.06em}
+.steps{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:6px}
+.steps li{font-size:.85rem;font-weight:700;padding:4px 10px;border-radius:999px;border:2px solid var(--cream-2);color:var(--ink-2);background:#fff}
+.steps li.now{border-color:var(--red);color:var(--red)}
+.steps li.done{background:var(--ok-bg);border-color:#58a36a;color:var(--ok)}
+.board{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.suspect{position:relative;background:var(--ink);border:3px solid var(--gold-2);border-radius:14px;padding:8px 12px 12px;box-shadow:0 5px 0 #000;min-width:0}
+.suspect .sno{font-family:var(--display);font-weight:900;font-size:.78rem;letter-spacing:.12em;color:var(--gold);margin-bottom:6px}
+.letters{display:flex;flex-wrap:nowrap;gap:3px;justify-content:center}
+.lt{flex:0 1 2.3rem;min-width:0;height:2.7rem;display:flex;align-items:center;justify-content:center;font-family:var(--display);font-weight:900;font-size:clamp(.95rem,2.1vw,1.45rem);text-transform:uppercase;
+  background:rgba(246,234,208,.1);color:var(--cream);border:2px solid rgba(232,182,74,.35);border-radius:7px;padding:0}
+button.lt{cursor:pointer}
+button.lt:hover{border-color:var(--gold);background:rgba(246,234,208,.2)}
+button.lt:focus-visible{outline:3px solid var(--gold-3);outline-offset:2px}
+.lt.sel{background:var(--cream);color:var(--red-3);border-color:var(--gold-3)}
+.lt.hl{background:var(--gold);color:var(--ink);border-color:var(--gold-3)}
+.suspect.pick{cursor:pointer;transition:transform .1s}
+.suspect.pick:hover{transform:translateY(-2px);border-color:var(--gold-3)}
+.suspect.pick:focus-visible{outline:3px solid var(--gold-3);outline-offset:3px}
+.suspect.honest,.suspect.faded{opacity:.55;border-color:#58a36a}
+.suspect.caught{border-color:var(--bad);background:#3a0c06}
+.stamp{position:absolute;top:6px;right:10px;font-family:var(--display);font-weight:900;font-size:.8rem;letter-spacing:.12em;color:#fff;background:var(--bad);border-radius:6px;padding:2px 8px;transform:rotate(3deg)}
+.stamp.ok{background:var(--ok)}
+.gloss{margin-top:8px;color:var(--cream-2);font-size:.95rem;line-height:1.35;text-align:center}
+.gloss i{color:var(--gold-3)}
+.caught .gloss{color:#f6bcb0}
+
+.desk{margin-top:16px;background:#fff;border:3px solid var(--ink);border-radius:14px;padding:14px 18px 14px;box-shadow:0 6px 0 var(--ink-2)}
+.task{font-size:1.1rem;font-weight:400;margin:0 0 10px}
+.selrow{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.selbox{flex:1 1 180px;min-height:52px;display:flex;align-items:center;gap:4px;padding:6px 10px;border:3px dashed var(--cream-2);border-radius:12px;background:var(--cream)}
+.selbox span{font-family:var(--display);font-weight:900;font-size:1.5rem;color:var(--red-3);background:#fff;border:2px solid var(--gold-2);border-radius:6px;min-width:1.8rem;text-align:center}
+.selbox em{color:var(--ink-2)}
+.big.sm{padding:9px 22px;font-size:1rem}
+.big:disabled,.ghost:disabled{opacity:.45;cursor:default}
+.fb{min-height:1.4em;margin-top:10px;font-size:1.02rem;line-height:1.4}
+.fb.n{color:var(--bad)}
+.nudges{margin-top:6px}
+.nudgebox{margin-top:6px;background:var(--cream);border-left:4px solid var(--gold-2);border-radius:6px;padding:7px 10px;font-size:1rem}
+.caught-note{background:var(--bad-bg);border-left:5px solid var(--bad);border-radius:8px;padding:8px 12px;margin-bottom:10px;font-size:1rem;line-height:1.4}
+.typerow{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+input[type=text]{font:inherit;font-size:1.2rem;padding:10px 12px;border:2px solid var(--ink-2);border-radius:10px;background:#fff;min-width:0;width:min(320px,100%)}
+input[type=text]:focus{outline:3px solid var(--gold);outline-offset:1px}
+.vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.opts{display:grid;gap:9px;grid-template-columns:repeat(3,1fr)}
+.opt{background:var(--cream);color:var(--ink);border:3px solid var(--cream-2);border-radius:10px;padding:11px 14px;font-size:1.08rem;font-weight:700;cursor:pointer}
+.opt:hover:not(:disabled){border-color:var(--gold)}
+.opt.wrong{background:var(--bad-bg);border-color:var(--bad);color:var(--bad);cursor:default}
+.solved p{font-size:1.08rem}
+.rootline{font-size:1.2rem !important}
+.rootline .la{color:var(--red-3)}
+.verdict{font-family:var(--display);font-weight:900;font-size:1.15rem;margin-bottom:6px}
+.verdict.y{color:var(--ok)}
+
+/* end */
+.endgrid{display:grid;grid-template-columns:1fr 1.2fr;gap:20px;align-items:start}
+.rank{text-align:center;background:var(--ink);color:var(--cream);border:3px solid var(--gold-2);border-radius:14px;padding:18px;box-shadow:0 6px 0 #000}
+.rank .step{color:var(--gold)}
+.rla{font-family:var(--display);font-weight:900;font-size:clamp(1.8rem,4.4vw,2.8rem);color:var(--gold);letter-spacing:.07em;line-height:1.1;text-shadow:0 0 14px rgba(232,182,74,.5)}
+.ren{font-size:1.1rem;color:var(--cream-2);margin-bottom:10px}
+.rsc{margin:8px 0}
+.rsc .la{color:var(--gold-3)}
+.rank .small{color:var(--cream-2)}
+.rank .small i,.rank .small b{color:var(--gold-3)}
+.casebook{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.casebook li{background:#fff;border:2px solid var(--cream-2);border-radius:10px;padding:8px 12px}
+.cbh{font-size:1.05rem}
+.cbh .la{color:var(--red-3)}
+.cbw{font-size:.95rem;color:var(--ink-2);margin-top:2px}
+.cbw u{text-decoration:none;font-weight:700;color:var(--red);border-bottom:2px solid var(--gold)}
+.cbw s{color:var(--bad)}
+.grown{display:flex;align-items:center;justify-content:center;gap:14px;margin:4px auto 0;max-width:520px;font-size:1rem;color:var(--ink-2)}
+.grown .qr{width:84px;height:84px;flex:none;background:#fff;padding:4px;border-radius:6px}
+.grown .qr svg{width:100%;height:100%;display:block}
+
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
+@keyframes pop{0%{transform:scale(.95);opacity:0}100%{transform:scale(1);opacity:1}}
+@media (prefers-reduced-motion:no-preference){ .shake{animation:shake .4s} .pop{animation:pop .25s ease-out} }
+
+@media (max-width:900px){
+  .pips{display:none}
+  .title{margin-right:auto}
+  .board{grid-template-columns:1fr}
+  .endgrid{grid-template-columns:1fr}
+}
+@media (max-width:640px){
+  .howto{grid-template-columns:1fr}
+  .opts{grid-template-columns:1fr}
+  .det .lbl{display:none}
+  .title{font-size:1rem}
+  .bar{flex-wrap:wrap;row-gap:8px}
+  .det{margin-left:auto}
+  .lt{height:2.3rem}
+  .panel{padding:14px 12px}
+  .desk{padding:12px}
+}
+@media print{ body{display:none !important} }
+
+/* idle (only used when this page is opened on its own, not inside the hub) */
+#idle{position:fixed;inset:0;z-index:80;display:flex;align-items:center;justify-content:center;background:rgba(26,8,4,.78);cursor:pointer}
+#idle[hidden]{display:none}
+#idle .box{background:var(--cream);border:4px solid var(--ink);border-radius:18px;padding:28px 34px;text-align:center;max-width:440px;margin:16px;box-shadow:0 8px 0 var(--shadow),inset 0 0 0 4px var(--cream),inset 0 0 0 7px var(--gold-2)}
+#idle .count{font-family:var(--display);font-weight:900;font-size:3rem;color:var(--red-3);line-height:1.1}
+</style>
+</head>
+<body>
+<div class="band" aria-hidden="true"></div>
+<div class="bar">
+  <button class="homebtn" id="home" type="button">&#8962; All games</button>
+  <div class="title">Root Detective</div>
+  <div class="pips" id="pips" aria-hidden="true"></div>
+  <div class="det" id="det"></div>
+</div>
+<main><div class="panel" id="screen" tabindex="-1"></div></main>
+
+<div id="idle" hidden role="alertdialog" aria-labelledby="idleh">
+  <div class="box">
+    <h2 id="idleh">Still playing?</h2>
+    <p>Tap anywhere to keep going.</p>
+    <div class="count" id="idlecount">15</div>
+    <p class="small">Otherwise the game goes back to the start for the next family.</p>
+  </div>
+</div>
+<script>
+/* QR Code Generator for JavaScript. Copyright (c) 2009 Kazuhiko Arase. MIT licence. https://github.com/kazuhikoarase/qrcode-generator */
+var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],f={},c=function(t,r){o=function(t){for(var r=new Array(t),e=0;e<t;e+=1){r[e]=new Array(t);for(var n=0;n<t;n+=1)r[e][n]=null}return r}(i=4*e+17),l(0,0),l(i-7,0),l(0,i-7),s(),h(),d(t,r),e>=7&&v(t),null==a&&(a=p(e,n,u)),w(a,r)},l=function(t,r){for(var e=-1;e<=7;e+=1)if(!(t+e<=-1||i<=t+e))for(var n=-1;n<=7;n+=1)r+n<=-1||i<=r+n||(o[t+e][r+n]=0<=e&&e<=6&&(0==n||6==n)||0<=n&&n<=6&&(0==e||6==e)||2<=e&&e<=4&&2<=n&&n<=4)},h=function(){for(var t=8;t<i-8;t+=1)null==o[t][6]&&(o[t][6]=t%2==0);for(var r=8;r<i-8;r+=1)null==o[6][r]&&(o[6][r]=r%2==0)},s=function(){for(var t=B.getPatternPosition(e),r=0;r<t.length;r+=1)for(var n=0;n<t.length;n+=1){var i=t[r],a=t[n];if(null==o[i][a])for(var u=-2;u<=2;u+=1)for(var f=-2;f<=2;f+=1)o[i+u][a+f]=-2==u||2==u||-2==f||2==f||0==u&&0==f}},v=function(t){for(var r=B.getBCHTypeNumber(e),n=0;n<18;n+=1){var a=!t&&1==(r>>n&1);o[Math.floor(n/3)][n%3+i-8-3]=a}for(n=0;n<18;n+=1){a=!t&&1==(r>>n&1);o[n%3+i-8-3][Math.floor(n/3)]=a}},d=function(t,r){for(var e=n<<3|r,a=B.getBCHTypeInfo(e),u=0;u<15;u+=1){var f=!t&&1==(a>>u&1);u<6?o[u][8]=f:u<8?o[u+1][8]=f:o[i-15+u][8]=f}for(u=0;u<15;u+=1){f=!t&&1==(a>>u&1);u<8?o[8][i-u-1]=f:u<9?o[8][15-u-1+1]=f:o[8][15-u-1]=f}o[i-8][8]=!t},w=function(t,r){for(var e=-1,n=i-1,a=7,u=0,f=B.getMaskFunction(r),c=i-1;c>0;c-=2)for(6==c&&(c-=1);;){for(var g=0;g<2;g+=1)if(null==o[n][c-g]){var l=!1;u<t.length&&(l=1==(t[u]>>>a&1)),f(n,c-g)&&(l=!l),o[n][c-g]=l,-1==(a-=1)&&(u+=1,a=7)}if((n+=e)<0||i<=n){n-=e,e=-e;break}}},p=function(t,r,e){for(var n=A.getRSBlocks(t,r),o=b(),i=0;i<e.length;i+=1){var a=e[i];o.put(a.getMode(),4),o.put(a.getLength(),B.getLengthInBits(a.getMode(),t)),a.write(o)}var u=0;for(i=0;i<n.length;i+=1)u+=n[i].dataCount;if(o.getLengthInBits()>8*u)throw"code length overflow. ("+o.getLengthInBits()+">"+8*u+")";for(o.getLengthInBits()+4<=8*u&&o.put(0,4);o.getLengthInBits()%8!=0;)o.putBit(!1);for(;!(o.getLengthInBits()>=8*u||(o.put(236,8),o.getLengthInBits()>=8*u));)o.put(17,8);return function(t,r){for(var e=0,n=0,o=0,i=new Array(r.length),a=new Array(r.length),u=0;u<r.length;u+=1){var f=r[u].dataCount,c=r[u].totalCount-f;n=Math.max(n,f),o=Math.max(o,c),i[u]=new Array(f);for(var g=0;g<i[u].length;g+=1)i[u][g]=255&t.getBuffer()[g+e];e+=f;var l=B.getErrorCorrectPolynomial(c),h=k(i[u],l.getLength()-1).mod(l);for(a[u]=new Array(l.getLength()-1),g=0;g<a[u].length;g+=1){var s=g+h.getLength()-a[u].length;a[u][g]=s>=0?h.getAt(s):0}}var v=0;for(g=0;g<r.length;g+=1)v+=r[g].totalCount;var d=new Array(v),w=0;for(g=0;g<n;g+=1)for(u=0;u<r.length;u+=1)g<i[u].length&&(d[w]=i[u][g],w+=1);for(g=0;g<o;g+=1)for(u=0;u<r.length;u+=1)g<a[u].length&&(d[w]=a[u][g],w+=1);return d}(o,n)};f.addData=function(t,r){var e=null;switch(r=r||"Byte"){case"Numeric":e=M(t);break;case"Alphanumeric":e=x(t);break;case"Byte":e=m(t);break;case"Kanji":e=L(t);break;default:throw"mode:"+r}u.push(e),a=null},f.isDark=function(t,r){if(t<0||i<=t||r<0||i<=r)throw t+","+r;return o[t][r]},f.getModuleCount=function(){return i},f.make=function(){if(e<1){for(var t=1;t<40;t++){for(var r=A.getRSBlocks(t,n),o=b(),i=0;i<u.length;i++){var a=u[i];o.put(a.getMode(),4),o.put(a.getLength(),B.getLengthInBits(a.getMode(),t)),a.write(o)}var g=0;for(i=0;i<r.length;i++)g+=r[i].dataCount;if(o.getLengthInBits()<=8*g)break}e=t}c(!1,function(){for(var t=0,r=0,e=0;e<8;e+=1){c(!0,e);var n=B.getLostPoint(f);(0==e||t>n)&&(t=n,r=e)}return r}())},f.createTableTag=function(t,r){t=t||2;var e="";e+='<table style="',e+=" border-width: 0px; border-style: none;",e+=" border-collapse: collapse;",e+=" padding: 0px; margin: "+(r=void 0===r?4*t:r)+"px;",e+='">',e+="<tbody>";for(var n=0;n<f.getModuleCount();n+=1){e+="<tr>";for(var o=0;o<f.getModuleCount();o+=1)e+='<td style="',e+=" border-width: 0px; border-style: none;",e+=" border-collapse: collapse;",e+=" padding: 0px; margin: 0px;",e+=" width: "+t+"px;",e+=" height: "+t+"px;",e+=" background-color: ",e+=f.isDark(n,o)?"#000000":"#ffffff",e+=";",e+='"/>';e+="</tr>"}return e+="</tbody>",e+="</table>"},f.createSvgTag=function(t,r,e,n){var o={};"object"==typeof arguments[0]&&(t=(o=arguments[0]).cellSize,r=o.margin,e=o.alt,n=o.title),t=t||2,r=void 0===r?4*t:r,(e="string"==typeof e?{text:e}:e||{}).text=e.text||null,e.id=e.text?e.id||"qrcode-description":null,(n="string"==typeof n?{text:n}:n||{}).text=n.text||null,n.id=n.text?n.id||"qrcode-title":null;var i,a,u,c,g=f.getModuleCount()*t+2*r,l="";for(c="l"+t+",0 0,"+t+" -"+t+",0 0,-"+t+"z ",l+='<svg version="1.1" xmlns="http://www.w3.org/2000/svg"',l+=o.scalable?"":' width="'+g+'px" height="'+g+'px"',l+=' viewBox="0 0 '+g+" "+g+'" ',l+=' preserveAspectRatio="xMinYMin meet"',l+=n.text||e.text?' role="img" aria-labelledby="'+y([n.id,e.id].join(" ").trim())+'"':"",l+=">",l+=n.text?'<title id="'+y(n.id)+'">'+y(n.text)+"</title>":"",l+=e.text?'<description id="'+y(e.id)+'">'+y(e.text)+"</description>":"",l+='<rect width="100%" height="100%" fill="white" cx="0" cy="0"/>',l+='<path d="',a=0;a<f.getModuleCount();a+=1)for(u=a*t+r,i=0;i<f.getModuleCount();i+=1)f.isDark(a,i)&&(l+="M"+(i*t+r)+","+u+c);return l+='" stroke="transparent" fill="black"/>',l+="</svg>"},f.createDataURL=function(t,r){t=t||2,r=void 0===r?4*t:r;var e=f.getModuleCount()*t+2*r,n=r,o=e-r;return I(e,e,function(r,e){if(n<=r&&r<o&&n<=e&&e<o){var i=Math.floor((r-n)/t),a=Math.floor((e-n)/t);return f.isDark(a,i)?0:1}return 1})},f.createImgTag=function(t,r,e){t=t||2,r=void 0===r?4*t:r;var n=f.getModuleCount()*t+2*r,o="";return o+="<img",o+=' src="',o+=f.createDataURL(t,r),o+='"',o+=' width="',o+=n,o+='"',o+=' height="',o+=n,o+='"',e&&(o+=' alt="',o+=y(e),o+='"'),o+="/>"};var y=function(t){for(var r="",e=0;e<t.length;e+=1){var n=t.charAt(e);switch(n){case"<":r+="&lt;";break;case">":r+="&gt;";break;case"&":r+="&amp;";break;case'"':r+="&quot;";break;default:r+=n}}return r};return f.createASCII=function(t,r){if((t=t||1)<2)return function(t){t=void 0===t?2:t;var r,e,n,o,i,a=1*f.getModuleCount()+2*t,u=t,c=a-t,g={"██":"█","█ ":"▀"," █":"▄","  ":" "},l={"██":"▀","█ ":"▀"," █":" ","  ":" "},h="";for(r=0;r<a;r+=2){for(n=Math.floor((r-u)/1),o=Math.floor((r+1-u)/1),e=0;e<a;e+=1)i="█",u<=e&&e<c&&u<=r&&r<c&&f.isDark(n,Math.floor((e-u)/1))&&(i=" "),u<=e&&e<c&&u<=r+1&&r+1<c&&f.isDark(o,Math.floor((e-u)/1))?i+=" ":i+="█",h+=t<1&&r+1>=c?l[i]:g[i];h+="\n"}return a%2&&t>0?h.substring(0,h.length-a-1)+Array(a+1).join("▀"):h.substring(0,h.length-1)}(r);t-=1,r=void 0===r?2*t:r;var e,n,o,i,a=f.getModuleCount()*t+2*r,u=r,c=a-r,g=Array(t+1).join("██"),l=Array(t+1).join("  "),h="",s="";for(e=0;e<a;e+=1){for(o=Math.floor((e-u)/t),s="",n=0;n<a;n+=1)i=1,u<=n&&n<c&&u<=e&&e<c&&f.isDark(o,Math.floor((n-u)/t))&&(i=0),s+=i?g:l;for(o=0;o<t;o+=1)h+=s+"\n"}return h.substring(0,h.length-1)},f.renderTo2dContext=function(t,r){r=r||2;for(var e=f.getModuleCount(),n=0;n<e;n++)for(var o=0;o<e;o++)t.fillStyle=f.isDark(n,o)?"black":"white",t.fillRect(o*r,n*r,r,r)},f};t.stringToBytes=(t.stringToBytesFuncs={default:function(t){for(var r=[],e=0;e<t.length;e+=1){var n=t.charCodeAt(e);r.push(255&n)}return r}}).default,t.createStringToBytes=function(t,r){var e=function(){for(var e=S(t),n=function(){var t=e.read();if(-1==t)throw"eof";return t},o=0,i={};;){var a=e.read();if(-1==a)break;var u=n(),f=n()<<8|n();i[String.fromCharCode(a<<8|u)]=f,o+=1}if(o!=r)throw o+" != "+r;return i}(),n="?".charCodeAt(0);return function(t){for(var r=[],o=0;o<t.length;o+=1){var i=t.charCodeAt(o);if(i<128)r.push(i);else{var a=e[t.charAt(o)];"number"==typeof a?(255&a)==a?r.push(a):(r.push(a>>>8),r.push(255&a)):r.push(n)}}return r}};var r,e,n,o,i,a=1,u=2,f=4,c=8,g={L:1,M:0,Q:3,H:2},l=0,h=1,s=2,v=3,d=4,w=5,p=6,y=7,B=(r=[[],[6,18],[6,22],[6,26],[6,30],[6,34],[6,22,38],[6,24,42],[6,26,46],[6,28,50],[6,30,54],[6,32,58],[6,34,62],[6,26,46,66],[6,26,48,70],[6,26,50,74],[6,30,54,78],[6,30,56,82],[6,30,58,86],[6,34,62,90],[6,28,50,72,94],[6,26,50,74,98],[6,30,54,78,102],[6,28,54,80,106],[6,32,58,84,110],[6,30,58,86,114],[6,34,62,90,118],[6,26,50,74,98,122],[6,30,54,78,102,126],[6,26,52,78,104,130],[6,30,56,82,108,134],[6,34,60,86,112,138],[6,30,58,86,114,142],[6,34,62,90,118,146],[6,30,54,78,102,126,150],[6,24,50,76,102,128,154],[6,28,54,80,106,132,158],[6,32,58,84,110,136,162],[6,26,54,82,110,138,166],[6,30,58,86,114,142,170]],e=1335,n=7973,i=function(t){for(var r=0;0!=t;)r+=1,t>>>=1;return r},(o={}).getBCHTypeInfo=function(t){for(var r=t<<10;i(r)-i(e)>=0;)r^=e<<i(r)-i(e);return 21522^(t<<10|r)},o.getBCHTypeNumber=function(t){for(var r=t<<12;i(r)-i(n)>=0;)r^=n<<i(r)-i(n);return t<<12|r},o.getPatternPosition=function(t){return r[t-1]},o.getMaskFunction=function(t){switch(t){case l:return function(t,r){return(t+r)%2==0};case h:return function(t,r){return t%2==0};case s:return function(t,r){return r%3==0};case v:return function(t,r){return(t+r)%3==0};case d:return function(t,r){return(Math.floor(t/2)+Math.floor(r/3))%2==0};case w:return function(t,r){return t*r%2+t*r%3==0};case p:return function(t,r){return(t*r%2+t*r%3)%2==0};case y:return function(t,r){return(t*r%3+(t+r)%2)%2==0};default:throw"bad maskPattern:"+t}},o.getErrorCorrectPolynomial=function(t){for(var r=k([1],0),e=0;e<t;e+=1)r=r.multiply(k([1,C.gexp(e)],0));return r},o.getLengthInBits=function(t,r){if(1<=r&&r<10)switch(t){case a:return 10;case u:return 9;case f:case c:return 8;default:throw"mode:"+t}else if(r<27)switch(t){case a:return 12;case u:return 11;case f:return 16;case c:return 10;default:throw"mode:"+t}else{if(!(r<41))throw"type:"+r;switch(t){case a:return 14;case u:return 13;case f:return 16;case c:return 12;default:throw"mode:"+t}}},o.getLostPoint=function(t){for(var r=t.getModuleCount(),e=0,n=0;n<r;n+=1)for(var o=0;o<r;o+=1){for(var i=0,a=t.isDark(n,o),u=-1;u<=1;u+=1)if(!(n+u<0||r<=n+u))for(var f=-1;f<=1;f+=1)o+f<0||r<=o+f||0==u&&0==f||a==t.isDark(n+u,o+f)&&(i+=1);i>5&&(e+=3+i-5)}for(n=0;n<r-1;n+=1)for(o=0;o<r-1;o+=1){var c=0;t.isDark(n,o)&&(c+=1),t.isDark(n+1,o)&&(c+=1),t.isDark(n,o+1)&&(c+=1),t.isDark(n+1,o+1)&&(c+=1),0!=c&&4!=c||(e+=3)}for(n=0;n<r;n+=1)for(o=0;o<r-6;o+=1)t.isDark(n,o)&&!t.isDark(n,o+1)&&t.isDark(n,o+2)&&t.isDark(n,o+3)&&t.isDark(n,o+4)&&!t.isDark(n,o+5)&&t.isDark(n,o+6)&&(e+=40);for(o=0;o<r;o+=1)for(n=0;n<r-6;n+=1)t.isDark(n,o)&&!t.isDark(n+1,o)&&t.isDark(n+2,o)&&t.isDark(n+3,o)&&t.isDark(n+4,o)&&!t.isDark(n+5,o)&&t.isDark(n+6,o)&&(e+=40);var g=0;for(o=0;o<r;o+=1)for(n=0;n<r;n+=1)t.isDark(n,o)&&(g+=1);return e+=Math.abs(100*g/r/r-50)/5*10},o),C=function(){for(var t=new Array(256),r=new Array(256),e=0;e<8;e+=1)t[e]=1<<e;for(e=8;e<256;e+=1)t[e]=t[e-4]^t[e-5]^t[e-6]^t[e-8];for(e=0;e<255;e+=1)r[t[e]]=e;var n={glog:function(t){if(t<1)throw"glog("+t+")";return r[t]},gexp:function(r){for(;r<0;)r+=255;for(;r>=256;)r-=255;return t[r]}};return n}();function k(t,r){if(void 0===t.length)throw t.length+"/"+r;var e=function(){for(var e=0;e<t.length&&0==t[e];)e+=1;for(var n=new Array(t.length-e+r),o=0;o<t.length-e;o+=1)n[o]=t[o+e];return n}(),n={getAt:function(t){return e[t]},getLength:function(){return e.length},multiply:function(t){for(var r=new Array(n.getLength()+t.getLength()-1),e=0;e<n.getLength();e+=1)for(var o=0;o<t.getLength();o+=1)r[e+o]^=C.gexp(C.glog(n.getAt(e))+C.glog(t.getAt(o)));return k(r,0)},mod:function(t){if(n.getLength()-t.getLength()<0)return n;for(var r=C.glog(n.getAt(0))-C.glog(t.getAt(0)),e=new Array(n.getLength()),o=0;o<n.getLength();o+=1)e[o]=n.getAt(o);for(o=0;o<t.getLength();o+=1)e[o]^=C.gexp(C.glog(t.getAt(o))+r);return k(e,0).mod(t)}};return n}var A=function(){var t=[[1,26,19],[1,26,16],[1,26,13],[1,26,9],[1,44,34],[1,44,28],[1,44,22],[1,44,16],[1,70,55],[1,70,44],[2,35,17],[2,35,13],[1,100,80],[2,50,32],[2,50,24],[4,25,9],[1,134,108],[2,67,43],[2,33,15,2,34,16],[2,33,11,2,34,12],[2,86,68],[4,43,27],[4,43,19],[4,43,15],[2,98,78],[4,49,31],[2,32,14,4,33,15],[4,39,13,1,40,14],[2,121,97],[2,60,38,2,61,39],[4,40,18,2,41,19],[4,40,14,2,41,15],[2,146,116],[3,58,36,2,59,37],[4,36,16,4,37,17],[4,36,12,4,37,13],[2,86,68,2,87,69],[4,69,43,1,70,44],[6,43,19,2,44,20],[6,43,15,2,44,16],[4,101,81],[1,80,50,4,81,51],[4,50,22,4,51,23],[3,36,12,8,37,13],[2,116,92,2,117,93],[6,58,36,2,59,37],[4,46,20,6,47,21],[7,42,14,4,43,15],[4,133,107],[8,59,37,1,60,38],[8,44,20,4,45,21],[12,33,11,4,34,12],[3,145,115,1,146,116],[4,64,40,5,65,41],[11,36,16,5,37,17],[11,36,12,5,37,13],[5,109,87,1,110,88],[5,65,41,5,66,42],[5,54,24,7,55,25],[11,36,12,7,37,13],[5,122,98,1,123,99],[7,73,45,3,74,46],[15,43,19,2,44,20],[3,45,15,13,46,16],[1,135,107,5,136,108],[10,74,46,1,75,47],[1,50,22,15,51,23],[2,42,14,17,43,15],[5,150,120,1,151,121],[9,69,43,4,70,44],[17,50,22,1,51,23],[2,42,14,19,43,15],[3,141,113,4,142,114],[3,70,44,11,71,45],[17,47,21,4,48,22],[9,39,13,16,40,14],[3,135,107,5,136,108],[3,67,41,13,68,42],[15,54,24,5,55,25],[15,43,15,10,44,16],[4,144,116,4,145,117],[17,68,42],[17,50,22,6,51,23],[19,46,16,6,47,17],[2,139,111,7,140,112],[17,74,46],[7,54,24,16,55,25],[34,37,13],[4,151,121,5,152,122],[4,75,47,14,76,48],[11,54,24,14,55,25],[16,45,15,14,46,16],[6,147,117,4,148,118],[6,73,45,14,74,46],[11,54,24,16,55,25],[30,46,16,2,47,17],[8,132,106,4,133,107],[8,75,47,13,76,48],[7,54,24,22,55,25],[22,45,15,13,46,16],[10,142,114,2,143,115],[19,74,46,4,75,47],[28,50,22,6,51,23],[33,46,16,4,47,17],[8,152,122,4,153,123],[22,73,45,3,74,46],[8,53,23,26,54,24],[12,45,15,28,46,16],[3,147,117,10,148,118],[3,73,45,23,74,46],[4,54,24,31,55,25],[11,45,15,31,46,16],[7,146,116,7,147,117],[21,73,45,7,74,46],[1,53,23,37,54,24],[19,45,15,26,46,16],[5,145,115,10,146,116],[19,75,47,10,76,48],[15,54,24,25,55,25],[23,45,15,25,46,16],[13,145,115,3,146,116],[2,74,46,29,75,47],[42,54,24,1,55,25],[23,45,15,28,46,16],[17,145,115],[10,74,46,23,75,47],[10,54,24,35,55,25],[19,45,15,35,46,16],[17,145,115,1,146,116],[14,74,46,21,75,47],[29,54,24,19,55,25],[11,45,15,46,46,16],[13,145,115,6,146,116],[14,74,46,23,75,47],[44,54,24,7,55,25],[59,46,16,1,47,17],[12,151,121,7,152,122],[12,75,47,26,76,48],[39,54,24,14,55,25],[22,45,15,41,46,16],[6,151,121,14,152,122],[6,75,47,34,76,48],[46,54,24,10,55,25],[2,45,15,64,46,16],[17,152,122,4,153,123],[29,74,46,14,75,47],[49,54,24,10,55,25],[24,45,15,46,46,16],[4,152,122,18,153,123],[13,74,46,32,75,47],[48,54,24,14,55,25],[42,45,15,32,46,16],[20,147,117,4,148,118],[40,75,47,7,76,48],[43,54,24,22,55,25],[10,45,15,67,46,16],[19,148,118,6,149,119],[18,75,47,31,76,48],[34,54,24,34,55,25],[20,45,15,61,46,16]],r=function(t,r){var e={};return e.totalCount=t,e.dataCount=r,e},e={};return e.getRSBlocks=function(e,n){var o=function(r,e){switch(e){case g.L:return t[4*(r-1)+0];case g.M:return t[4*(r-1)+1];case g.Q:return t[4*(r-1)+2];case g.H:return t[4*(r-1)+3];default:return}}(e,n);if(void 0===o)throw"bad rs block @ typeNumber:"+e+"/errorCorrectionLevel:"+n;for(var i=o.length/3,a=[],u=0;u<i;u+=1)for(var f=o[3*u+0],c=o[3*u+1],l=o[3*u+2],h=0;h<f;h+=1)a.push(r(c,l));return a},e}(),b=function(){var t=[],r=0,e={getBuffer:function(){return t},getAt:function(r){var e=Math.floor(r/8);return 1==(t[e]>>>7-r%8&1)},put:function(t,r){for(var n=0;n<r;n+=1)e.putBit(1==(t>>>r-n-1&1))},getLengthInBits:function(){return r},putBit:function(e){var n=Math.floor(r/8);t.length<=n&&t.push(0),e&&(t[n]|=128>>>r%8),r+=1}};return e},M=function(t){var r=a,e=t,n={getMode:function(){return r},getLength:function(t){return e.length},write:function(t){for(var r=e,n=0;n+2<r.length;)t.put(o(r.substring(n,n+3)),10),n+=3;n<r.length&&(r.length-n==1?t.put(o(r.substring(n,n+1)),4):r.length-n==2&&t.put(o(r.substring(n,n+2)),7))}},o=function(t){for(var r=0,e=0;e<t.length;e+=1)r=10*r+i(t.charAt(e));return r},i=function(t){if("0"<=t&&t<="9")return t.charCodeAt(0)-"0".charCodeAt(0);throw"illegal char :"+t};return n},x=function(t){var r=u,e=t,n={getMode:function(){return r},getLength:function(t){return e.length},write:function(t){for(var r=e,n=0;n+1<r.length;)t.put(45*o(r.charAt(n))+o(r.charAt(n+1)),11),n+=2;n<r.length&&t.put(o(r.charAt(n)),6)}},o=function(t){if("0"<=t&&t<="9")return t.charCodeAt(0)-"0".charCodeAt(0);if("A"<=t&&t<="Z")return t.charCodeAt(0)-"A".charCodeAt(0)+10;switch(t){case" ":return 36;case"$":return 37;case"%":return 38;case"*":return 39;case"+":return 40;case"-":return 41;case".":return 42;case"/":return 43;case":":return 44;default:throw"illegal char :"+t}};return n},m=function(r){var e=f,n=t.stringToBytes(r),o={getMode:function(){return e},getLength:function(t){return n.length},write:function(t){for(var r=0;r<n.length;r+=1)t.put(n[r],8)}};return o},L=function(r){var e=c,n=t.stringToBytesFuncs.SJIS;if(!n)throw"sjis not supported.";!function(){var t=n("友");if(2!=t.length||38726!=(t[0]<<8|t[1]))throw"sjis not supported."}();var o=n(r),i={getMode:function(){return e},getLength:function(t){return~~(o.length/2)},write:function(t){for(var r=o,e=0;e+1<r.length;){var n=(255&r[e])<<8|255&r[e+1];if(33088<=n&&n<=40956)n-=33088;else{if(!(57408<=n&&n<=60351))throw"illegal char at "+(e+1)+"/"+n;n-=49472}n=192*(n>>>8&255)+(255&n),t.put(n,13),e+=2}if(e<r.length)throw"illegal char at "+(e+1)}};return i},D=function(){var t=[],r={writeByte:function(r){t.push(255&r)},writeShort:function(t){r.writeByte(t),r.writeByte(t>>>8)},writeBytes:function(t,e,n){e=e||0,n=n||t.length;for(var o=0;o<n;o+=1)r.writeByte(t[o+e])},writeString:function(t){for(var e=0;e<t.length;e+=1)r.writeByte(t.charCodeAt(e))},toByteArray:function(){return t},toString:function(){var r="";r+="[";for(var e=0;e<t.length;e+=1)e>0&&(r+=","),r+=t[e];return r+="]"}};return r},S=function(t){var r=t,e=0,n=0,o=0,i={read:function(){for(;o<8;){if(e>=r.length){if(0==o)return-1;throw"unexpected end of file./"+o}var t=r.charAt(e);if(e+=1,"="==t)return o=0,-1;t.match(/^\s$/)||(n=n<<6|a(t.charCodeAt(0)),o+=6)}var i=n>>>o-8&255;return o-=8,i}},a=function(t){if(65<=t&&t<=90)return t-65;if(97<=t&&t<=122)return t-97+26;if(48<=t&&t<=57)return t-48+52;if(43==t)return 62;if(47==t)return 63;throw"c:"+t};return i},I=function(t,r,e){for(var n=function(t,r){var e=t,n=r,o=new Array(t*r),i={setPixel:function(t,r,n){o[r*e+t]=n},write:function(t){t.writeString("GIF87a"),t.writeShort(e),t.writeShort(n),t.writeByte(128),t.writeByte(0),t.writeByte(0),t.writeByte(0),t.writeByte(0),t.writeByte(0),t.writeByte(255),t.writeByte(255),t.writeByte(255),t.writeString(","),t.writeShort(0),t.writeShort(0),t.writeShort(e),t.writeShort(n),t.writeByte(0);var r=a(2);t.writeByte(2);for(var o=0;r.length-o>255;)t.writeByte(255),t.writeBytes(r,o,255),o+=255;t.writeByte(r.length-o),t.writeBytes(r,o,r.length-o),t.writeByte(0),t.writeString(";")}},a=function(t){for(var r=1<<t,e=1+(1<<t),n=t+1,i=u(),a=0;a<r;a+=1)i.add(String.fromCharCode(a));i.add(String.fromCharCode(r)),i.add(String.fromCharCode(e));var f,c,g,l=D(),h=(f=l,c=0,g=0,{write:function(t,r){if(t>>>r!=0)throw"length over";for(;c+r>=8;)f.writeByte(255&(t<<c|g)),r-=8-c,t>>>=8-c,g=0,c=0;g|=t<<c,c+=r},flush:function(){c>0&&f.writeByte(g)}});h.write(r,n);var s=0,v=String.fromCharCode(o[s]);for(s+=1;s<o.length;){var d=String.fromCharCode(o[s]);s+=1,i.contains(v+d)?v+=d:(h.write(i.indexOf(v),n),i.size()<4095&&(i.size()==1<<n&&(n+=1),i.add(v+d)),v=d)}return h.write(i.indexOf(v),n),h.write(e,n),h.flush(),l.toByteArray()},u=function(){var t={},r=0,e={add:function(n){if(e.contains(n))throw"dup key:"+n;t[n]=r,r+=1},size:function(){return r},indexOf:function(r){return t[r]},contains:function(r){return void 0!==t[r]}};return e};return i}(t,r),o=0;o<r;o+=1)for(var i=0;i<t;i+=1)n.setPixel(i,o,e(i,o));var a=D();n.write(a);for(var u=function(){var t=0,r=0,e=0,n="",o={},i=function(t){n+=String.fromCharCode(a(63&t))},a=function(t){if(t<0);else{if(t<26)return 65+t;if(t<52)return t-26+97;if(t<62)return t-52+48;if(62==t)return 43;if(63==t)return 47}throw"n:"+t};return o.writeByte=function(n){for(t=t<<8|255&n,r+=8,e+=1;r>=6;)i(t>>>r-6),r-=6},o.flush=function(){if(r>0&&(i(t<<6-r),t=0,r=0),e%3!=0)for(var o=3-e%3,a=0;a<o;a+=1)n+="="},o.toString=function(){return n},o}(),f=a.toByteArray(),c=0;c<f.length;c+=1)u.writeByte(f[c]);return u.flush(),"data:image/gif;base64,"+u};return t}();qrcode.stringToBytesFuncs["UTF-8"]=function(t){return function(t){for(var r=[],e=0;e<t.length;e++){var n=t.charCodeAt(e);n<128?r.push(n):n<2048?r.push(192|n>>6,128|63&n):n<55296||n>=57344?r.push(224|n>>12,128|n>>6&63,128|63&n):(e++,n=65536+((1023&n)<<10|1023&t.charCodeAt(e)),r.push(240|n>>18,128|n>>12&63,128|n>>6&63,128|63&n))}return r}(t)},function(t){"function"==typeof define&&define.amd?define([],t):"object"==typeof exports&&(module.exports=t())}(function(){return qrcode});
+</script>
+<script>
+/* ============================================================
+   LUDI kiosk snippet (shared by every open-evening game)
+   Inside the hub: tells the hub it is ready, reports taps, asks to go home.
+   On its own: runs its own idle timer and goes back to ../play/.
+   ============================================================ */
+(function(){
+  var embedded = window.parent !== window;
+  var IDLE = 90, WARN = 15, HUB = "../play/index.html";
+  function post(m){ try { parent.postMessage({ludi:m}, "*"); } catch(e){} }
+  window.LUDI = {
+    embedded: embedded,
+    home: function(){ if (embedded) post("home"); else location.href = HUB; }
+  };
+  if (embedded) {
+    post("ready");
+    var lastPost = 0;
+    var act = function(){ var n = Date.now(); if (n - lastPost > 1000) { lastPost = n; post("activity"); } };
+    ["pointerdown","pointermove","keydown","wheel","touchstart"].forEach(function(t){ document.addEventListener(t, act, {capture:true, passive:true}); });
+    window.addEventListener("afterprint", function(){ lastPost = 0; act(); });
+    return;
+  }
+  var last = Date.now(), box = null, cnt = null;
+  function poke(){ last = Date.now(); if (box && !box.hidden) box.hidden = true; }
+  ["pointerdown","pointermove","keydown","wheel","touchstart"].forEach(function(t){ document.addEventListener(t, poke, {capture:true, passive:true}); });
+  window.addEventListener("afterprint", poke);
+  document.addEventListener("DOMContentLoaded", function(){
+    box = document.getElementById("idle"); cnt = document.getElementById("idlecount");
+    if (box) box.addEventListener("pointerdown", function(e){ e.stopPropagation(); poke(); });
+  });
+  setInterval(function(){
+    if (!box) return;
+    var idle = (Date.now() - last) / 1000;
+    if (idle > IDLE + WARN) { location.href = HUB; last = Date.now(); return; }
+    if (idle > IDLE) { box.hidden = false; cnt.textContent = Math.max(1, Math.ceil(IDLE + WARN - idle)); }
+  }, 250);
+})();
+</script>
+<script>
+(function(){
+"use strict";
+var PARENT_URL = "https://mrbeasley930-ai.github.io/Parent-Latin-Website/";
+var ROUNDS = 5;
+/* ============================================================
+   CASES
+   w:     the three honest words, [word, short gloss shown after the case]
+   imp:   the impostor, [word, where it really comes from]
+   chunk: the root letters shared by all four words
+   latin: the Latin word(s) behind the root
+   mean:  the meaning shown in the casebook
+   ok:    typed answers accepted (whole words)
+   near:  typed answers that are close, [answers], note
+   hint:  first meaning nudge; opts: three choices (first is right)
+   tier:  1 = warm-up, 2 = middle, 3 = hardest
+   ============================================================ */
+var CASES = [
+ {id:"terr", tier:1, chunk:"terr", latin:"terra", mean:"land, earth",
+  w:[["territory","land that someone controls"],["terrain","the kind of land you are crossing"],["subterranean","under the earth (<i>sub</i> = under)"]],
+  imp:["terrible","from a different Latin word, <i>terreo</i>, I frighten. Something terrible frightens you."],
+  ok:["land","earth","ground","soil","dirt","world","lands"], near:[["floor","underground","under","rock","mud"],"Close. <i>Subterranean</i> is under it, and a <i>territory</i> is made of it. One word will do."],
+  hint:"A mole lives in a subterranean tunnel. What is the tunnel under?", opts:["land, earth","fear","water"]},
+ {id:"sol", tier:1, chunk:"sol", latin:"sol", mean:"sun",
+  w:[["solar","to do with the sun"],["solstice","the day the sun seems to stand still at its highest or lowest (<i>sisto</i>, I stand)"],["parasol","an umbrella that guards against the sun"]],
+  imp:["solitary","from a different Latin word, <i>solus</i>, alone. A solitary animal lives alone."],
+  ok:["sun","sunshine","sunlight","suns"], near:[["light","heat","hot","warm","star","summer","sky"],"Warm! What in the sky gives that? Solar panels need it."],
+  hint:"Solar panels on a roof collect energy from what?", opts:["sun","alone","moon"]},
+ {id:"cent", tier:1, chunk:"cent", latin:"centum", mean:"a hundred",
+  w:[["century","a hundred years"],["centipede","a creature with 'a hundred feet' (most have fewer!)"],["percent","out of each hundred"]],
+  imp:["centre","from a Greek word, <i>kentron</i>, a sharp point: the point of a pair of compasses sits at the centre."],
+  ok:["hundred","100","hundreds","onehundred"], near:[["many","lots","legs","feet","number","thousand"],"Close: it is a number. How many years are in a century?"],
+  hint:"How many years are there in a century?", opts:["a hundred","middle","a thousand"]},
+ {id:"fin", tier:1, chunk:"fin", latin:"finis", mean:"end",
+  w:[["final","at the end"],["finish","to come to the end"],["infinite","without end (<i>in</i> = not)"]],
+  imp:["finger","an Old English word. It has nothing to do with Latin."],
+  ok:["end","ending","ends","finish","finished","last","limit","stop","over"], near:[["done","complete","race","line"],"Nearly. What does <i>infinite</i> have none of?"],
+  hint:"Something infinite goes on for ever. What does it never reach?", opts:["end","hand","start"]},
+ {id:"dent", tier:1, chunk:"dent", latin:"dens, dentis", mean:"tooth",
+  w:[["dentist","a tooth doctor"],["dental","to do with teeth"],["trident","Neptune's spear with three 'teeth' (<i>tri</i> = three)"]],
+  imp:["accident","from <i>ad</i> + <i>cado</i>, I fall. An accident is something that 'falls' on you."],
+  ok:["tooth","teeth","toothy"], near:[["mouth","jaw","smile","bite","gum","gums","fork","spike","prong","prongs"],"Close. What does a dentist look after?"],
+  hint:"What does a dentist look after?", opts:["tooth","fall","spear"]},
+ {id:"mar", tier:1, chunk:"mar", latin:"mare", mean:"sea",
+  w:[["marine","to do with the sea"],["submarine","a boat that goes under the sea"],["maritime","to do with ships and the sea"]],
+  imp:["marathon","named after Marathon, a place in Greece. A messenger is said to have run from there to Athens with news of a battle."],
+  ok:["sea","ocean","seas","oceans","seawater"], near:[["water","wet","boat","ship","ships","fish","swim","waves","river","lake"],"Close. Which water? Where does a submarine go?"],
+  hint:"Where does a submarine go?", opts:["sea","race","river"]},
+
+ {id:"equ", tier:2, chunk:"equ", latin:"aequus", mean:"equal, level",
+  w:[["equal","the same in size or amount"],["equator","the line that cuts the Earth into two equal halves"],["equation","a sum that says both sides are equal"]],
+  imp:["equestrian","from a different Latin word, <i>equus</i>, horse. An equestrian rides horses."],
+  ok:["equal","equally","same","even","level","fair","balanced","balance","identical","halves","half"], near:[["line","middle","maths","sum","math"],"Close. What does an equation say about its two sides?"],
+  hint:"An equation says that both sides are...?", opts:["equal, level","horse","hot"]},
+ {id:"nov", tier:2, chunk:"nov", latin:"novus", mean:"new",
+  w:[["novel","new; a novel was once a new kind of story"],["novice","a beginner, someone new"],["renovate","to make new again (<i>re</i> = again)"]],
+  imp:["November","from a different Latin word, <i>novem</i>, nine. November was the ninth month of the oldest Roman year, which began in March."],
+  ok:["new","newly","fresh","newness","brandnew"], near:[["beginner","book","story","young","start","first"],"Close. To renovate a house is to make it ... again?"],
+  hint:"To renovate an old house is to make it ... again?", opts:["new","nine","old"]},
+ {id:"magn", tier:2, chunk:"magn", latin:"magnus", mean:"great, big",
+  w:[["magnify","to make something look bigger"],["magnificent","great and splendid"],["magnitude","how great something is"]],
+  imp:["magnet","from Greek: the magnetic stone was named after Magnesia, a region of Greece where it was found."],
+  ok:["big","great","large","huge","giant","grand","enormous","massive","bigger","greater","larger","size","vast"], near:[["good","amazing","splendid","wonderful","impressive","glass","lens","strong"],"Close. A magnifying glass makes things look ... ?"],
+  hint:"A magnifying glass makes things look ... ?", opts:["great, big","stone","small"]},
+ {id:"loc", tier:2, chunk:"loc", latin:"locus", mean:"place",
+  w:[["location","a place"],["local","belonging to this place"],["locomotive","an engine that moves from place to place (<i>moveo</i>, I move)"]],
+  imp:["locket","from an old French word, <i>loquet</i>, a latch."],
+  ok:["place","places","location","spot","area","position","site","somewhere","where"], near:[["train","near","nearby","home","town","move"],"Close. <i>Location</i> and <i>local</i> are both about a ... ?"],
+  hint:"Your local shop is in your ... ?", opts:["place","latch","train"]},
+ {id:"min", tier:2, chunk:"min", latin:"minor, minimus, minus", mean:"smaller, less",
+  w:[["minimum","the smallest amount (<i>minimus</i>, smallest)"],["minor","smaller, less important"],["minus","less, take away"]],
+  imp:["miniature","from Latin <i>minium</i>, the red paint used to decorate old handwritten books. The pictures were tiny, and people then linked the word with 'small'."],
+  ok:["small","smaller","smallest","little","less","least","tiny","few","fewer","lower","lowest"], near:[["take","away","subtract","minus","short","low"],"Close. <i>Minimum</i> is the ... -est amount?"],
+  hint:"The minimum is the ...est amount you can have.", opts:["smaller, less","red paint","more"]},
+ {id:"pac", tier:2, chunk:"pac", latin:"pax, pacis", mean:"peace",
+  w:[["pacify","to calm someone down, to make peace"],["Pacific","the 'peaceful' ocean, named by the explorer Magellan in 1520 because it was calm"],["pacifist","someone who refuses to fight"]],
+  imp:["package","from <i>pack</i>, a word English took from its Germanic neighbours, not from Latin."],
+  ok:["peace","peaceful","calm","calmness","quiet","tranquil","nofighting"], near:[["ocean","sea","water","gentle","nice","kind","friendly","soothe"],"Close. A pacifist refuses to fight because they want ... ?"],
+  hint:"A pacifist refuses to fight. What do they want instead?", opts:["peace","box","war"]},
+ {id:"ann", tier:2, chunk:"ann", latin:"annus", mean:"year",
+  w:[["annual","happening every year"],["anniversary","the day the year comes round again (<i>verto</i>, I turn)"],["biannual","happening twice a year (<i>bi</i> = two)"]],
+  imp:["announce","from <i>ad</i> + <i>nuntius</i>, a messenger. The 'n' of <i>nuntius</i> doubled up."],
+  ok:["year","years","yearly","annual","annually"], near:[["birthday","time","day","every","once","date","month","twice"],"Close: it is a length of time. An anniversary comes round once every ... ?"],
+  hint:"An anniversary comes round once every ... ?", opts:["year","messenger","day"]},
+
+ {id:"lib", tier:3, chunk:"lib", latin:"liber", mean:"free",
+  w:[["liberty","freedom"],["liberate","to set free"],["liberal","generous; first, 'suited to a free person'"]],
+  imp:["library","from <i>liber</i>, book! Latin had two words spelled <i>liber</i>: one meant free, the other meant book."],
+  ok:["free","freedom","freed","liberty","freeing","release"], near:[["prison","escape","out","loose","save","rescue"],"Close. To liberate a prisoner is to set them ... ?"],
+  hint:"To liberate a prisoner is to set them ... ?", opts:["free","book","locked"]},
+ {id:"vac", tier:3, chunk:"vac", latin:"vacuus", mean:"empty",
+  w:[["vacuum","a completely empty space"],["vacant","empty, not in use"],["evacuate","to empty a building of people (<i>e</i> = out)"]],
+  imp:["vaccine","from <i>vacca</i>, cow! Edward Jenner made the first vaccine in 1796 from cowpox, a disease of cows."],
+  ok:["empty","emptiness","emptied","nothing","void","hollow","clear","vacant","blank","space","bare"], near:[["hoover","cleaner","suck","leave","out","gone","away"],"Close. A vacant seat has nobody in it. It is ... ?"],
+  hint:"A vacant seat has nobody in it. It is ... ?", opts:["empty","cow","full"]},
+ {id:"urb", tier:3, chunk:"urb", latin:"urbs", mean:"city",
+  w:[["urban","to do with a city"],["suburb","an area on the edge of a city (<i>sub</i> = under, near)"],["conurbation","cities and towns that have grown together (<i>con</i> = together)"]],
+  imp:["turban","from a Persian word, which reached English through Turkish."],
+  ok:["city","cities","town","towns","citys"], near:[["houses","buildings","streets","busy","place","village","london","birmingham"],"Close. Birmingham is a big urban area. It is a ... ?"],
+  hint:"Birmingham is a big urban area. What is Birmingham?", opts:["city","hat","countryside"]},
+ {id:"grat", tier:3, chunk:"grat", latin:"gratus", mean:"thankful, pleasing",
+  w:[["grateful","thankful"],["gratitude","the feeling of being thankful"],["congratulate","to show you are pleased for someone (<i>gratulor</i>, I show joy)"]],
+  imp:["grater","from an old French word, <i>grater</i>, to scrape."],
+  ok:["thankful","thanks","thank","thanking","grateful","pleased","pleasing","pleasure","glad","happy","joy","joyful","please","gratitude"], near:[["nice","kind","good","well","done","polite","cheese"],"Close. A grateful person says ... ?"],
+  hint:"A grateful person says 'thank you'. So the root means ... ?", opts:["thankful, pleasing","scrape","sorry"]},
+ {id:"son", tier:3, chunk:"son", latin:"sonus", mean:"sound",
+  w:[["sonic","to do with sound"],["unison","singing the same note, 'one sound' (<i>unus</i> = one)"],["resonate","to sound again, to echo (<i>re</i> = again)"]],
+  imp:["season","from a different Latin word, <i>satio</i>, sowing seeds. Spring was the season for sowing."],
+  ok:["sound","sounds","noise","noises","sounding"], near:[["music","sing","singing","note","loud","hear","hearing","echo","voice","speed"],"Close. A sonic boom is a huge ... ?"],
+  hint:"A sonic boom is a very loud ... ?", opts:["sound","sowing","light"]},
+ {id:"fort", tier:3, chunk:"fort", latin:"fortis", mean:"strong, brave",
+  w:[["fortress","a strong castle"],["fortify","to make a place strong"],["comfort","to strengthen someone (<i>com</i> = very)"]],
+  imp:["fortnight","an Old English phrase, 'fourteen nights'."],
+  ok:["strong","strength","strongly","brave","bravery","tough","powerful","bold","sturdy","safe","secure"], near:[["castle","wall","walls","protect","protected","defend","defence","army","soldier","safety"],"Close. A fortress is a castle that is very ... ?"],
+  hint:"A fortress is a castle that is very ... ?", opts:["strong, brave","fourteen","weak"]},
+ {id:"mal", tier:3, chunk:"mal", latin:"male, malus", mean:"bad, badly",
+  w:[["malfunction","to work badly, go wrong"],["malicious","wanting to do harm"],["malnutrition","bad feeding, not enough good food"]],
+  imp:["mallet","from a different Latin word, <i>malleus</i>, hammer."],
+  ok:["bad","badly","evil","wrong","poor","poorly","harm","harmful","ill","nasty","worse","broken","wicked"], near:[["break","fault","hurt","sick","food","hungry"],"Close. When a robot malfunctions, it works ... ?"],
+  hint:"When a machine malfunctions, it works ... ?", opts:["bad, badly","hammer","well"]}
+];
+
+
+/* ============================================================
+   HELPERS
+   ============================================================ */
+function range(n){ var a=[]; for (var i=0;i<n;i++) a.push(i); return a; }
+function shuffle(a){ a=a.slice(); for (var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=a[i]; a[i]=a[j]; a[j]=t; } return a; }
+function toRoman(n){
+  if (n===0) return "nihil";
+  var v=[1000,900,500,400,100,90,50,40,10,9,5,4,1], s=["M","CM","D","CD","C","XC","L","XL","X","IX","V","IV","I"], r="";
+  for (var i=0;i<v.length;i++) while (n>=v[i]){ r+=s[i]; n-=v[i]; }
+  return r;
+}
+function esc(t){ return String(t).replace(/[&<>"]/g,function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]; }); }
+function low(w){ return w.toLowerCase(); }
+
+/* five cases: two warm-ups, two middle, one hardest, in that order */
+function buildDeck(){
+  var t1=shuffle(CASES.filter(function(c){return c.tier===1;})),
+      t2=shuffle(CASES.filter(function(c){return c.tier===2;})),
+      t3=shuffle(CASES.filter(function(c){return c.tier===3;}));
+  return [t1[0],t1[1],t2[0],t2[1],t3[0]];
+}
+function newRound(c){
+  var words = c.w.map(function(x){ return {w:x[0], g:x[1], imp:false}; });
+  words.push({w:c.imp[0], g:c.imp[1], imp:true});
+  return {c:c, words:shuffle(words), stage:"find",
+    sel:null,              /* {wi, a, b} */
+    findWrong:0, findNudge:0, findShown:false, findMsg:"", findCls:"",
+    impWrong:[], impNudge:0, impFaded:-1, impShown:false,
+    meanTries:0, meanNudge:0, meanMsg:"", meanCls:"", meanTyped:false, meanChoiceWrong:[], meanShown:false, meanOpts:shuffle(c.opts.map(function(o,i){return {t:o,right:i===0};})), typed:""};
+}
+
+/* ============================================================
+   STATE
+   ============================================================ */
+var S;
+function fresh(){
+  S = {view:"start", i:0, deck:buildDeck()};
+  S.rounds = S.deck.map(newRound);
+}
+fresh();
+
+function findOk(R){ return (R.stage==="find") ? null : (!R.findShown && R.findWrong===0); }
+function impOk(R){ return (R.stage==="find"||R.stage==="imp") ? null : (!R.impShown && R.impWrong.length===0); }
+function meanOk(R){ return (R.stage!=="done") ? null : (!R.meanShown && R.meanTyped); }
+function score(){ var c=0; S.rounds.forEach(function(R){ if (findOk(R)===true) c++; if (impOk(R)===true) c++; if (meanOk(R)===true) c++; }); return c; }
+function maxScore(){ return ROUNDS*3; }
+
+var screen = document.getElementById("screen");
+function show(v){ S.view=v; render(); window.scrollTo(0,0); try{ screen.focus({preventScroll:true}); }catch(e){} }
+
+function renderBar(){
+  var pips=document.getElementById("pips"), det=document.getElementById("det");
+  if (S.view==="start"){ pips.innerHTML=""; det.innerHTML=""; det.removeAttribute("aria-label"); return; }
+  var inCases = S.view==="case";
+  pips.innerHTML = range(ROUNDS).map(function(k){
+    var cls = (!inCases || k<S.i) ? "done" : (k===S.i ? "now" : "");
+    return '<div class="pip '+cls+'">'+toRoman(k+1)+'</div>';
+  }).join("") + '<div class="pip '+(inCases?"":"now")+'">&#9733;</div>';
+  var gems="";
+  S.rounds.forEach(function(R){ [findOk(R),impOk(R),meanOk(R)].forEach(function(v){ gems+='<span class="gem '+(v===true?"on":(v===false?"off":""))+'"></span>'; }); });
+  det.innerHTML = '<span class="lbl">Clues</span><span class="gems">'+gems+'</span>';
+  det.setAttribute("aria-label","Clue points: "+score()+" of "+maxScore());
+}
+function render(){ renderBar(); ({start:rStart, "case":rCase, end:rEnd})[S.view](); }
+
+/* ============================================================
+   START
+   ============================================================ */
+function rStart(){
+  screen.innerHTML =
+   '<h1>Root Detective</h1>'+
+   '<p class="lead">Thousands of long English words are built from Latin, the language of the Romans. Words that share a Latin <b>root</b> share a meaning, and a good detective can use that to crack words they have never met.</p>'+
+   '<div class="example" aria-label="Example: aquarium, aquatic and aqueduct all contain A Q U, from the Latin aqua, water">'+
+     '<div class="exw">'+['aquarium','aquatic','aqueduct'].map(function(w){ return '<span><u>'+w.slice(0,3)+'</u>'+w.slice(3)+'</span>'; }).join("")+'</div>'+
+     '<div class="arrow" aria-hidden="true">&rarr;</div>'+
+     '<div class="w"><b>aqua</b><span>water</span></div>'+
+   '</div>'+
+   '<ol class="howto">'+
+     '<li>Each case has four suspect words. Find the letters that all four share: that is the root.</li>'+
+     '<li>One word is an <b>impostor</b>. It has the letters, but they come from somewhere else. Unmask it.</li>'+
+     '<li>Use the three honest words to work out what the root means, and type it in.</li>'+
+   '</ol>'+
+   '<p class="small" style="text-align:center">Five cases. Up to three clue points each. Stuck? Every step has a &ldquo;Need a nudge?&rdquo; button.</p>'+
+   '<div class="next" style="justify-content:center"><button class="big" id="begin" type="button">Open case file I &rarr;</button></div>';
+  document.getElementById("begin").onclick=function(){ S.i=0; show("case"); };
+}
+
+/* ============================================================
+   CASES
+   ============================================================ */
+function chunkAt(word, chunk){ return low(word).indexOf(chunk); }
+function selText(R){ if (!R.sel) return ""; var w=R.words[R.sel.wi].w, a=Math.min(R.sel.a,R.sel.b), b=Math.max(R.sel.a,R.sel.b); return low(w.slice(a,b+1)); }
+
+var LENS = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="10" cy="10" r="6"/><path d="M14.5 14.5 20 20"/></svg>';
+
+function wordCard(R, wi){
+  var o=R.words[wi], c=R.c, w=o.w, html="";
+  var found = R.stage!=="find", at = found ? chunkAt(w,c.chunk) : -1;
+  var sa=-1, sb=-1;
+  if (!found && R.sel && R.sel.wi===wi){ sa=Math.min(R.sel.a,R.sel.b); sb=Math.max(R.sel.a,R.sel.b); }
+  var letters="";
+  for (var k=0;k<w.length;k++){
+    var cls="lt";
+    if (found && k>=at && k<at+c.chunk.length) cls+=" hl";
+    if (k>=sa && k<=sb) cls+=" sel";
+    if (R.stage==="find") letters+='<button type="button" class="'+cls+'" data-wi="'+wi+'" data-k="'+k+'" aria-label="letter '+w.charAt(k)+' of '+w+'">'+w.charAt(k)+'</button>';
+    else letters+='<span class="'+cls+'">'+w.charAt(k)+'</span>';
+  }
+  var state="";
+  if (R.stage!=="find"){
+    if (o.imp && R.stage!=="imp") state=" caught";
+    else if (R.impWrong.indexOf(wi)>=0) state=" honest";
+    else if (R.impFaded===wi) state=" faded";
+  }
+  var tag="";
+  if (state===" caught") tag='<div class="stamp">Impostor</div>';
+  else if (state===" honest" || state===" faded") tag='<div class="stamp ok">Honest</div>';
+  var gloss = R.stage==="done" ? '<div class="gloss">'+o.g+'</div>' : "";
+  var clickable = R.stage==="imp" && state==="";
+  return '<div class="suspect'+state+(clickable?' pick':'')+'" '+(clickable?'role="button" tabindex="0" data-imp="'+wi+'" aria-label="'+esc(w)+': accuse this word"':'')+'>'+
+    '<div class="sno">Suspect '+toRoman(wi+1)+'</div>'+
+    '<div class="letters">'+letters+'</div>'+tag+gloss+'</div>';
+}
+
+function stepHead(R){
+  var steps=[["find","Find the root"],["imp","Unmask the impostor"],["mean","Crack the meaning"]];
+  var order={find:0,imp:1,mean:2,done:3}[R.stage];
+  return '<ol class="steps">'+steps.map(function(s,k){ return '<li class="'+(k<order?"done":(k===order?"now":""))+'">'+toRoman(k+1)+'. '+s[1]+'</li>'; }).join("")+'</ol>';
+}
+
+function rCase(){
+  var R=S.rounds[S.i], c=R.c, h="";
+  h+='<div class="casehead"><div><div class="step">Case file '+toRoman(S.i+1)+' of '+toRoman(ROUNDS)+'</div><h2>'+(R.stage==="find"?"Four suspects":"The <span class=\"root\">"+c.chunk.toUpperCase()+"</span> case")+'</h2></div>'+stepHead(R)+'</div>';
+  h+='<div class="board">'+R.words.map(function(o,wi){ return wordCard(R,wi); }).join("")+'</div>';
+  h+='<div class="desk">'+deskHtml(R)+'</div>';
+  screen.innerHTML=h;
+  wireCase(R);
+}
+
+function deskHtml(R){
+  var c=R.c, h="";
+  if (R.stage==="find"){
+    var st=selText(R);
+    h+='<p class="task">Tap the first and last letter of the run of letters that <b>all four</b> words share.</p>';
+    h+='<div class="selrow"><div class="selbox" aria-live="polite">'+(st? st.toUpperCase().split("").map(function(ch){return '<span>'+ch+'</span>';}).join("") : '<em>nothing picked yet</em>')+'</div>'+
+       '<button class="big sm" id="check" type="button"'+(st?'':' disabled')+'>Check</button>'+
+       '<button class="ghost" id="clear" type="button"'+(st?'':' disabled')+'>Clear</button></div>';
+    h+='<div class="fb '+R.findCls+'" aria-live="polite">'+R.findMsg+'</div>';
+    h+=nudgeHtml(R.findNudge, [
+      'The shared letters are <b>'+c.chunk.length+'</b> letters long.',
+      'They begin with <b>'+c.chunk.charAt(0).toUpperCase()+'</b>.'
+    ], true);
+  } else if (R.stage==="imp"){
+    h+='<p class="task">All four words contain <b class="root">'+c.chunk.toUpperCase()+'</b>. Three of them share a meaning. One is an impostor: its letters come from a different word. <b>Tap the impostor.</b></p>';
+    h+='<div class="fb '+(R.impWrong.length?"n":"")+'" aria-live="polite">'+(R.impWrong.length?'That one is honest. Think about what the other honest words have in common.':'')+'</div>';
+    h+=nudgeHtml(R.impNudge, ['One honest word has been cleared for you.'], true);
+  } else if (R.stage==="mean"){
+    var imp=R.words.filter(function(o){return o.imp;})[0];
+    h+='<div class="caught-note"><b>Unmasked: '+esc(imp.w)+'</b> &mdash; '+imp.g+'</div>';
+    h+='<p class="task">So <b class="root">'+c.chunk.toUpperCase()+'</b> in the three honest words comes from one Latin word. <b>What does it mean?</b></p>';
+    if (R.meanNudge<2){
+      h+='<form class="typerow" id="typeform" autocomplete="off"><label for="guess" class="vh">What the root means</label>'+
+         '<input type="text" id="guess" maxlength="40" placeholder="Type one word" value="'+esc(R.typed)+'" autocapitalize="off" spellcheck="false">'+
+         '<button class="big sm" type="submit">Check</button></form>';
+    } else {
+      h+='<div class="opts">'+R.meanOpts.map(function(o,k){ var bad=R.meanChoiceWrong.indexOf(k)>=0; return '<button type="button" class="opt'+(bad?' wrong':'')+'" data-opt="'+k+'"'+(bad?' disabled':'')+'>'+o.t+'</button>'; }).join("")+'</div>';
+    }
+    h+='<div class="fb '+R.meanCls+'" aria-live="polite">'+R.meanMsg+'</div>';
+    h+=nudgeHtml(R.meanNudge, [c.hint, 'Choose from three instead. (No clue point for this step.)'], true);
+  } else {
+    var ok=[findOk(R),impOk(R),meanOk(R)].filter(function(v){return v;}).length;
+    h+='<div class="solved pop"><div class="verdict y">Case closed! '+(ok===3?'A perfect case: three clue points.':(ok===0?'Solved, with help.':ok+' clue point'+(ok===1?'':'s')+'.'))+'</div>'+
+       '<p class="rootline"><b class="root">'+c.chunk.toUpperCase()+'</b> comes from the Latin <b class="la">'+c.latin+'</b> = <b>'+c.mean+'</b>.</p>'+
+       '<p>The impostor, <b>'+esc(R.words.filter(function(o){return o.imp;})[0].w)+'</b>, only looked like it belonged.</p></div>';
+    h+='<div class="next"><button class="big" id="nextcase" type="button">'+(S.i<ROUNDS-1?'Case file '+toRoman(S.i+2)+' &rarr;':'Your detective rank &rarr;')+'</button></div>';
+  }
+  return h;
+}
+
+function nudgeHtml(n, tips, showMe){
+  var h='<div class="nudges">';
+  for (var k=0;k<n && k<tips.length;k++) h+='<div class="nudgebox">'+tips[k]+'</div>';
+  h+='<div class="nrow">';
+  if (n<tips.length) h+='<button class="link" id="nudge" type="button">Need a nudge?</button>';
+  else if (showMe) h+='<button class="link" id="showme" type="button">Show me</button>';
+  h+='</div></div>';
+  return h;
+}
+
+function wireCase(R){
+  var c=R.c;
+  var q=function(id){ return document.getElementById(id); };
+  if (R.stage==="find"){
+    Array.prototype.forEach.call(screen.querySelectorAll(".lt[data-k]"), function(b){
+      b.onclick=function(){
+        var wi=+b.getAttribute("data-wi"), k=+b.getAttribute("data-k");
+        if (!R.sel || R.sel.wi!==wi || R.sel.done) R.sel={wi:wi,a:k,b:k,done:false};
+        else { R.sel.b=k; R.sel.done=true; }
+        R.findMsg=""; R.findCls="";
+        rCase();
+        var nb=screen.querySelector('.lt[data-wi="'+wi+'"][data-k="'+k+'"]'); if (nb) nb.focus();
+      };
+    });
+    q("clear").onclick=function(){ R.sel=null; R.findMsg=""; rCase(); };
+    q("check").onclick=function(){ checkFind(R); };
+    if (q("nudge")) q("nudge").onclick=function(){ R.findNudge++; rCase(); };
+    if (q("showme")) q("showme").onclick=function(){ R.findShown=true; R.stage="imp"; R.sel=null; render(); };
+  } else if (R.stage==="imp"){
+    Array.prototype.forEach.call(screen.querySelectorAll("[data-imp]"), function(el){
+      var go=function(){ accuse(R, +el.getAttribute("data-imp")); };
+      el.onclick=go;
+      el.onkeydown=function(e){ if (e.key==="Enter"||e.key===" "){ e.preventDefault(); go(); } };
+    });
+    if (q("nudge")) q("nudge").onclick=function(){
+      var honest=R.words.map(function(o,k){return k;}).filter(function(k){ return !R.words[k].imp && R.impWrong.indexOf(k)<0; });
+      R.impFaded=honest[Math.floor(Math.random()*honest.length)]; R.impNudge++; rCase();
+    };
+    if (q("showme")) q("showme").onclick=function(){ R.impShown=true; R.stage="mean"; render(); };
+  } else if (R.stage==="mean"){
+    var f=q("typeform");
+    if (f){
+      var inp=q("guess");
+      inp.oninput=function(){ R.typed=inp.value; };
+      f.onsubmit=function(e){ e.preventDefault(); checkMean(R, inp.value); };
+      try { inp.focus({preventScroll:true}); } catch(e){}
+    }
+    Array.prototype.forEach.call(screen.querySelectorAll("[data-opt]"), function(b){
+      b.onclick=function(){
+        var k=+b.getAttribute("data-opt");
+        if (R.meanOpts[k].right){ R.meanMsg=""; R.stage="done"; render(); }
+        else { R.meanChoiceWrong.push(k); R.meanMsg="Not that one."; R.meanCls="n"; rCase(); }
+      };
+    });
+    if (q("nudge")) q("nudge").onclick=function(){ R.meanNudge++; R.meanMsg=""; rCase(); };
+    if (q("showme")) q("showme").onclick=function(){ R.meanShown=true; R.stage="done"; render(); };
+  } else {
+    q("nextcase").onclick=function(){ if (S.i<ROUNDS-1){ S.i++; show("case"); } else show("end"); };
+  }
+}
+
+function checkFind(R){
+  var c=R.c, s=selText(R);
+  if (!s) return;
+  if (s.length<3){ R.findMsg="A root has at least three letters here. Pick a longer run."; R.findCls="n"; rCase(); return; }
+  if (s===c.chunk){ R.stage="imp"; R.sel=null; R.findMsg=""; render(); return; }
+  var missing=R.words.filter(function(o){ return low(o.w).indexOf(s)<0; });
+  if (!missing.length){ R.findMsg="All four words do have <b>"+s.toUpperCase()+"</b>, but they share a longer run than that. Look again."; R.findCls="n"; rCase(); return; }
+  R.findWrong++;
+  R.findMsg="Not every word has <b>"+s.toUpperCase()+"</b>. Look at <b>"+esc(missing[0].w)+"</b>."; R.findCls="n";
+  R.sel=null;
+  rCase();
+  var box=screen.querySelector(".selbox"); if (box){ box.classList.add("shake"); }
+}
+
+function accuse(R, wi){
+  if (R.words[wi].imp){ R.stage="mean"; render(); return; }
+  if (R.impWrong.indexOf(wi)<0) R.impWrong.push(wi);
+  rCase();
+}
+
+function norm(t){ return low(t).replace(/[^a-z0-9]+/g," ").trim(); }
+function matches(list, t){
+  var n=norm(t); if (!n) return false;
+  var toks=n.split(" "), joined=toks.join("");
+  var stop={"a":1,"an":1,"the":1,"to":1,"i":1,"it":1,"means":1,"mean":1,"of":1,"is":1};
+  var rest=toks.filter(function(x){return !stop[x];});
+  return list.indexOf(joined)>=0 || list.indexOf(rest.join(""))>=0 || rest.some(function(x){ return list.indexOf(x)>=0; });
+}
+function checkMean(R, t){
+  var c=R.c;
+  if (!norm(t)){ R.meanMsg="Type what you think it means first."; R.meanCls="n"; rCase(); return; }
+  if (matches(c.ok, t)){ R.meanTyped=true; R.stage="done"; R.meanMsg=""; render(); return; }
+  R.meanTries++; R.typed=t;
+  if (matches(c.near[0], t)){ R.meanMsg=c.near[1]; R.meanCls="n"; }
+  else { R.meanMsg="Not quite. What do the three honest words have in common?"; R.meanCls="n"; }
+  if (R.meanTries>=3 && R.meanNudge<2){ R.meanNudge=2; R.meanMsg="Three tries. Choose from these instead."; }
+  rCase();
+}
+
+/* ============================================================
+   END
+   ============================================================ */
+var RANKS = [
+  {min:0,  la:"TIRO",             en:"a new recruit",                 x:"A <i>tiro</i> was a new recruit in the Roman army. English still has <b>tyro</b>, a beginner."},
+  {min:6,  la:"SPECULATOR",       en:"a scout",                       x:"A <i>speculator</i> was an army scout, sent ahead to look (<i>specto</i>, I look). That gives English <b>speculate</b>."},
+  {min:10, la:"QUAESITOR",        en:"an investigator",               x:"A <i>quaesitor</i> investigated crimes (<i>quaero</i>, I seek). English gets <b>question</b> and <b>quest</b> from the same family."},
+  {min:13, la:"SUMMUS QUAESITOR", en:"the highest investigator",      x:"<i>Summus</i> means highest (English <b>summit</b>) and a <i>quaesitor</i> investigated crimes (<i>quaero</i>, I seek)."}
+];
+function rankFor(sc){ var r=RANKS[0]; RANKS.forEach(function(x){ if (sc>=x.min) r=x; }); return r; }
+
+function rEnd(){
+  var sc=score(), rk=rankFor(sc);
+  var qrsvg="";
+  try { var qq=qrcode(0,"M"); qq.addData(PARENT_URL); qq.make(); qrsvg=qq.createSvgTag({cellSize:4, margin:0, scalable:true}); } catch(err){}
+  var h='<div class="endgrid"><div class="rank pop">'+
+    '<div class="step">Your detective rank</div>'+
+    '<div class="rla">'+rk.la+'</div><div class="ren">'+rk.en+'</div>'+
+    '<p class="rsc">Clue points: <b class="la">'+toRoman(sc)+'</b> out of <b class="la">'+toRoman(maxScore())+'</b> <span class="small">('+sc+' out of '+maxScore()+')</span></p>'+
+    '<p class="small">'+rk.x+'</p>'+
+    '</div><div><h3>Your casebook</h3><ul class="casebook">';
+  S.rounds.forEach(function(R){
+    var c=R.c, imp=R.words.filter(function(o){return o.imp;})[0];
+    h+='<li><div class="cbh"><b class="root">'+c.chunk.toUpperCase()+'</b> <span class="la">'+c.latin+'</span> = '+c.mean+'</div>'+
+       '<div class="cbw">'+c.w.map(function(x){ var at=low(x[0]).indexOf(c.chunk); return x[0].slice(0,at)+'<u>'+x[0].slice(at,at+c.chunk.length)+'</u>'+x[0].slice(at+c.chunk.length); }).join(", ")+
+       ' &middot; <s>'+esc(imp.w)+'</s></div></li>';
+  });
+  h+='</ul></div></div>';
+  h+='<p class="lead" style="text-align:center;margin-top:16px">Latin pupils at Five Ways use Latin like this to unlock long English words.</p>';
+  h+='<div class="grown"><div class="qr">'+qrsvg+'</div><div><b>Grown-ups:</b> scan to read about Latin at King Edward VI Five Ways.</div></div>';
+  h+='<div class="next" style="justify-content:center"><button class="ghost" id="allgames" type="button">&#8962; All games</button><button class="big" id="restart" type="button">New cases &rarr;</button></div>';
+  screen.innerHTML=h;
+  document.getElementById("restart").onclick=function(){ fresh(); show("start"); };
+  document.getElementById("allgames").onclick=function(){ LUDI.home(); };
+}
+
+document.getElementById("home").onclick=function(){ LUDI.home(); };
+render();
+
+/* for testing */
+window.RD = {S:function(){return S;}, CASES:CASES, score:score, buildDeck:buildDeck, matches:matches, toRoman:toRoman, rankFor:rankFor, render:render};
+})();
+</script>
+</body>
+</html>
