@@ -178,6 +178,7 @@ p{margin:0 0 .8em;font-size:clamp(1rem,1.9vw,1.15rem);line-height:1.45}
   .buzz{min-height:90px}
 }
 .buzz.lit:disabled{filter:none}
+.aopt:disabled:not(.no):not(.yes):not(.dim){opacity:1}
 
 @media (max-width:900px){
   .pips{display:none}
@@ -259,7 +260,7 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
 var PARENT_URL = "https://mrbeasley930-ai.github.io/Parent-Latin-Website/";
 var ROUNDS = 8;
 var WORD_MS = 240;        // question appears one word at a time
-var OPEN_SECS = 12;       // time to buzz once the question is complete
+var OPEN_SECS = 15;       // time to buzz once the question and the four answers are showing
 var ANSWER_SECS = 10;     // time to pick an answer after buzzing
 var HANDICAP_SECS = 2;    // grown-up's buzzer wakes up this much later
 
@@ -393,7 +394,7 @@ function rStart(){
     '<div class="keyshow"><div class="lab">HOW TO BUZZ</div><div class="keyrow">'+
       '<div><b>'+(fam?"Child":"You")+'</b>press <span class="kb">Z</span><br>or the red buzzer</div>'+
       '<div><b>'+(fam?"Grown-up":"Magister")+'</b>'+(fam?'press <span class="kb">M</span><br>or the blue buzzer':'buzzes by itself')+'</div></div>'+
-      '<p style="margin:8px 0 4px">After you buzz, pick an answer with <span class="kb">1</span><span class="kb">2</span><span class="kb">3</span><span class="kb">4</span> or by tapping it.</p>'+
+      '<p style="margin:8px 0 4px">Read the question and the four answers, then buzz. The first to buzz picks an answer with <span class="kb">1</span><span class="kb">2</span><span class="kb">3</span><span class="kb">4</span> or by tapping it.</p>'+
       '<p style="margin:0">Get it wrong and the other player can <b>steal</b> it. The last question is worth <b>double</b>.</p></div></div>';
   screen.innerHTML=h;
   q("mfam").onclick=function(){ S.mode="family"; rStart(); };
@@ -430,7 +431,7 @@ function openBuzz(){
 }
 function setDeadline(secs){ S.R.deadline=Date.now()+secs*1000; S.R.span=secs*1000; }
 function canBuzz(pl){
-  var R=S.R; if (!R || !(R.phase==="reading"||R.phase==="open")) return false;
+  var R=S.R; if (!R || R.phase!=="open") return false;
   if (isCpu(pl)) return false;
   if (pl==="p" && S.handicap){ return R.phase==="open" && Date.now()-R.readEnd >= HANDICAP_SECS*1000; }
   return true;
@@ -438,7 +439,7 @@ function canBuzz(pl){
 function buzz(pl, fromCpu){
   var R=S.R;
   if (!fromCpu && !canBuzz(pl)) return;
-  if (!(R.phase==="reading"||R.phase==="open")) return;
+  if (R.phase!=="open") return;
   clearTimers();
   R.buzzer=pl; R.answerer=pl; R.phase="answer"; R.shown=R.words.length;
   R.msg='<span class="'+pl+'">'+names()[pl]+'</span> buzzed first!';
@@ -495,8 +496,8 @@ function nextRound(){
 
 /* the Magister */
 function scheduleCpuBuzz(){
-  var R=S.R, wait = 500 + R.words.length*WORD_MS + 2200 + Math.random()*4300;
-  later(function(){ if (S.R===R && (R.phase==="reading"||R.phase==="open")) buzz("p", true); }, wait);
+  var R=S.R, wait = 500 + R.words.length*WORD_MS + 3000 + Math.random()*4500;
+  later(function(){ if (S.R===R && R.phase==="open") buzz("p", true); }, wait);
 }
 function cpuAnswer(){
   var R=S.R;
@@ -529,13 +530,13 @@ function rRound(){
     '<div class="qq" id="qq">'+R.words.map(function(w,i){ return '<span class="w'+(i<R.shown?" on":"")+'">'+w+'</span>'; }).join(" ")+'</div>'+
     '<div class="timer"><div class="t" id="tbar"'+(R.deadline?'':' style="width:0"')+'></div></div>'+
     '<div class="status" id="status" aria-live="polite">'+statusText()+'</div>';
-  if (R.phase==="reading"||R.phase==="open"){
-    h+='<p class="small" style="margin:6px 0 0">The four answers appear when someone buzzes.</p>';
+  if (R.phase==="reading"){
+    h+='<p class="small" style="margin:6px 0 0">The four answers appear when the question is finished. No buzzing until then.</p>';
   } else {
     h+='<div class="aopts">';
     D.order.forEach(function(oi,n){
       var cls = R.wrong[oi] ? " no" : (R.phase==="result" ? (oi===0?" yes":" dim") : "");
-      var dis = R.wrong[oi] || R.phase==="result" || isCpu(R.answerer);
+      var dis = R.wrong[oi] || R.phase==="result" || R.phase==="open" || isCpu(R.answerer);
       h+='<button class="aopt'+cls+'" type="button" data-o="'+oi+'"'+(dis?" disabled":"")+'><span class="k">'+(n+1)+'</span><span>'+B.o[oi]+'</span></button>';
     });
     h+='</div>';
@@ -551,8 +552,8 @@ function rRound(){
 }
 function statusText(){
   var R=S.R, n=names();
-  if (R.phase==="reading") return "Read the question… you can buzz any time.";
-  if (R.phase==="open") return "Buzz now! First to buzz answers.";
+  if (R.phase==="reading") return "Read the question…";
+  if (R.phase==="open") return "Read the four answers. Buzz when you know which one is right!";
   if (R.phase==="answer") return R.msg+(isCpu(R.answerer)?" The Magister is thinking…":" Pick an answer: keys 1–4, or tap.");
   if (R.phase==="steal") return R.msg+(isCpu(R.answerer)?" The Magister is thinking…":" Keys 1–4, or tap.");
   return R.msg;
@@ -564,7 +565,7 @@ function paintWords(){
 function paintBuzzers(){
   ["c","p"].forEach(function(pl){
     var b=q("buzz"+pl); if (!b) return;
-    var R=S.R, live=(R.phase==="reading"||R.phase==="open");
+    var R=S.R, live=(R.phase==="open");
     b.disabled = !live || isCpu(pl);
     b.classList.toggle("lit", R.buzzer===pl && R.phase!=="result" || (R.answerer===pl && (R.phase==="answer"||R.phase==="steal")));
     b.classList.toggle("wait", live && !canBuzz(pl) && !isCpu(pl));
