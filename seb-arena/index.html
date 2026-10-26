@@ -1,0 +1,1093 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Seb's Arena">
+<meta name="theme-color" content="#0b0f1e">
+<title>Seb's Arena</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Press+Start+2P&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0b0f1e; --bg2:#121a33; --card:#171f3a; --card2:#1f2a4d; --line:#2b3764;
+  --ink:#f3f5ff; --mute:#9fb0e6; --gold:#ffcd3c; --xp:#7cf5a4; --warn:#ffb15c; --soft:#ff7eb6;
+  --mine:#57c84d; --brick:#ff4d4d; --astro:#5ec8ff; --forza:#ff9f1c; --words:#c77dff; --atlas:#ffd166;
+  --r:22px; --shadow:0 10px 30px rgba(0,0,0,.35);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:Fredoka,system-ui,sans-serif;min-height:100%;-webkit-text-size-adjust:100%}
+body{padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);overflow-x:hidden}
+#scene{position:fixed;inset:0;z-index:-1;background:
+  radial-gradient(1200px 600px at 80% -10%,#2a3a7a55,transparent 60%),
+  radial-gradient(900px 500px at -10% 110%,#7a2a5a44,transparent 60%),var(--bg)}
+#scene img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.28}
+#scene::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,#0b0f1ecc,#0b0f1ee6 60%,#0b0f1e)}
+button{font-family:inherit;font-size:inherit;color:inherit;border:0;background:none;cursor:pointer}
+input{font-family:inherit;font-size:inherit;color:inherit}
+h1,h2,h3{margin:0;font-weight:700}
+.wrap{max-width:980px;margin:0 auto;padding:12px 16px 40px}
+.px{font-family:"Press Start 2P",monospace;font-size:.72em;letter-spacing:.5px}
+
+/* header */
+header{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:8px 0 14px}
+.logo{display:flex;align-items:center;gap:10px;cursor:pointer}
+.logo .mark{width:44px;height:44px;border-radius:14px;background:linear-gradient(135deg,var(--gold),#ff7a1c);display:grid;place-items:center;font-size:24px;box-shadow:var(--shadow)}
+.logo h1{font-size:1.35rem;letter-spacing:.5px}
+.logo small{display:block;color:var(--mute);font-weight:500;font-size:.78rem}
+.spacer{flex:1}
+.chip{display:inline-flex;align-items:center;gap:6px;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:7px 12px;font-weight:600;font-size:.92rem;white-space:nowrap}
+.chip.xp{border-color:#2f6b47;background:#0f2a1c;color:var(--xp)}
+.chip.rank{border-color:#6b5a2f;background:#2a200f;color:var(--gold)}
+.chip.bank{border-color:#2f4f6b;background:#0f1f2a;color:#8fd6ff}
+.chip .n{font-family:"Press Start 2P",monospace;font-size:.7rem}
+#sync{width:9px;height:9px;border-radius:50%;background:#555;display:inline-block;margin-left:4px}
+#sync.ok{background:var(--xp)} #sync.bad{background:var(--warn)} #sync.busy{background:var(--gold)}
+.iconbtn{width:40px;height:40px;border-radius:12px;background:var(--card);border:1px solid var(--line);display:grid;place-items:center;font-size:18px}
+
+/* xp bar */
+.xpbar{height:14px;border-radius:999px;background:#0a1222;border:1px solid var(--line);overflow:hidden;position:relative}
+.xpbar i{display:block;height:100%;background:linear-gradient(90deg,var(--xp),#3ddc84);width:0;transition:width .6s cubic-bezier(.2,.8,.2,1)}
+.xpbar b{position:absolute;inset:0;display:grid;place-items:center;font-size:.72rem;font-weight:600;color:#fff;text-shadow:0 1px 2px #000}
+.rankrow{display:flex;justify-content:space-between;color:var(--mute);font-size:.82rem;margin:6px 2px 0}
+
+/* views */
+.view{display:none;animation:fade .25s ease}
+.view.on{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+/* cards */
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:16px;box-shadow:var(--shadow)}
+.card h2{font-size:1.1rem;margin-bottom:8px}
+.grid{display:grid;gap:12px}
+.g2{grid-template-columns:repeat(2,1fr)} .g3{grid-template-columns:repeat(3,1fr)}
+@media(max-width:640px){.g3{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:420px){.g2,.g3{grid-template-columns:1fr}}
+
+/* world tiles */
+.worlds{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:14px}
+@media(max-width:720px){.worlds{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:400px){.worlds{grid-template-columns:1fr}}
+.tile{position:relative;border-radius:var(--r);overflow:hidden;min-height:168px;padding:14px;display:flex;flex-direction:column;justify-content:flex-end;text-align:left;border:2px solid transparent;box-shadow:var(--shadow);transition:transform .15s}
+.tile:active{transform:scale(.97)}
+.tile img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0}
+.tile::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 30%,#000a 80%,#000d);z-index:1}
+.tile .em{position:absolute;top:10px;right:12px;font-size:34px;z-index:2;filter:drop-shadow(0 2px 4px #0008)}
+.tile img+.em{display:none}
+.tile .t{position:relative;z-index:2}
+.tile .t h3{font-size:1.15rem;line-height:1.1}
+.tile .t small{color:#e8ecff;opacity:.9;font-weight:500}
+.tile .meta{position:relative;z-index:2;display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+.tile .meta span{background:#0008;border-radius:999px;padding:3px 8px;font-size:.72rem;font-weight:600}
+.tile.focus{border-color:var(--gold);box-shadow:0 0 0 3px #ffcd3c44,var(--shadow)}
+.tile.mine{background:linear-gradient(160deg,#2d6b25,#163d12)} .tile.brick{background:linear-gradient(160deg,#b8322f,#5e1414)}
+.tile.astro{background:linear-gradient(160deg,#1f5f9a,#0c2a4d)} .tile.forza{background:linear-gradient(160deg,#c46a0d,#5c2f05)}
+.tile.words{background:linear-gradient(160deg,#6a2fb0,#2e1152)} .tile.atlas{background:linear-gradient(160deg,#9a7a1a,#4a3a08)}
+.tile.boss{background:linear-gradient(160deg,#3b3b4a,#15151c)}
+.stars{letter-spacing:1px}
+
+/* quests + dad card */
+.quest{display:flex;align-items:center;gap:10px;padding:10px 0;border-top:1px solid var(--line)}
+.quest:first-of-type{border-top:0}
+.quest .ic{width:38px;height:38px;border-radius:12px;background:var(--card2);display:grid;place-items:center;font-size:18px;flex:none}
+.quest .tx{flex:1}.quest .tx small{display:block;color:var(--mute)}
+.quest .bar{width:90px;height:8px;border-radius:99px;background:#0a1222;overflow:hidden}
+.quest .bar i{display:block;height:100%;background:var(--gold)}
+.quest.done .ic{background:#1b4d2e}.quest.done .tx{text-decoration:line-through;color:var(--mute)}
+.dad{border-color:#6b5a2f;background:linear-gradient(135deg,#2a200f,#171f3a)}
+.dad h2{color:var(--gold)}
+.pill{display:inline-block;background:var(--card2);border-radius:999px;padding:4px 10px;font-size:.8rem;font-weight:600;color:var(--mute)}
+
+/* play */
+.playtop{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.playtop .back{font-weight:600;color:var(--mute)}
+.playtop .wn{font-weight:700;font-size:1.05rem}
+.combo{margin-left:auto;background:#2a1a0f;border:1px solid #6b3a2f;color:#ffb15c;border-radius:999px;padding:5px 11px;font-weight:700;font-size:.9rem;opacity:.35;transition:opacity .2s,transform .2s}
+.combo.hot{opacity:1}.combo.pop{transform:scale(1.18)}
+.prog{display:flex;gap:5px;margin-bottom:14px}
+.prog i{flex:1;height:10px;border-radius:99px;background:#0a1222;border:1px solid var(--line)}
+.prog i.ok{background:var(--xp);border-color:var(--xp)} .prog i.half{background:#9adf9a;border-color:#9adf9a}
+.prog i.miss{background:#5a6a9a;border-color:#5a6a9a} .prog i.now{border-color:var(--gold);box-shadow:0 0 0 2px #ffcd3c55}
+.qcard{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:20px;box-shadow:var(--shadow);min-height:200px}
+.qcard .topic{color:var(--mute);font-size:.8rem;font-weight:600;letter-spacing:.3px;text-transform:uppercase}
+.qcard .q{font-size:1.45rem;font-weight:600;margin:8px 0 16px;line-height:1.3}
+.qcard .q .big{font-size:2.2rem;font-family:"Press Start 2P",monospace;display:block;margin:10px 0;line-height:1.4;word-break:break-word}
+.opts{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+@media(max-width:520px){.opts{grid-template-columns:1fr}}
+.opt{background:var(--card2);border:2px solid var(--line);border-radius:16px;padding:16px 14px;font-size:1.1rem;font-weight:600;text-align:left;min-height:58px;transition:transform .1s,background .2s}
+.opt:active{transform:scale(.98)}
+.opt.right{background:#1b4d2e;border-color:var(--xp)} .opt.notyet{background:#3a2a44;border-color:#8a6aa0;opacity:.75}
+.opt.dim{opacity:.4}
+.typerow{display:flex;gap:10px}
+.typerow input{flex:1;background:#0a1222;border:2px solid var(--line);border-radius:16px;padding:14px 16px;font-size:1.5rem;font-weight:600;outline:none;min-width:0}
+.typerow input:focus{border-color:var(--gold)}
+.btn{background:var(--gold);color:#1a1200;border-radius:16px;padding:14px 20px;font-weight:700;font-size:1.05rem;box-shadow:0 6px 0 #a67a00;transition:transform .08s,box-shadow .08s}
+.btn:active{transform:translateY(4px);box-shadow:0 2px 0 #a67a00}
+.btn.sec{background:var(--card2);color:var(--ink);box-shadow:0 6px 0 #0a1222}
+.btn.sec:active{box-shadow:0 2px 0 #0a1222}
+.btn.ok{background:var(--xp);color:#042;box-shadow:0 6px 0 #2a7a4a}
+.btn[disabled]{opacity:.5;pointer-events:none}
+.fb{margin-top:14px;border-radius:16px;padding:14px 16px;display:none;animation:fade .2s}
+.fb.on{display:block}
+.fb.good{background:#123b26;border:1px solid #2f6b47}
+.fb.hint{background:#2a2340;border:1px solid #6a5a9a}
+.fb.show{background:#2a2a1a;border:1px solid #6b6a2f}
+.fb h3{font-size:1.1rem;margin-bottom:4px}
+.fb .why{color:#dfe5ff;margin-top:4px}
+.fb .row{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap}
+.xpfloat{position:fixed;left:50%;top:38%;transform:translateX(-50%);font-family:"Press Start 2P",monospace;color:var(--xp);font-size:1.3rem;pointer-events:none;animation:floatup 1.1s ease forwards;text-shadow:0 2px 0 #000;z-index:50}
+@keyframes floatup{0%{opacity:0;transform:translate(-50%,10px) scale(.8)}20%{opacity:1;transform:translate(-50%,0) scale(1.1)}100%{opacity:0;transform:translate(-50%,-70px) scale(1)}}
+.shake{animation:shake .35s}
+@keyframes shake{20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
+.memo{background:#0a1222;border:2px dashed var(--line);border-radius:16px;padding:16px;text-align:center;margin-bottom:12px}
+.memo .w{font-size:2rem;font-weight:700;letter-spacing:2px}
+.memo .cnt{color:var(--mute);font-size:.85rem;margin-top:4px}
+.stopwatch{font-family:"Press Start 2P",monospace;color:var(--forza);font-size:.9rem;margin-left:auto}
+.ghost{height:10px;border-radius:99px;background:#0a1222;border:1px solid var(--line);position:relative;margin:4px 0 12px;overflow:hidden}
+.ghost i{position:absolute;left:0;top:0;height:100%;background:var(--forza);width:0;transition:width .3s}
+.ghost b{position:absolute;top:-4px;width:3px;height:18px;background:#fff;opacity:.7}
+.ores{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+.ores span{width:34px;height:34px;border-radius:8px;background:#0a1222;border:1px solid var(--line);display:grid;place-items:center;font-size:18px;opacity:.35}
+.ores span.got{opacity:1;background:#1b3b26;border-color:var(--mine)}
+
+/* run summary */
+.summary{text-align:center}
+.summary .bigxp{font-family:"Press Start 2P",monospace;color:var(--xp);font-size:1.8rem;margin:10px 0}
+.summary .stat{display:inline-block;margin:6px 10px;color:var(--mute)}
+.summary .stat b{display:block;color:var(--ink);font-size:1.3rem}
+.loot{font-size:2.6rem;margin:6px 0}
+
+/* boss */
+.bosshead{display:flex;align-items:center;gap:14px;margin-bottom:12px}
+.bosshead .ic{font-size:52px;filter:drop-shadow(0 4px 6px #000)}
+.hp{height:18px;border-radius:99px;background:#2a0f14;border:1px solid #6b2f3a;overflow:hidden}
+.hp i{display:block;height:100%;background:linear-gradient(90deg,#ff4d6d,#ff7a1c);transition:width .5s}
+.shields{font-size:1.4rem;letter-spacing:4px;margin:8px 0}
+.speech{background:#0a1222;border:1px solid var(--line);border-radius:16px;padding:10px 14px;font-style:italic;color:#dfe5ff;margin-bottom:12px;min-height:44px}
+.bosslist .tile{min-height:120px}
+
+/* trophies */
+.badges{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px}
+.badge{background:var(--card2);border:1px solid var(--line);border-radius:16px;padding:12px;text-align:center}
+.badge .i{font-size:30px}.badge b{display:block;margin-top:4px}.badge small{color:var(--mute);display:block}
+.badge.lock{opacity:.35;filter:grayscale(1)}
+
+/* overlays */
+.ov{position:fixed;inset:0;background:#0b0f1ef2;display:none;place-items:center;z-index:100;padding:20px}
+.ov.on{display:grid}
+.ov .box{background:var(--card);border:1px solid var(--line);border-radius:28px;padding:28px;max-width:440px;width:100%;text-align:center;box-shadow:var(--shadow);animation:pop .35s cubic-bezier(.2,1.4,.3,1)}
+@keyframes pop{from{transform:scale(.6);opacity:0}to{transform:none;opacity:1}}
+.ov .huge{font-size:64px;line-height:1;margin-bottom:8px}
+.ov h2{font-size:1.6rem}
+.ov p{color:var(--mute)}
+.confetti{position:fixed;inset:0;pointer-events:none;z-index:101;overflow:hidden}
+.confetti i{position:absolute;top:-10px;width:10px;height:14px;border-radius:2px;animation:drop 2.4s linear forwards}
+@keyframes drop{to{transform:translateY(110vh) rotate(720deg)}}
+.gate .box{text-align:left}
+.gate .who{display:grid;gap:10px;margin-top:14px}
+.gate .who button{padding:18px;border-radius:18px;background:var(--card2);border:2px solid var(--line);font-size:1.3rem;font-weight:700;text-align:left}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#fff;color:#111;border-radius:999px;padding:10px 18px;font-weight:600;box-shadow:var(--shadow);z-index:120;animation:fade .25s;max-width:92vw;text-align:center}
+footer{color:var(--mute);font-size:.78rem;text-align:center;margin-top:30px}
+.small{font-size:.85rem;color:var(--mute)}
+.mt{margin-top:12px}
+.center{text-align:center}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+</style>
+</head>
+<body>
+<div id="scene"><img src="images/arena-bg.jpg" alt="" onerror="this.remove()"></div>
+<div class="wrap">
+  <header>
+    <div class="logo" onclick="go('hub')">
+      <div class="mark">🏟️</div>
+      <div><h1>SEB'S ARENA</h1><small id="subtitle">Six worlds. One champion.</small></div>
+    </div>
+    <div class="spacer"></div>
+    <div class="chip rank" id="rankchip">🥾 Rookie</div>
+    <div class="chip xp">XP <span class="n" id="xpn">0</span></div>
+    <div class="chip bank" id="bankchip" title="iPad time earned">⏱ <span id="bankmin">0</span> min</div>
+    <button class="iconbtn" id="mutebtn" onclick="toggleMute()" title="Sound">🔊</button>
+    <button class="iconbtn" onclick="go('trophies')" title="Trophies">🏆</button>
+    <span id="sync" title="cloud save"></span>
+  </header>
+  <div class="xpbar"><i id="xpfill"></i><b id="xplabel"></b></div>
+  <div class="rankrow"><span id="ranknow"></span><span id="ranknext"></span></div>
+
+  <!-- HUB -->
+  <section class="view" id="v-hub">
+    <div class="grid g2 mt">
+      <div class="card dad" id="dadcard" style="display:none"></div>
+      <div class="card" id="questcard"></div>
+      <div class="card" id="streakcard"></div>
+    </div>
+    <div class="worlds" id="worlds"></div>
+    <div class="worlds mt" id="extra"></div>
+    <footer>Every "not yet" earns Grit XP. Nothing you earn can ever be taken away.</footer>
+  </section>
+
+  <!-- PLAY -->
+  <section class="view" id="v-play">
+    <div class="playtop">
+      <button class="back" onclick="endRun(true)">‹ Arena</button>
+      <span class="wn" id="p-world"></span>
+      <span class="stopwatch" id="p-clock" style="display:none">0.0s</span>
+      <span class="combo" id="p-combo">🔥 0</span>
+    </div>
+    <div class="prog" id="p-prog"></div>
+    <div id="p-deco"></div>
+    <div class="qcard" id="p-card"></div>
+    <div class="fb" id="p-fb"></div>
+  </section>
+
+  <!-- SUMMARY -->
+  <section class="view" id="v-sum"></section>
+
+  <!-- BOSS LIST -->
+  <section class="view" id="v-bosses">
+    <div class="playtop"><button class="back" onclick="go('hub')">‹ Arena</button><span class="wn">Boss Battles</span></div>
+    <p class="small">Each right answer hits the boss. A "not yet" costs one shield. If your shields run out the boss escapes — but every bit of damage you did stays. Nobody beats a boss first time. Everybody beats them eventually.</p>
+    <div class="worlds bosslist" id="bosslist"></div>
+  </section>
+
+  <!-- BOSS FIGHT -->
+  <section class="view" id="v-boss">
+    <div class="playtop"><button class="back" onclick="fleeBoss()">‹ Retreat (keep damage)</button><span class="wn" id="b-name"></span></div>
+    <div class="bosshead"><div class="ic" id="b-icon"></div><div style="flex:1"><div class="hp"><i id="b-hp"></i></div><div class="shields" id="b-shields"></div></div></div>
+    <div class="speech" id="b-speech"></div>
+    <div class="qcard" id="b-card"></div>
+    <div class="fb" id="b-fb"></div>
+  </section>
+
+  <!-- TROPHIES -->
+  <section class="view" id="v-trophies">
+    <div class="playtop"><button class="back" onclick="go('hub')">‹ Arena</button><span class="wn">Trophy Room</span></div>
+    <div class="card" id="trophystats"></div>
+    <h2 class="mt">Badges</h2>
+    <div class="badges mt" id="badges"></div>
+    <h2 class="mt">Belts</h2>
+    <div class="row mt" id="belts"></div>
+    <p class="small mt" id="whoami"></p>
+  </section>
+</div>
+
+<div class="ov gate" id="gate"><div class="box">
+  <div class="huge center">🏟️</div>
+  <h2 class="center">Who's entering the Arena?</h2>
+  <div class="who" id="who"></div>
+  <p class="small center mt">Your XP, belts and badges are saved to the cloud, so you can carry on on any iPad.</p>
+</div></div>
+
+<div class="ov" id="ov"><div class="box" id="ovbox"></div></div>
+<div class="confetti" id="confetti"></div>
+
+<script>
+/* ===================== SEB'S ARENA — CONTENT BANKS ===================== */
+/* Everything Seb can be asked lives here. Tiers: 1 (easy) … 5 (hard).      */
+
+const RANKS = [
+  [0,"Rookie","🥾"],[500,"Apprentice","🔧"],[1500,"Explorer","🧭"],[3000,"Builder","🧱"],
+  [5000,"Racer","🏎️"],[7500,"Contender","🥊"],[11000,"Champion","🏆"],[15000,"Legend","⚡"],
+  [20000,"Grand Master","👑"],[28000,"Mythic","🐉"],[40000,"Immortal","🌌"]
+];
+
+/* ---------- SPELLING (Brick Builder) ---------- */
+/* w = word, d = short meaning, t = tier 1-3, f = focus: "dbl" (has a double consonant Seb must keep),
+   "sgl" (a single consonant people wrongly double), "y56" (Year 5/6 word) */
+const SPELL = [
+ // tier 1 — common double-consonant words
+ {w:"rabbit",d:"a furry animal with long ears",t:1,f:"dbl"},{w:"butter",d:"spread on toast",t:1,f:"dbl"},
+ {w:"letter",d:"you post it, or A, B, C",t:1,f:"dbl"},{w:"dinner",d:"evening meal",t:1,f:"dbl"},
+ {w:"summer",d:"the hot season",t:1,f:"dbl"},{w:"yellow",d:"the colour of a banana",t:1,f:"dbl"},
+ {w:"happy",d:"feeling glad",t:1,f:"dbl"},{w:"little",d:"small",t:1,f:"dbl"},
+ {w:"bottle",d:"holds a drink",t:1,f:"dbl"},{w:"puppy",d:"a young dog",t:1,f:"dbl"},
+ {w:"kitten",d:"a young cat",t:1,f:"dbl"},{w:"hidden",d:"out of sight",t:1,f:"dbl"},
+ {w:"ladder",d:"you climb it",t:1,f:"dbl"},{w:"mirror",d:"shows your reflection",t:1,f:"dbl"},
+ {w:"carry",d:"take something in your arms",t:1,f:"dbl"},{w:"hurry",d:"go fast",t:1,f:"dbl"},
+ {w:"sorry",d:"what you say when you apologise",t:1,f:"dbl"},{w:"funny",d:"makes you laugh",t:1,f:"dbl"},
+ {w:"pretty",d:"nice to look at",t:1,f:"dbl"},{w:"jelly",d:"wobbly pudding",t:1,f:"dbl"},
+ {w:"coffee",d:"a hot drink grown-ups like",t:1,f:"dbl"},{w:"balloon",d:"filled with air at a party",t:1,f:"dbl"},
+ {w:"pepper",d:"black powder you shake on food",t:1,f:"dbl"},{w:"ribbon",d:"a strip of fabric for tying",t:1,f:"dbl"},
+ {w:"tunnel",d:"a passage underground",t:1,f:"dbl"},{w:"village",d:"a small group of houses",t:1,f:"dbl"},
+ {w:"swimming",d:"moving through water",t:1,f:"dbl"},{w:"running",d:"going fast on foot",t:1,f:"dbl"},
+ {w:"shopping",d:"buying things",t:1,f:"dbl"},{w:"skipping",d:"jumping over a rope",t:1,f:"dbl"},
+ {w:"middle",d:"the centre",t:1,f:"dbl"},{w:"puzzle",d:"a problem to solve",t:1,f:"dbl"},
+ {w:"follow",d:"go after someone",t:1,f:"dbl"},{w:"better",d:"more good",t:1,f:"dbl"},
+ // tier 1 — single consonants that get wrongly doubled
+ {w:"until",d:"up to the time when",t:1,f:"sgl"},{w:"always",d:"every time",t:1,f:"sgl"},
+ {w:"robot",d:"a machine that can move by itself",t:1,f:"sgl"},{w:"lemon",d:"a sour yellow fruit",t:1,f:"sgl"},
+ {w:"planet",d:"Earth or Mars, for example",t:1,f:"sgl"},{w:"visit",d:"go to see someone",t:1,f:"sgl"},
+ {w:"finish",d:"come to the end",t:1,f:"sgl"},{w:"animal",d:"a living creature",t:1,f:"sgl"},
+ {w:"camel",d:"a desert animal with humps",t:1,f:"sgl"},{w:"habit",d:"something you do without thinking",t:1,f:"sgl"},
+ {w:"salad",d:"a cold dish of leaves and vegetables",t:1,f:"sgl"},{w:"holiday",d:"time off school",t:1,f:"sgl"},
+ {w:"already",d:"before now",t:1,f:"sgl"},{w:"body",d:"all of you from head to toe",t:1,f:"sgl"},
+ {w:"money",d:"coins and notes",t:1,f:"sgl"},{w:"river",d:"a long flowing body of water",t:1,f:"sgl"},
+ // tier 2
+ {w:"beginning",d:"the start",t:2,f:"dbl"},{w:"tomorrow",d:"the day after today",t:2,f:"dbl"},
+ {w:"different",d:"not the same",t:2,f:"dbl"},{w:"difficult",d:"hard to do",t:2,f:"dbl"},
+ {w:"happen",d:"take place",t:2,f:"dbl"},{w:"sudden",d:"happening quickly without warning",t:2,f:"dbl"},
+ {w:"suddenly",d:"all at once",t:2,f:"dbl"},{w:"terrible",d:"very bad",t:2,f:"dbl"},
+ {w:"horrible",d:"nasty, awful",t:2,f:"dbl"},{w:"possible",d:"can be done",t:2,f:"dbl"},
+ {w:"collect",d:"gather things together",t:2,f:"dbl"},{w:"common",d:"found everywhere, usual",t:2,f:"dbl"},
+ {w:"address",d:"where you live",t:2,f:"dbl"},{w:"arrive",d:"get to a place",t:2,f:"dbl"},
+ {w:"appear",d:"come into view",t:2,f:"dbl"},{w:"disappear",d:"vanish",t:2,f:"dbl"},
+ {w:"accident",d:"something bad that happens by chance",t:2,f:"dbl"},{w:"written",d:"put down in words",t:2,f:"dbl"},
+ {w:"forgotten",d:"gone from your memory",t:2,f:"dbl"},{w:"grammar",d:"the rules of a language",t:2,f:"dbl"},
+ {w:"traffic",d:"cars on the road",t:2,f:"dbl"},{w:"rubbish",d:"things you throw away",t:2,f:"dbl"},
+ {w:"scissors",d:"they cut paper",t:2,f:"dbl"},{w:"narrow",d:"not wide",t:2,f:"dbl"},
+ {w:"pattern",d:"a repeated design",t:2,f:"dbl"},{w:"passenger",d:"someone riding in a vehicle",t:2,f:"dbl"},
+ {w:"mammal",d:"a warm-blooded animal that feeds milk to its young",t:2,f:"dbl"},{w:"settle",d:"come to rest",t:2,f:"dbl"},
+ {w:"excellent",d:"extremely good",t:2,f:"dbl"},{w:"opposite",d:"completely different",t:2,f:"dbl"},
+ {w:"mission",d:"an important job to do",t:2,f:"dbl"},{w:"pressure",d:"a pushing force",t:2,f:"dbl"},
+ {w:"success",d:"doing well",t:2,f:"dbl"},{w:"suppose",d:"think something is probably true",t:2,f:"dbl"},
+ {w:"worry",d:"feel anxious",t:2,f:"dbl"},{w:"cabbage",d:"a round green vegetable",t:2,f:"dbl"},
+ {w:"interrupt",d:"break in while someone is talking",t:2,f:"dbl"},{w:"immediately",d:"right now",t:2,f:"dbl"},
+ {w:"occasion",d:"a special event",t:2,f:"dbl"},{w:"actually",d:"in fact, really",t:2,f:"sgl"},
+ {w:"famous",d:"known by lots of people",t:2,f:"sgl"},{w:"natural",d:"from nature, not made by people",t:2,f:"sgl"},
+ {w:"medicine",d:"what you take to get better",t:2,f:"sgl"},{w:"promise",d:"say you will definitely do something",t:2,f:"sgl"},
+ {w:"imagine",d:"picture it in your mind",t:2,f:"sgl"},{w:"popular",d:"liked by many people",t:2,f:"sgl"},
+ {w:"minute",d:"sixty seconds",t:2,f:"sgl"},{w:"separate",d:"apart, not joined",t:2,f:"sgl"},
+ {w:"decide",d:"make up your mind",t:2,f:"sgl"},{w:"experiment",d:"a scientific test",t:2,f:"sgl"},
+ // tier 3 — Year 5/6 words
+ {w:"necessary",d:"needed",t:3,f:"y56"},{w:"occasionally",d:"now and then",t:3,f:"y56"},
+ {w:"embarrass",d:"make someone feel awkward",t:3,f:"y56"},{w:"recommend",d:"say something is good",t:3,f:"y56"},
+ {w:"accommodate",d:"have room for",t:3,f:"y56"},{w:"accompany",d:"go along with",t:3,f:"y56"},
+ {w:"aggressive",d:"fierce, ready to attack",t:3,f:"y56"},{w:"apparent",d:"clear, obvious",t:3,f:"y56"},
+ {w:"committee",d:"a group that makes decisions",t:3,f:"y56"},{w:"communicate",d:"share information",t:3,f:"y56"},
+ {w:"community",d:"people living in one place",t:3,f:"y56"},{w:"correspond",d:"match up; write letters to",t:3,f:"y56"},
+ {w:"exaggerate",d:"make something sound bigger than it is",t:3,f:"y56"},{w:"opportunity",d:"a chance",t:3,f:"y56"},
+ {w:"parallel",d:"lines that never meet",t:3,f:"y56"},{w:"profession",d:"a job needing training",t:3,f:"y56"},
+ {w:"programme",d:"a TV show or a plan",t:3,f:"y56"},{w:"sufficient",d:"enough",t:3,f:"y56"},
+ {w:"attached",d:"joined on",t:3,f:"y56"},{w:"available",d:"ready to use",t:3,f:"y56"},
+ {w:"according",d:"as stated by",t:3,f:"y56"},{w:"possession",d:"something you own",t:3,f:"y56"},
+ {w:"occur",d:"happen",t:3,f:"y56"},{w:"occupy",d:"fill a space",t:3,f:"y56"},
+ {w:"harass",d:"keep bothering someone",t:3,f:"y56"},{w:"immediately",d:"at once",t:3,f:"y56"},
+ {w:"desperate",d:"wanting something very badly",t:3,f:"y56"},{w:"develop",d:"grow or build up",t:3,f:"y56"},
+ {w:"definite",d:"certain",t:3,f:"y56"},{w:"category",d:"a group of similar things",t:3,f:"y56"},
+ {w:"competition",d:"a contest",t:3,f:"y56"},{w:"vegetable",d:"a carrot or a pea",t:3,f:"y56"},
+ {w:"temperature",d:"how hot or cold",t:3,f:"y56"},{w:"environment",d:"the world around us",t:3,f:"y56"},
+ {w:"government",d:"the people who run the country",t:3,f:"y56"},{w:"equipment",d:"the kit you need",t:3,f:"y56"},
+ {w:"marvellous",d:"wonderful",t:3,f:"y56"},{w:"muscle",d:"it moves your bones",t:3,f:"y56"},
+ {w:"physical",d:"to do with the body",t:3,f:"y56"},{w:"relevant",d:"connected to the matter",t:3,f:"y56"},
+ {w:"sincerely",d:"truly, from the heart",t:3,f:"y56"},{w:"thorough",d:"careful and complete",t:3,f:"y56"},
+ {w:"vehicle",d:"a car, bus or lorry",t:3,f:"y56"},{w:"yacht",d:"a sailing boat",t:3,f:"y56"},
+ {w:"rhythm",d:"the beat in music",t:3,f:"y56"},{w:"stomach",d:"where your food goes",t:3,f:"y56"},
+ {w:"soldier",d:"a person in the army",t:3,f:"y56"},{w:"language",d:"English, Latin, Spanish",t:3,f:"y56"},
+ {w:"knowledge",d:"what you know",t:3,f:"y56"},{w:"guarantee",d:"a firm promise",t:3,f:"y56"}
+];
+
+/* ---------- SCIENCE (Astro Lab) ---------- */
+/* {q, o:[4 options], a: index, why, t: tier 1-3, k: topic} */
+const SCI = [
+ {q:"Which planet is closest to the Sun?",o:["Mercury","Venus","Earth","Mars"],a:0,why:"Mercury is the innermost planet, then Venus, Earth, Mars.",t:1,k:"Space"},
+ {q:"How long does the Earth take to orbit the Sun once?",o:["One day","One month","One year","Ten years"],a:2,why:"One full orbit of the Sun is one year (about 365 days).",t:1,k:"Space"},
+ {q:"What causes day and night?",o:["The Sun moving around Earth","Earth spinning on its axis","The Moon blocking the Sun","Clouds covering the Sun"],a:1,why:"Earth spins once every 24 hours; the side facing the Sun has day.",t:1,k:"Space"},
+ {q:"What does the Moon orbit?",o:["The Sun","Mars","The Earth","Jupiter"],a:2,why:"The Moon goes round the Earth about once a month.",t:1,k:"Space"},
+ {q:"The Sun is a…",o:["planet","star","moon","comet"],a:1,why:"The Sun is a star — a huge ball of burning gas.",t:1,k:"Space"},
+ {q:"Which is the largest planet in our solar system?",o:["Saturn","Earth","Neptune","Jupiter"],a:3,why:"Jupiter is so big that over 1,300 Earths would fit inside it.",t:1,k:"Space"},
+ {q:"Which planet is famous for its rings?",o:["Mars","Saturn","Venus","Mercury"],a:1,why:"Saturn's rings are made of ice and rock.",t:1,k:"Space"},
+ {q:"Which planet is called the Red Planet?",o:["Mars","Jupiter","Venus","Uranus"],a:0,why:"Mars looks red because of iron-rich dust on its surface.",t:1,k:"Space"},
+ {q:"What shape is the Earth?",o:["A flat disc","A cube","Roughly a sphere","A cylinder"],a:2,why:"Earth is a slightly squashed sphere.",t:1,k:"Space"},
+ {q:"Which force pulls everything towards the ground?",o:["Friction","Magnetism","Gravity","Air resistance"],a:2,why:"Gravity pulls objects towards the centre of the Earth.",t:1,k:"Forces"},
+ {q:"Air resistance is a kind of…",o:["gravity","friction","magnetism","electricity"],a:1,why:"Air resistance is friction between an object and the air.",t:2,k:"Forces"},
+ {q:"Which shape cuts through the air with the LEAST air resistance?",o:["A flat square","A pointed, streamlined shape","A big open parachute","A round ball of fluff"],a:1,why:"Streamlined shapes let air flow past smoothly — like a racing car's nose.",t:2,k:"Forces"},
+ {q:"Levers, pulleys and gears all let…",o:["a smaller force have a bigger effect","objects float","magnets stick","water boil faster"],a:0,why:"Simple machines multiply a force — a small push moves a heavy load.",t:2,k:"Forces"},
+ {q:"Friction is a force that…",o:["makes things speed up","slows things that rub together","pulls things to the Moon","makes things lighter"],a:1,why:"Friction acts when two surfaces rub, slowing movement.",t:1,k:"Forces"},
+ {q:"Weight is a force. It is measured in…",o:["kilograms","metres","newtons","litres"],a:2,why:"Weight (a force) is measured in newtons; mass is in kilograms.",t:3,k:"Forces"},
+ {q:"On the Moon, gravity is…",o:["stronger than on Earth","the same as Earth","weaker than on Earth","zero"],a:2,why:"Moon gravity is about a sixth of Earth's — that's why astronauts bounce.",t:2,k:"Forces"},
+ {q:"In a vacuum (no air), a feather and a hammer dropped together would…",o:["hammer lands first","feather lands first","land at the same time","both float"],a:2,why:"Without air resistance, gravity pulls everything down at the same rate.",t:3,k:"Forces"},
+ {q:"Which of these is a mammal?",o:["Shark","Whale","Lizard","Frog"],a:1,why:"Whales breathe air and feed milk to their young — they are mammals.",t:1,k:"Living things"},
+ {q:"Amphibians such as frogs begin their lives…",o:["in the air","in water","underground","in trees"],a:1,why:"Frogs start as eggs in water, then tadpoles, then grow legs and lungs.",t:1,k:"Living things"},
+ {q:"Which is NOT a stage in a butterfly's life cycle?",o:["Egg","Caterpillar","Chrysalis","Tadpole"],a:3,why:"Tadpoles are baby frogs. A butterfly goes egg → caterpillar → chrysalis → butterfly.",t:1,k:"Living things"},
+ {q:"Metamorphosis means…",o:["growing taller","a complete change of body form","sleeping through winter","laying eggs"],a:1,why:"A caterpillar becoming a butterfly is metamorphosis.",t:2,k:"Living things"},
+ {q:"An animal that eats only plants is a…",o:["carnivore","omnivore","herbivore","predator"],a:2,why:"Herb = plant. Herbivores eat plants only.",t:1,k:"Living things"},
+ {q:"An animal that eats both plants and animals is an…",o:["omnivore","herbivore","carnivore","insectivore"],a:0,why:"Omni = all. Humans are omnivores.",t:1,k:"Living things"},
+ {q:"In a food chain, what does every chain start with?",o:["A predator","A producer (a plant)","A prey animal","A human"],a:1,why:"Plants make their own food using sunlight, so they start every chain.",t:2,k:"Living things"},
+ {q:"A fox eats a rabbit. The fox is the…",o:["prey","producer","predator","plant"],a:2,why:"The hunter is the predator; the hunted is the prey.",t:1,k:"Living things"},
+ {q:"Insects have how many legs?",o:["4","6","8","10"],a:1,why:"All insects have six legs. Spiders have eight — they are arachnids.",t:1,k:"Living things"},
+ {q:"Spiders belong to which group?",o:["Insects","Arachnids","Reptiles","Amphibians"],a:1,why:"Arachnids have eight legs and two body parts.",t:2,k:"Living things"},
+ {q:"Which of these do all birds have?",o:["Fur","Feathers","Scales","Fins"],a:1,why:"Birds are warm-blooded, lay eggs and have feathers.",t:1,k:"Living things"},
+ {q:"Which organs do you breathe with?",o:["Kidneys","Lungs","Liver","Stomach"],a:1,why:"Lungs take in oxygen and give out carbon dioxide.",t:1,k:"Human body"},
+ {q:"What does the heart pump around the body?",o:["Air","Water","Blood","Food"],a:2,why:"The heart pumps blood, carrying oxygen to every part of you.",t:1,k:"Human body"},
+ {q:"Which teeth are pointed and used for tearing food?",o:["Incisors","Canines","Molars","Wisdom teeth"],a:1,why:"Canines are the pointed teeth next to the front ones.",t:2,k:"Human body"},
+ {q:"Which teeth are flat and used for grinding?",o:["Molars","Canines","Incisors","Baby teeth"],a:0,why:"Molars at the back crush and grind food.",t:2,k:"Human body"},
+ {q:"Muscles work in…",o:["threes","pairs","single units","groups of ten"],a:1,why:"One muscle pulls a bone one way, its partner pulls it back (like biceps and triceps).",t:2,k:"Human body"},
+ {q:"Which gas do we need from the air we breathe in?",o:["Carbon dioxide","Nitrogen","Oxygen","Helium"],a:2,why:"Our bodies use oxygen to release energy from food.",t:1,k:"Human body"},
+ {q:"Which gas do we breathe OUT more of than we breathe in?",o:["Oxygen","Carbon dioxide","Hydrogen","Neon"],a:1,why:"Breathing out releases the carbon dioxide our bodies make.",t:2,k:"Human body"},
+ {q:"The skeleton's three main jobs are support, movement and…",o:["digestion","protection","breathing","hearing"],a:1,why:"The skull protects the brain and the ribs protect the heart and lungs.",t:1,k:"Human body"},
+ {q:"The correct order of the human life cycle is…",o:["baby, adult, child, teenager","baby, child, teenager, adult","child, baby, adult, teenager","teenager, child, baby, adult"],a:1,why:"We grow from baby to child to adolescent (teenager) to adult.",t:1,k:"Human body"},
+ {q:"Which material is magnetic?",o:["Plastic","Iron","Wood","Glass"],a:1,why:"Iron, steel, nickel and cobalt are magnetic. Most metals (like copper) are not.",t:1,k:"Materials"},
+ {q:"Which is the best conductor of electricity?",o:["Rubber","Copper","Wood","Paper"],a:1,why:"Metals such as copper let electricity flow — that's why wires are copper.",t:1,k:"Materials"},
+ {q:"Which material is an electrical INSULATOR?",o:["Plastic","Steel","Copper","Aluminium"],a:0,why:"Plastic stops electricity flowing — it coats the wires to keep us safe.",t:1,k:"Materials"},
+ {q:"Which material is a good THERMAL insulator (keeps heat in)?",o:["Metal","Wool","Glass","Water"],a:1,why:"Wool traps air, and trapped air is a poor conductor of heat.",t:2,k:"Materials"},
+ {q:"Sugar stirred into water seems to vanish. It has…",o:["melted","evaporated","dissolved","frozen"],a:2,why:"The sugar dissolves to make a solution; it is still there.",t:1,k:"Materials"},
+ {q:"How could you get the salt back out of salt water?",o:["Filtering","Sieving","Evaporation","Freezing"],a:2,why:"Evaporate the water and the salt is left behind.",t:2,k:"Materials"},
+ {q:"How would you separate sand from water?",o:["Evaporation","Filtering","Magnet","Stirring"],a:1,why:"Sand does not dissolve, so a filter catches it and lets the water through.",t:2,k:"Materials"},
+ {q:"Which change is REVERSIBLE?",o:["Burning wood","Baking a cake","Melting ice","Frying an egg"],a:2,why:"Ice can melt and freeze again. Burning and baking cannot be undone.",t:1,k:"Materials"},
+ {q:"Which change is IRREVERSIBLE?",o:["Freezing water","Dissolving salt","Burning paper","Melting chocolate"],a:2,why:"Burning makes new substances (ash, smoke). You cannot get the paper back.",t:2,k:"Materials"},
+ {q:"Which is a TRANSPARENT material?",o:["Wood","Clear glass","Brick","Cardboard"],a:1,why:"Transparent means light passes straight through, so you can see clearly.",t:1,k:"Materials"},
+ {q:"A rock that lets water pass through it is…",o:["permeable","impermeable","invisible","magnetic"],a:0,why:"Permeable rocks like sandstone soak up water; impermeable rocks like slate do not.",t:3,k:"Materials"},
+ {q:"At what temperature does water boil?",o:["0 °C","50 °C","100 °C","200 °C"],a:2,why:"Water boils at 100 °C and freezes at 0 °C.",t:1,k:"States of matter"},
+ {q:"At what temperature does water freeze?",o:["0 °C","10 °C","32 °C","100 °C"],a:0,why:"Water freezes at 0 °C.",t:1,k:"States of matter"},
+ {q:"Water vapour turning back into liquid water is called…",o:["evaporation","condensation","melting","freezing"],a:1,why:"Condensation — like water droplets on a cold window.",t:2,k:"States of matter"},
+ {q:"A liquid turning into a gas is called…",o:["condensation","freezing","evaporation","melting"],a:2,why:"Puddles disappear because the water evaporates.",t:1,k:"States of matter"},
+ {q:"Which is NOT one of the three states of matter?",o:["Solid","Liquid","Gas","Light"],a:3,why:"Solid, liquid and gas are the three states. Light is energy.",t:1,k:"States of matter"},
+ {q:"Which of these is a GAS at room temperature?",o:["Oxygen","Ice","Milk","Iron"],a:0,why:"Oxygen is a gas in the air around us.",t:1,k:"States of matter"},
+ {q:"Sound is made when something…",o:["gets hot","vibrates","glows","melts"],a:1,why:"Vibrations push the air, and those waves reach your ears.",t:1,k:"Sound & light"},
+ {q:"Sound cannot travel through…",o:["water","wood","empty space (a vacuum)","air"],a:2,why:"Sound needs something to vibrate — in space there is nothing, so it is silent.",t:2,k:"Sound & light"},
+ {q:"A higher-pitched sound is made by…",o:["slower vibrations","faster vibrations","louder vibrations","no vibrations"],a:1,why:"Faster vibrations = higher pitch (like a short, tight guitar string).",t:2,k:"Sound & light"},
+ {q:"Light travels in…",o:["curves","circles","straight lines","zigzags"],a:2,why:"Light travels in straight lines — that's why shadows have sharp edges.",t:1,k:"Sound & light"},
+ {q:"A shadow is made when light is…",o:["reflected","blocked by an opaque object","bent by water","switched off"],a:1,why:"Opaque objects block light, leaving a dark shape behind them.",t:1,k:"Sound & light"},
+ {q:"We see objects because light…",o:["comes out of our eyes","reflects off them into our eyes","makes them warm","passes through them"],a:1,why:"Light bounces (reflects) off objects and travels into our eyes.",t:2,k:"Sound & light"},
+ {q:"For a bulb to light up, a circuit must be…",o:["broken","complete (a full loop)","made of plastic","very long"],a:1,why:"Electricity only flows round a complete loop.",t:1,k:"Electricity"},
+ {q:"What is a switch for?",o:["Making the bulb brighter","Breaking or completing the circuit","Storing electricity","Cooling the wires"],a:1,why:"A switch opens a gap (off) or closes it (on).",t:1,k:"Electricity"},
+ {q:"Adding more batteries (cells) to a bulb circuit makes the bulb…",o:["dimmer","brighter","change colour","go silent"],a:1,why:"More cells push more electricity round, so the bulb glows brighter.",t:2,k:"Electricity"},
+ {q:"Which part of a plant takes in water from the soil?",o:["Leaves","Flowers","Roots","Petals"],a:2,why:"Roots absorb water and nutrients and anchor the plant.",t:1,k:"Plants"},
+ {q:"Which part of a plant makes food using sunlight?",o:["Roots","Leaves","Stem","Seeds"],a:1,why:"Leaves use light, water and carbon dioxide to make food.",t:2,k:"Plants"},
+ {q:"Pollination is when pollen moves from one flower to…",o:["the roots","the soil","another flower","the leaves"],a:2,why:"Insects and wind carry pollen between flowers so seeds can form.",t:2,k:"Plants"},
+ {q:"Which is NOT a way seeds are spread?",o:["Wind","Animals","Water","Telephone"],a:3,why:"Seeds travel by wind, animals, water and exploding pods.",t:1,k:"Plants"},
+ {q:"Which do plants NOT need to grow well?",o:["Light","Water","Chocolate","Air"],a:2,why:"Plants need light, water, air, nutrients and the right temperature.",t:1,k:"Plants"},
+ {q:"Fossils are…",o:["new rocks","the remains or traces of living things from long ago","frozen water","pieces of meteorite"],a:1,why:"Fossils form over millions of years when remains are buried and turn to rock.",t:2,k:"Rocks"},
+ {q:"Soil is made mostly of tiny rock pieces mixed with…",o:["plastic","dead plants and animals","metal","glass"],a:1,why:"Organic matter (rotted plants and animals) mixes with rock pieces to make soil.",t:2,k:"Rocks"},
+ {q:"A pond, a desert and a rainforest are all examples of…",o:["habitats","planets","materials","forces"],a:0,why:"A habitat is where a living thing lives.",t:1,k:"Living things"},
+ {q:"Which planet is furthest from the Sun?",o:["Uranus","Neptune","Saturn","Jupiter"],a:1,why:"Order: Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, Neptune.",t:2,k:"Space"},
+ {q:"The Moon seems to change shape each month because…",o:["it is getting smaller","we see different amounts of its sunlit side","clouds hide it","it spins very fast"],a:1,why:"The Moon's phases come from how much of its lit side faces Earth.",t:3,k:"Space"},
+ {q:"A year on Mercury is shorter than a year on Earth because Mercury…",o:["is smaller","is closer to the Sun, so its orbit is shorter","spins faster","is colder"],a:1,why:"Planets near the Sun have shorter orbits — Mercury's year is 88 days.",t:3,k:"Space"},
+ {q:"What is a solution?",o:["A solid that has melted","A liquid with a solid dissolved in it","A gas that has frozen","A mixture you can sieve"],a:1,why:"Salt water is a solution: the salt is dissolved and spread evenly through the water.",t:3,k:"Materials"},
+ {q:"Which of these is a solid, a liquid AND a gas depending on temperature?",o:["Wood","Water","Paper","Rubber"],a:1,why:"Ice, water and steam are the same substance in three states.",t:2,k:"States of matter"},
+ {q:"Why do you see lightning before you hear thunder?",o:["Light travels faster than sound","Sound travels faster than light","Thunder happens later","Your eyes are closer to the sky"],a:0,why:"Light reaches you almost instantly; sound takes about 3 seconds per kilometre.",t:3,k:"Sound & light"},
+ {q:"The force that makes a parachute fall slowly is…",o:["gravity","air resistance","magnetism","water resistance"],a:1,why:"The big canopy catches lots of air, so air resistance pushes up against gravity.",t:2,k:"Forces"}
+];
+
+/* ---------- ATLAS (History & Geography) ---------- */
+const ATLAS = [
+ {q:"How many continents are there?",o:["5","6","7","8"],a:2,why:"Africa, Antarctica, Asia, Australia (Oceania), Europe, North America, South America.",t:1,k:"Geography"},
+ {q:"Which is the largest ocean?",o:["Atlantic","Pacific","Indian","Arctic"],a:1,why:"The Pacific is bigger than all the land on Earth put together.",t:1,k:"Geography"},
+ {q:"What is the capital city of the United Kingdom?",o:["Manchester","Birmingham","London","Edinburgh"],a:2,why:"London is the UK's capital.",t:1,k:"Geography"},
+ {q:"What is the capital of Scotland?",o:["Glasgow","Edinburgh","Aberdeen","Dundee"],a:1,why:"Edinburgh, home of the Scottish Parliament.",t:1,k:"Geography"},
+ {q:"What is the capital of Wales?",o:["Swansea","Cardiff","Newport","Bangor"],a:1,why:"Cardiff is the capital of Wales.",t:1,k:"Geography"},
+ {q:"What is the capital of Northern Ireland?",o:["Dublin","Belfast","Derry","Cork"],a:1,why:"Belfast. (Dublin is the capital of the Republic of Ireland.)",t:2,k:"Geography"},
+ {q:"How many countries make up the United Kingdom?",o:["2","3","4","5"],a:2,why:"England, Scotland, Wales and Northern Ireland.",t:1,k:"Geography"},
+ {q:"Birmingham is in which region of England?",o:["The South West","The West Midlands","The North East","East Anglia"],a:1,why:"Birmingham is the biggest city in the West Midlands.",t:1,k:"Geography"},
+ {q:"Which river flows through London?",o:["The Severn","The Trent","The Thames","The Mersey"],a:2,why:"The Thames flows through London to the North Sea.",t:1,k:"Geography"},
+ {q:"The longest river in the UK is the…",o:["Thames","Severn","Trent","Tyne"],a:1,why:"The Severn is about 354 km long, a little longer than the Thames.",t:2,k:"Geography"},
+ {q:"The highest mountain in the UK is…",o:["Snowdon (Yr Wyddfa)","Scafell Pike","Ben Nevis","Helvellyn"],a:2,why:"Ben Nevis in Scotland, 1,345 m.",t:2,k:"Geography"},
+ {q:"The highest mountain in the world is…",o:["K2","Mont Blanc","Kilimanjaro","Mount Everest"],a:3,why:"Everest, in the Himalayas, is 8,849 m high.",t:1,k:"Geography"},
+ {q:"The imaginary line around the middle of the Earth is the…",o:["Prime Meridian","Equator","Tropic of Cancer","Arctic Circle"],a:1,why:"The Equator divides the Northern and Southern Hemispheres.",t:1,k:"Geography"},
+ {q:"The UK is in which hemisphere?",o:["Southern","Northern","Eastern only","Neither"],a:1,why:"The UK is north of the Equator.",t:1,k:"Geography"},
+ {q:"Which compass direction is between North and East?",o:["North-west","South-east","North-east","South-west"],a:2,why:"NE sits halfway between N and E.",t:1,k:"Geography"},
+ {q:"How many points are there on an 8-point compass?",o:["4","6","8","12"],a:2,why:"N, NE, E, SE, S, SW, W, NW.",t:1,k:"Geography"},
+ {q:"Which is the largest hot desert in the world?",o:["Gobi","Sahara","Kalahari","Atacama"],a:1,why:"The Sahara covers most of North Africa.",t:2,k:"Geography"},
+ {q:"Which continent is also the coldest desert?",o:["Europe","Asia","Antarctica","Australia"],a:2,why:"Antarctica gets very little rain or snow, so it counts as a desert.",t:2,k:"Geography"},
+ {q:"The capital of France is…",o:["Lyon","Paris","Marseille","Nice"],a:1,why:"Paris.",t:1,k:"Geography"},
+ {q:"The capital of Italy is…",o:["Milan","Venice","Rome","Naples"],a:2,why:"Rome — also the capital of the ancient Roman Empire.",t:1,k:"Geography"},
+ {q:"The capital of Spain is…",o:["Barcelona","Madrid","Seville","Valencia"],a:1,why:"Madrid, in the centre of Spain.",t:1,k:"Geography"},
+ {q:"The capital of Germany is…",o:["Munich","Hamburg","Berlin","Frankfurt"],a:2,why:"Berlin.",t:1,k:"Geography"},
+ {q:"The capital of the USA is…",o:["New York","Los Angeles","Washington, D.C.","Chicago"],a:2,why:"Washington, D.C. — New York is bigger but is not the capital.",t:2,k:"Geography"},
+ {q:"The capital of Australia is…",o:["Sydney","Melbourne","Canberra","Perth"],a:2,why:"Canberra was built to be the capital because Sydney and Melbourne both wanted it.",t:3,k:"Geography"},
+ {q:"The capital of Japan is…",o:["Kyoto","Tokyo","Osaka","Beijing"],a:1,why:"Tokyo.",t:1,k:"Geography"},
+ {q:"The Amazon river is in…",o:["Africa","Asia","South America","Europe"],a:2,why:"The Amazon flows through Brazil and carries more water than any other river.",t:1,k:"Geography"},
+ {q:"The river Nile is in…",o:["Africa","South America","Europe","Australia"],a:0,why:"The Nile flows north through Egypt to the Mediterranean.",t:1,k:"Geography"},
+ {q:"The Alps are a mountain range in…",o:["Africa","Europe","Asia","North America"],a:1,why:"The Alps run through France, Switzerland, Italy, Austria and more.",t:2,k:"Geography"},
+ {q:"The Prime Meridian (0° longitude) passes through…",o:["Paris","Greenwich, London","New York","Rome"],a:1,why:"Greenwich — that's why world time is measured from GMT.",t:3,k:"Geography"},
+ {q:"Lines of latitude run…",o:["from top to bottom","from side to side (parallel to the Equator)","diagonally","in circles round the poles only"],a:1,why:"Latitude lines are like rungs on a ladder; longitude lines go pole to pole.",t:3,k:"Geography"},
+ {q:"Earthquakes happen mostly where…",o:["it rains a lot","tectonic plates meet","there are big cities","the sea is deep"],a:1,why:"The Earth's crust is in plates; where they push and grind, the ground shakes.",t:2,k:"Geography"},
+ {q:"Which of these is a volcano in Italy?",o:["Ben Nevis","Mount Vesuvius","Mont Blanc","Mount Fuji"],a:1,why:"Vesuvius buried Pompeii in AD 79.",t:2,k:"Geography"},
+ {q:"In the water cycle, water rising from the sea as vapour is called…",o:["precipitation","condensation","evaporation","collection"],a:2,why:"Evaporation → condensation (clouds) → precipitation (rain) → collection.",t:2,k:"Geography"},
+ {q:"Rain, snow and hail are all types of…",o:["evaporation","precipitation","condensation","erosion"],a:1,why:"Precipitation is any water falling from clouds.",t:2,k:"Geography"},
+ {q:"The Romans invaded Britain successfully in which year?",o:["55 BC","AD 43","AD 410","1066"],a:1,why:"Emperor Claudius sent the army in AD 43. (Caesar had tried in 55 and 54 BC.)",t:2,k:"History"},
+ {q:"Which Roman general first tried to invade Britain in 55 BC?",o:["Julius Caesar","Hadrian","Claudius","Nero"],a:0,why:"Caesar came twice, in 55 and 54 BC, but did not stay.",t:3,k:"History"},
+ {q:"Who led a rebellion against the Romans in Britain?",o:["Cleopatra","Boudica","Queen Victoria","Elizabeth I"],a:1,why:"Boudica, queen of the Iceni, burned Colchester, London and St Albans.",t:1,k:"History"},
+ {q:"Hadrian's Wall was built to…",o:["keep the sea out","mark the northern edge of Roman Britain","hold up a road","protect a city"],a:1,why:"Emperor Hadrian had it built in AD 122 across northern England.",t:2,k:"History"},
+ {q:"After the Romans left Britain (about AD 410), who settled next?",o:["The Normans","The Anglo-Saxons","The Tudors","The Victorians"],a:1,why:"Angles, Saxons and Jutes came from Germany and Denmark.",t:2,k:"History"},
+ {q:"Sutton Hoo is famous for…",o:["a Roman bath","an Anglo-Saxon ship burial","a Viking longship","a castle"],a:1,why:"A king (probably Raedwald) was buried in a ship full of treasure in Suffolk.",t:3,k:"History"},
+ {q:"The Vikings' first big raid on England was on the monastery at…",o:["Canterbury","Lindisfarne","York","Winchester"],a:1,why:"Lindisfarne, AD 793 — monks were killed and treasure stolen.",t:2,k:"History"},
+ {q:"The Vikings came from…",o:["Spain and Portugal","Scandinavia (Norway, Denmark, Sweden)","Italy","Egypt"],a:1,why:"Viking means 'raider' — they sailed from Scandinavia.",t:1,k:"History"},
+ {q:"Which English king fought the Vikings and is called 'the Great'?",o:["Alfred","Harold","John","Henry"],a:0,why:"Alfred the Great, king of Wessex, defeated the Vikings at Edington in 878.",t:2,k:"History"},
+ {q:"The Battle of Hastings was in…",o:["1066","1666","1215","793"],a:0,why:"William of Normandy beat King Harold in 1066.",t:1,k:"History"},
+ {q:"Who won the Battle of Hastings?",o:["King Harold","William the Conqueror","Alfred the Great","Boudica"],a:1,why:"William became the first Norman king of England.",t:1,k:"History"},
+ {q:"Put these in order from oldest: ",o:["Iron Age, Bronze Age, Stone Age","Stone Age, Bronze Age, Iron Age","Bronze Age, Stone Age, Iron Age","Iron Age, Stone Age, Bronze Age"],a:1,why:"Stone tools came first, then bronze (copper + tin), then iron.",t:2,k:"History"},
+ {q:"Stonehenge was built in…",o:["the Stone Age and Bronze Age","Roman times","Viking times","Victorian times"],a:0,why:"It was built in stages from about 3000 BC — before the Romans.",t:2,k:"History"},
+ {q:"Which Ancient Greek city is called the birthplace of democracy?",o:["Sparta","Athens","Troy","Olympia"],a:1,why:"In Athens, citizens voted on laws.",t:2,k:"History"},
+ {q:"The first Olympic Games were held at…",o:["Athens","Rome","Olympia","Sparta"],a:2,why:"At Olympia, in honour of Zeus, from 776 BC.",t:2,k:"History"},
+ {q:"Egyptian picture-writing is called…",o:["hieroglyphs","runes","the alphabet","cuneiform"],a:0,why:"Hieroglyphs were carved on temples and tombs.",t:1,k:"History"},
+ {q:"An Egyptian king was called a…",o:["caesar","pharaoh","sultan","emperor"],a:1,why:"Pharaohs such as Tutankhamun were buried in tombs full of treasure.",t:1,k:"History"},
+ {q:"The pyramids of Giza were built as…",o:["palaces","tombs for pharaohs","shops","schools"],a:1,why:"The Great Pyramid was the tomb of Pharaoh Khufu.",t:1,k:"History"},
+ {q:"The Ancient Maya lived in…",o:["Central America","Northern Europe","Australia","India"],a:0,why:"The Maya built stone cities in Mexico, Guatemala and Belize.",t:3,k:"History"},
+ {q:"The Great Fire of London happened in…",o:["1066","1666","1966","1266"],a:1,why:"It started in a bakery on Pudding Lane in September 1666.",t:1,k:"History"},
+ {q:"Which Tudor king had six wives?",o:["Henry VII","Henry VIII","Edward VI","Richard III"],a:1,why:"Henry VIII: divorced, beheaded, died, divorced, beheaded, survived.",t:1,k:"History"},
+ {q:"The Second World War lasted from…",o:["1914 to 1918","1939 to 1945","1950 to 1953","1900 to 1910"],a:1,why:"Britain declared war on Germany in September 1939; the war ended in 1945.",t:1,k:"History"},
+ {q:"During WW2, children moved out of cities to the countryside were called…",o:["refugees","evacuees","soldiers","spies"],a:1,why:"Evacuees were sent away to be safe from the bombing (the Blitz).",t:2,k:"History"},
+ {q:"Florence Nightingale is famous as a…",o:["queen","nurse","pilot","scientist"],a:1,why:"The 'Lady with the Lamp' improved hospitals during the Crimean War.",t:1,k:"History"},
+ {q:"Queen Victoria reigned for about…",o:["6 years","24 years","64 years","100 years"],a:2,why:"From 1837 to 1901 — the Victorian era.",t:2,k:"History"},
+ {q:"Roman roads were famous for being…",o:["straight","made of wood","very narrow","built on water"],a:0,why:"Straight roads let the army march quickly between forts and towns.",t:1,k:"History"},
+ {q:"Which was NOT brought to Britain by the Romans?",o:["Baths","Straight roads","Towns with forums","Television"],a:3,why:"The Romans brought roads, baths, towns, coins and Latin — not TV.",t:1,k:"History"},
+ {q:"The Danelaw was…",o:["a Roman tax","the part of England ruled by Vikings","a type of Saxon sword","a Norman castle"],a:1,why:"After Alfred's treaty, the Vikings ruled the north and east — the Danelaw.",t:3,k:"History"},
+ {q:"The Shang Dynasty ruled in ancient…",o:["Egypt","China","Greece","Mexico"],a:1,why:"The Shang ruled part of China about 3,500 years ago and used oracle bones.",t:3,k:"History"},
+ {q:"Which ocean lies between the UK and the USA?",o:["Pacific","Atlantic","Indian","Southern"],a:1,why:"The Atlantic separates Europe from the Americas.",t:1,k:"Geography"},
+ {q:"The capital of Brazil is…",o:["Rio de Janeiro","São Paulo","Brasília","Lima"],a:2,why:"Brasília was purpose-built as the capital in 1960.",t:3,k:"Geography"},
+ {q:"Which country is NOT in Europe?",o:["Poland","Greece","Egypt","Portugal"],a:2,why:"Egypt is in Africa.",t:2,k:"Geography"},
+ {q:"The Tropics are…",o:["very cold regions near the poles","hot regions either side of the Equator","mountain areas","the deep sea"],a:1,why:"Between the Tropic of Cancer and the Tropic of Capricorn it is hot all year.",t:3,k:"Geography"}
+];
+
+/* ---------- WORD WRESTLING (Reading, vocabulary, grammar) ---------- */
+/* kinds: syn (closest meaning), ant (opposite), cls (word class), gram (grammar/punctuation), vocab, fig (figurative) */
+const WORDS = [
+ {q:"Which word means almost the same as ENORMOUS?",o:["tiny","huge","angry","quick"],a:1,why:"Enormous = huge, gigantic, massive.",t:1,k:"Synonyms"},
+ {q:"Which word means almost the same as FURIOUS?",o:["sleepy","very angry","hungry","polite"],a:1,why:"Furious is a stronger word for angry.",t:1,k:"Synonyms"},
+ {q:"Which word means almost the same as BRAVE?",o:["courageous","nervous","careful","lazy"],a:0,why:"Courageous = brave, fearless, bold.",t:1,k:"Synonyms"},
+ {q:"Which word means almost the same as ANCIENT?",o:["modern","very old","broken","shiny"],a:1,why:"Ancient = from a very long time ago.",t:1,k:"Synonyms"},
+ {q:"Which word means almost the same as RAPID?",o:["slow","fast","wet","loud"],a:1,why:"Rapid = fast, quick, swift.",t:1,k:"Synonyms"},
+ {q:"Which word means almost the same as GLOOMY?",o:["bright","dark and sad","noisy","tidy"],a:1,why:"Gloomy = dark, dull, miserable.",t:2,k:"Synonyms"},
+ {q:"Which word means almost the same as EXHAUSTED?",o:["excited","very tired","hungry","lost"],a:1,why:"Exhausted = completely worn out.",t:2,k:"Synonyms"},
+ {q:"Which word means almost the same as FRAGILE?",o:["strong","easily broken","heavy","sticky"],a:1,why:"Fragile = delicate, breakable.",t:2,k:"Synonyms"},
+ {q:"Which word means almost the same as RELUCTANT?",o:["eager","unwilling","cheerful","fast"],a:1,why:"Reluctant = not wanting to do something.",t:3,k:"Synonyms"},
+ {q:"Which word means almost the same as ABUNDANT?",o:["rare","plentiful","expensive","hidden"],a:1,why:"Abundant = lots of it, in large amounts.",t:3,k:"Synonyms"},
+ {q:"Which word means almost the same as HESITATE?",o:["rush","pause","shout","sleep"],a:1,why:"To hesitate is to pause before doing something.",t:2,k:"Synonyms"},
+ {q:"Which word means almost the same as CAUTIOUS?",o:["careless","careful","sad","clever"],a:1,why:"Cautious = careful to avoid danger.",t:2,k:"Synonyms"},
+ {q:"Which word means almost the same as ASTONISHED?",o:["bored","amazed","annoyed","calm"],a:1,why:"Astonished = very surprised.",t:2,k:"Synonyms"},
+ {q:"Which word means almost the same as PECULIAR?",o:["normal","strange","tasty","tall"],a:1,why:"Peculiar = odd, unusual.",t:2,k:"Synonyms"},
+ {q:"Which word means almost the same as DEMOLISH?",o:["build","knock down","paint","measure"],a:1,why:"Demolish = destroy completely.",t:2,k:"Synonyms"},
+ {q:"Which word means almost the same as VACANT?",o:["full","empty","clean","high"],a:1,why:"A vacant room has no one in it.",t:3,k:"Synonyms"},
+ {q:"Which word means almost the same as TRIUMPH?",o:["defeat","victory","journey","problem"],a:1,why:"A triumph is a great success or win.",t:2,k:"Synonyms"},
+ {q:"Which word means almost the same as GRIT?",o:["giving up","determination to keep going","speed","luck"],a:1,why:"Grit is sticking at something hard — the Arena's favourite word.",t:1,k:"Synonyms"},
+ {q:"What is the OPPOSITE of GENEROUS?",o:["kind","selfish","happy","rich"],a:1,why:"Generous people give; selfish people keep it all.",t:1,k:"Antonyms"},
+ {q:"What is the OPPOSITE of ANCIENT?",o:["old","modern","heavy","broken"],a:1,why:"Ancient = very old; modern = new.",t:1,k:"Antonyms"},
+ {q:"What is the OPPOSITE of EXPAND?",o:["grow","shrink","explode","stretch"],a:1,why:"Expand = get bigger; shrink/contract = get smaller.",t:2,k:"Antonyms"},
+ {q:"What is the OPPOSITE of VICTORY?",o:["defeat","win","prize","battle"],a:0,why:"Victory = winning; defeat = losing.",t:1,k:"Antonyms"},
+ {q:"What is the OPPOSITE of TEMPORARY?",o:["short","permanent","quick","weak"],a:1,why:"Temporary lasts a short time; permanent lasts for ever.",t:2,k:"Antonyms"},
+ {q:"What is the OPPOSITE of ARRIVE?",o:["depart","come","stay","enter"],a:0,why:"Arrive = get there; depart = leave.",t:1,k:"Antonyms"},
+ {q:"What is the OPPOSITE of OPAQUE?",o:["dark","transparent","thick","solid"],a:1,why:"Opaque blocks light; transparent lets it through.",t:3,k:"Antonyms"},
+ {q:"What is the OPPOSITE of CAUTIOUS?",o:["careful","reckless","quiet","slow"],a:1,why:"Reckless = not caring about danger.",t:2,k:"Antonyms"},
+ {q:"What is the OPPOSITE of INCLUDE?",o:["add","exclude","invite","join"],a:1,why:"Exclude = leave out.",t:2,k:"Antonyms"},
+ {q:"What is the OPPOSITE of MAXIMUM?",o:["most","minimum","middle","medium"],a:1,why:"Maximum = the most; minimum = the least.",t:2,k:"Antonyms"},
+ {q:"In 'The wrestler LIFTED the giant', what word class is LIFTED?",o:["noun","verb","adjective","adverb"],a:1,why:"A verb is a doing or being word. 'Lifted' is the action.",t:1,k:"Word classes"},
+ {q:"In 'The ENORMOUS crowd roared', what word class is ENORMOUS?",o:["noun","verb","adjective","adverb"],a:2,why:"An adjective describes a noun — enormous describes the crowd.",t:1,k:"Word classes"},
+ {q:"In 'He climbed the ladder QUICKLY', what word class is QUICKLY?",o:["noun","verb","adjective","adverb"],a:3,why:"An adverb tells you how a verb is done. Many end in -ly.",t:1,k:"Word classes"},
+ {q:"In 'The CHAMPION raised the belt', what word class is CHAMPION?",o:["noun","verb","adjective","adverb"],a:0,why:"A noun names a person, place or thing.",t:1,k:"Word classes"},
+ {q:"In 'The car raced ACROSS the bridge', what word class is ACROSS?",o:["preposition","verb","adjective","pronoun"],a:0,why:"Prepositions show where or when: across, under, before, in.",t:2,k:"Word classes"},
+ {q:"In 'SHE built a castle', what word class is SHE?",o:["noun","pronoun","adjective","conjunction"],a:1,why:"A pronoun stands in for a noun: she, he, it, they.",t:2,k:"Word classes"},
+ {q:"In 'I wanted to play BUT it was raining', what word class is BUT?",o:["conjunction","adverb","noun","preposition"],a:0,why:"Conjunctions join parts of a sentence: and, but, because, although.",t:2,k:"Word classes"},
+ {q:"Which word is a NOUN?",o:["jump","quickly","bridge","green"],a:2,why:"A bridge is a thing, so it is a noun.",t:1,k:"Word classes"},
+ {q:"Which word is an ADVERB?",o:["silently","silent","silence","silencer"],a:0,why:"Silently tells you HOW something is done.",t:2,k:"Word classes"},
+ {q:"Which word is a VERB?",o:["swimmer","swimming pool","swam","swift"],a:2,why:"Swam is the action.",t:1,k:"Word classes"},
+ {q:"Which is a DETERMINER?",o:["the","run","happy","slowly"],a:0,why:"Determiners come before nouns: the, a, an, this, my, some.",t:3,k:"Word classes"},
+ {q:"Which sentence uses THEIR / THERE / THEY'RE correctly?",o:["There going to the park.","Their going to the park.","They're going to the park.","Theyre going to the park."],a:2,why:"They're = they are. Their = belongs to them. There = a place.",t:1,k:"Grammar"},
+ {q:"Which sentence is correct?",o:["The robot lost it's arm.","The robot lost its arm.","The robot lost its' arm.","The robot lost it arm."],a:1,why:"Its = belongs to it. It's = it is.",t:2,k:"Grammar"},
+ {q:"Which sentence uses TO / TOO / TWO correctly?",o:["I have two much homework.","I have too much homework.","I have to much homework.","I have tow much homework."],a:1,why:"Too = also or more than enough. Two = 2. To = towards.",t:1,k:"Grammar"},
+ {q:"Which sentence has the apostrophe in the right place?",o:["The dogs' bone was buried. (one dog)","The dog's bone was buried. (one dog)","The dogs bone was buried. (one dog)","The do'gs bone was buried. (one dog)"],a:1,why:"One owner: dog's. More than one: dogs'.",t:2,k:"Grammar"},
+ {q:"Which sentence is punctuated correctly?",o:["\"Lets go,\" said Seb.","\"Let's go\" said Seb.","\"Let's go,\" said Seb.","Let's go, said Seb."],a:2,why:"Speech marks round the words, a comma before the closing mark, apostrophe in let's (let us).",t:2,k:"Grammar"},
+ {q:"Which sentence needs a QUESTION MARK?",o:["What a goal that was","Where is the key","Pass me the brick","The race starts at ten"],a:1,why:"'Where is the key?' asks something, so it needs a question mark.",t:1,k:"Grammar"},
+ {q:"Which word is spelt with a CAPITAL letter because it is a proper noun?",o:["river","city","birmingham","building"],a:2,why:"Names of people, places, days and months take capitals: Birmingham.",t:1,k:"Grammar"},
+ {q:"Which sentence is in the PAST tense?",o:["Seb mines the diamond.","Seb will mine the diamond.","Seb mined the diamond.","Seb is mining the diamond."],a:2,why:"Mined = already happened.",t:1,k:"Grammar"},
+ {q:"Which sentence has a FRONTED ADVERBIAL?",o:["The car sped away.","After the race, the car sped away.","The car sped away after the race.","Sped away, the car."],a:1,why:"A fronted adverbial starts the sentence and is followed by a comma.",t:3,k:"Grammar"},
+ {q:"Which is a COMMAND?",o:["Can you pass the brick?","Pass the brick.","You passed the brick.","What a brick!"],a:1,why:"Commands start with a verb and tell someone to do something.",t:1,k:"Grammar"},
+ {q:"Which word is the SUBJECT of 'The crowd cheered the champion'?",o:["cheered","the champion","The crowd","the"],a:2,why:"The subject is who does the verb — the crowd did the cheering.",t:3,k:"Grammar"},
+ {q:"Which sentence uses a comma to avoid confusion?",o:["Let's eat Grandad!","Let's eat, Grandad!","Lets eat Grandad","Let's, eat Grandad!"],a:1,why:"Without the comma, Grandad is on the menu.",t:2,k:"Grammar"},
+ {q:"What does the prefix UN- do in UNLOCK?",o:["makes it bigger","makes it the opposite","makes it past tense","makes it plural"],a:1,why:"Un- = not / the opposite of: unlock, unhappy, undo.",t:1,k:"Vocabulary"},
+ {q:"What does the suffix -LESS mean in FEARLESS?",o:["full of","without","again","before"],a:1,why:"-less = without. Fearless = without fear.",t:1,k:"Vocabulary"},
+ {q:"What does the prefix RE- mean in REBUILD?",o:["before","again","not","under"],a:1,why:"Re- = again: rebuild, replay, return.",t:1,k:"Vocabulary"},
+ {q:"The Latin word AQUA means water. Which word comes from it?",o:["aquarium","acorn","acrobat","active"],a:0,why:"Aquarium = a tank of water. Also aquatic, aqueduct.",t:2,k:"Vocabulary"},
+ {q:"The Latin word TERRA means earth/land. Which word comes from it?",o:["terrible","territory","terrier","tennis"],a:1,why:"Territory = an area of land. Also terrain, terrace.",t:3,k:"Vocabulary"},
+ {q:"The Greek word MICRO means small. A microscope lets you see…",o:["far away","small things","in the dark","through walls"],a:1,why:"Micro = small, scope = look at.",t:2,k:"Vocabulary"},
+ {q:"If someone is DETERMINED, they…",o:["give up easily","keep going until they succeed","are always late","are very tall"],a:1,why:"Determined = fixed on reaching a goal.",t:1,k:"Vocabulary"},
+ {q:"What does OBSTACLE mean?",o:["a prize","something in the way","a type of car","a loud noise"],a:1,why:"An obstacle blocks your path — in an obstacle course you climb over them.",t:2,k:"Vocabulary"},
+ {q:"What does PERSEVERE mean?",o:["stop","keep trying even when it's hard","run away","fall asleep"],a:1,why:"Persevere = carry on through difficulty.",t:2,k:"Vocabulary"},
+ {q:"What does RIVAL mean?",o:["a close friend","someone you compete against","a river","a referee"],a:1,why:"A rival is a competitor — like two drivers fighting for first place.",t:2,k:"Vocabulary"},
+ {q:"What does STRATEGY mean?",o:["a plan to achieve something","a type of brick","a mistake","a loud shout"],a:0,why:"A strategy is a careful plan — in games and in battles.",t:2,k:"Vocabulary"},
+ {q:"What does INVISIBLE mean?",o:["cannot be seen","cannot be heard","very bright","very old"],a:0,why:"In- = not, visible = can be seen.",t:1,k:"Vocabulary"},
+ {q:"What does ACCELERATE mean?",o:["slow down","speed up","turn round","stop"],a:1,why:"To accelerate is to go faster — the pedal in a car.",t:2,k:"Vocabulary"},
+ {q:"What does SPECTATOR mean?",o:["a player","a person watching","a referee","a trophy"],a:1,why:"Spectators watch. From Latin spectare, to look.",t:2,k:"Vocabulary"},
+ {q:"What does FORTUNATE mean?",o:["unlucky","lucky","strong","forgotten"],a:1,why:"Fortunate = lucky. Fortuna was the Roman goddess of luck.",t:2,k:"Vocabulary"},
+ {q:"'The wind howled like a wolf' is an example of…",o:["a simile","a metaphor","alliteration","onomatopoeia"],a:0,why:"A simile compares using 'like' or 'as'.",t:1,k:"Figurative language"},
+ {q:"'The classroom was a zoo' is an example of…",o:["a simile","a metaphor","personification","a rhyme"],a:1,why:"A metaphor says something IS something else, with no 'like' or 'as'.",t:2,k:"Figurative language"},
+ {q:"'Big bricks build brilliant buildings' is an example of…",o:["a simile","alliteration","a metaphor","personification"],a:1,why:"Alliteration repeats the same starting sound.",t:1,k:"Figurative language"},
+ {q:"'Crash! Bang! Boom!' are examples of…",o:["similes","metaphors","onomatopoeia","adverbs"],a:2,why:"Onomatopoeia = words that sound like the noise they describe.",t:1,k:"Figurative language"},
+ {q:"'The sun smiled down on the racetrack' is an example of…",o:["a simile","personification","alliteration","a fact"],a:1,why:"Personification gives human actions to non-human things.",t:2,k:"Figurative language"},
+ {q:"'I've told you a MILLION times' is an example of…",o:["a simile","hyperbole (exaggeration)","alliteration","a question"],a:1,why:"Hyperbole exaggerates for effect.",t:3,k:"Figurative language"},
+ {q:"Which sentence is a SIMILE?",o:["The car is a rocket.","The car was as fast as a rocket.","The car zoomed.","Rockets are fast."],a:1,why:"'As fast as' makes it a simile.",t:1,k:"Figurative language"},
+ {q:"What is a SYNONYM?",o:["a word that means the opposite","a word that means the same or nearly the same","a word that rhymes","a word with a capital letter"],a:1,why:"Synonym = same meaning. Antonym = opposite meaning.",t:1,k:"Vocabulary"},
+ {q:"Which word means the same as INQUISITIVE?",o:["curious","tired","wealthy","silent"],a:0,why:"Inquisitive = eager to find out, curious.",t:3,k:"Synonyms"},
+ {q:"Which word means the same as MISCHIEVOUS?",o:["naughty in a playful way","very serious","sleepy","frightened"],a:0,why:"Mischievous = playfully naughty.",t:3,k:"Synonyms"},
+ {q:"Which word means the same as INDUSTRIOUS?",o:["lazy","hard-working","wealthy","noisy"],a:1,why:"Industrious = works hard.",t:3,k:"Synonyms"},
+ {q:"What is the plural of CHILD?",o:["childs","childes","children","childrens"],a:2,why:"Child → children. Some plurals are irregular: mouse → mice, foot → feet.",t:1,k:"Grammar"},
+ {q:"What is the plural of BOX?",o:["boxs","boxes","boxies","box's"],a:1,why:"Words ending in -x, -s, -ch, -sh add -es.",t:1,k:"Grammar"},
+ {q:"Which sentence uses a RELATIVE CLAUSE?",o:["The driver, who had never lost, waved to the crowd.","The driver waved to the crowd.","Waving, the driver smiled.","The crowd waved at the driver."],a:0,why:"'Who had never lost' is a relative clause, starting with who/which/that.",t:3,k:"Grammar"},
+ {q:"What does the word 'modal verb' MIGHT show in 'It MIGHT rain'?",o:["certainty","possibility","the past","a command"],a:1,why:"Modal verbs (might, could, should, must) show how likely or necessary something is.",t:3,k:"Grammar"}
+];
+
+/* ---------- BOSSES ---------- */
+const BOSSES = [
+ {id:"gravel", name:"The Gravel Giant", world:"mine",  hp:8, icon:"🪨", intro:"He blocks the deepest tunnel. Every right answer chips a boulder away.", taunt:["Is that all you've got, miner?","My boulders laugh at you.","You'll never dig this deep."], hurt:["ARGH! That one cracked!","You're chipping me!","Not the diamond pick!"]},
+ {id:"brickster", name:"The Brickster", world:"brick", hp:8, icon:"🧱", intro:"She scrambles the letters of every word. Spell them right and her tower tumbles.", taunt:["Double or single? Guess wrong!","My tower is unbreakable.","Spelling is for losers!"], hurt:["My bricks! My beautiful bricks!","Oof — that word was solid.","Stop spelling so well!"]},
+ {id:"voidbot", name:"Void-Bot 9000", world:"astro", hp:8, icon:"🤖", intro:"A rogue robot who has forgotten all its science. Teach it a lesson.", taunt:["GRAVITY IS A MYTH.","ERROR: HUMAN TOO WEAK.","MY CIRCUITS ARE PERFECT."], hurt:["SYSTEM DAMAGE 20%…","THAT FACT… HURT…","REBOOTING… REBOOTING…"]},
+ {id:"drift", name:"Captain Drift", world:"forza", hp:8, icon:"🏁", intro:"The fastest driver on the track. Beat him on fractions and take the trophy.", taunt:["Eat my dust!","You're in the slow lane, kid.","I was born in pole position."], hurt:["Whoa — you're gaining on me!","My tyres! Not my tyres!","Pit stop! PIT STOP!"]},
+ {id:"wordsmasher", name:"The Word Smasher", world:"words", hp:8, icon:"💪", intro:"The reigning champion of the ring. Only perfect words can pin him.", taunt:["You can't out-word me!","I eat dictionaries for breakfast.","One-two-three? Never!"], hurt:["ONE!","TWO!","He's wobbling, folks!"]},
+ {id:"timelord", name:"The Time Thief", world:"atlas", hp:8, icon:"⏳", intro:"He steals dates and capitals. Get them right and he loses his power.", taunt:["History is MINE.","You don't even know where you are.","1066? Never heard of it."], hurt:["My timeline is cracking!","No! Not the facts!","I'm fading…"]},
+ {id:"grand", name:"The Grand Champion", world:"all", hp:12, icon:"👑", intro:"Every subject at once. Beat the Grand Champion to take the Arena belt.", taunt:["Nobody has ever held my belt.","Jack of all trades, master of none!","The Arena belongs to ME."], hurt:["Impossible!","The belt… is slipping…","Who IS this kid?!"]}
+];
+
+/* ---------- BADGES ---------- */
+const BADGES = [
+ {id:"first",  icon:"🎯", name:"First Steps",      how:"Answer your first question"},
+ {id:"ten",    icon:"🔟", name:"Ten Up",           how:"Answer 10 questions"},
+ {id:"hundred",icon:"💯", name:"Century",          how:"Answer 100 questions"},
+ {id:"fivehun",icon:"🏟️", name:"Arena Regular",    how:"Answer 500 questions"},
+ {id:"combo5", icon:"🔥", name:"On Fire",          how:"5 right in a row"},
+ {id:"combo10",icon:"☄️", name:"Unstoppable",      how:"10 right in a row"},
+ {id:"comeback",icon:"🔁",name:"Comeback Kid",     how:"Get a comeback card right"},
+ {id:"grit",   icon:"🪨", name:"Gritty",           how:"Keep going after 5 'not yet's in one run"},
+ {id:"allworlds",icon:"🌍",name:"World Tour",      how:"Play every world"},
+ {id:"tier3",  icon:"⛏️", name:"Diamond Pick",     how:"Reach difficulty 3 in any world"},
+ {id:"tier5",  icon:"💎", name:"Netherite",        how:"Reach difficulty 5 in any world"},
+ {id:"boss1",  icon:"🥊", name:"Boss Beater",      how:"Beat your first boss"},
+ {id:"bossall",icon:"🏆", name:"Belt Holder",      how:"Beat every world boss"},
+ {id:"grand",  icon:"👑", name:"Grand Champion",   how:"Beat the Grand Champion"},
+ {id:"streak3",icon:"📅", name:"Three-Day Streak", how:"Play 3 days in a row"},
+ {id:"streak7",icon:"🗓️", name:"Week Warrior",     how:"Play 7 days in a row"},
+ {id:"quests10",icon:"📜",name:"Quest Master",     how:"Finish 10 daily quests"},
+ {id:"pb",     icon:"⏱️", name:"Personal Best",    how:"Beat your best race time"},
+ {id:"speller50",icon:"🔤",name:"Word Builder",    how:"Spell 50 words right"},
+ {id:"dad",    icon:"🎖️", name:"Dad's Challenge",  how:"Complete a Dad's Challenge"}
+];
+
+</script>
+<script>
+/* ===================== SEB'S ARENA — ENGINE ===================== */
+const CLOUD = { endpoint:"https://vestigia-store.mrbeasley930.workers.dev", book:"seb-arena-26" };
+const PLAYERS = ["Seb"];
+const QS = new URLSearchParams(location.search);
+const CLS = QS.get("test") ? "TEST" : "SEB";
+let IDENTITY = null;
+
+/* ---------- helpers ---------- */
+const $ = id => document.getElementById(id);
+const rnd = (a,b)=>a+Math.floor(Math.random()*(b-a+1));
+const pick = arr => arr[Math.floor(Math.random()*arr.length)];
+const shuffle = arr => { const a=arr.slice(); for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; };
+const esc = s => String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const todayKey = () => { const d=new Date(); return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); };
+const dayDiff = (a,b) => Math.round((new Date(b)-new Date(a))/864e5);
+function toast(msg,ms=2200){ const t=document.createElement("div"); t.className="toast"; t.textContent=msg; document.body.appendChild(t); setTimeout(()=>t.remove(),ms); }
+function fullKey(){ return CLOUD.book+"::"+IDENTITY.cls+"::"+IDENTITY.cand; }
+function parentKey(){ return CLOUD.book+"::"+IDENTITY.cls+"::_parent"; }
+function lsKey(){ return "sebArena26_"+IDENTITY.cls+"_"+IDENTITY.cand; }
+
+/* ---------- sound (gentle) ---------- */
+let AC=null, muted = localStorage.getItem("sebArena_mute")==="1";
+function beep(seq){ if(muted) return; try{ AC=AC||new (window.AudioContext||window.webkitAudioContext)(); const t0=AC.currentTime;
+  seq.forEach(([f,d,at])=>{ const o=AC.createOscillator(), g=AC.createGain(); o.type="triangle"; o.frequency.value=f; g.gain.setValueAtTime(0.0001,t0+at); g.gain.exponentialRampToValueAtTime(0.18,t0+at+0.02); g.gain.exponentialRampToValueAtTime(0.0001,t0+at+d); o.connect(g).connect(AC.destination); o.start(t0+at); o.stop(t0+at+d+0.05); }); }catch(e){} }
+const SND = { good:()=>beep([[523,.12,0],[659,.12,.1],[784,.2,.2]]), notyet:()=>beep([[330,.18,0],[294,.22,.15]]), xp:()=>beep([[880,.08,0],[1175,.12,.07]]), rank:()=>beep([[523,.15,0],[659,.15,.15],[784,.15,.3],[1047,.4,.45]]), hit:()=>beep([[200,.1,0],[150,.15,.08]]), win:()=>beep([[392,.15,0],[523,.15,.15],[659,.15,.3],[784,.15,.45],[1047,.5,.6]]) };
+function toggleMute(){ muted=!muted; localStorage.setItem("sebArena_mute",muted?"1":"0"); $("mutebtn").textContent=muted?"🔇":"🔊"; }
+
+/* ---------- state ---------- */
+const WORLD_IDS = ["mine","brick","astro","forza","words","atlas"];
+function freshState(){
+  return { v:1, name:"", xp:0, answered:0, right:0, bestCombo:0, comebacks:0, spelled:0,
+    worlds: Object.fromEntries(WORLD_IDS.map(w=>[w,{answered:0,right:0,tier:1,recent:[],xp:0,runs:0,secs:0,bestTime:null,bestRun:0}])),
+    topics:{}, log:[], badges:[], bosses:{}, daily:{date:"",quests:[],bonus:false}, questsDone:0,
+    streak:{days:0,last:""}, playedDays:[], dadDone:{}, updatedAt:"" };
+}
+let state = freshState();
+let PARENT = { rate:50, redeemedXP:0, ledger:[], focus:null, bonuses:[] };
+let saveTimer=null, cloudBusy=false;
+
+function load(){ try{ const j=JSON.parse(localStorage.getItem(lsKey())||"null"); if(j&&j.v) state=Object.assign(freshState(),j); }catch(e){} }
+function persist(){ state.updatedAt=new Date().toISOString(); try{ localStorage.setItem(lsKey(),JSON.stringify(state)); }catch(e){}
+  clearTimeout(saveTimer); saveTimer=setTimeout(cloudPush,2500); }
+async function cloudPull(){
+  try{ const r=await fetch(CLOUD.endpoint+"?key="+encodeURIComponent(fullKey())); if(!r.ok) return null; const j=await r.json(); return j&&j.data?j.data:null; }catch(e){ return null; }
+}
+async function cloudPush(){
+  if(!IDENTITY) return; cloudBusy=true; setSync("busy");
+  try{ const r=await fetch(CLOUD.endpoint,{method:"POST",headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({key:fullKey(),cls:IDENTITY.cls,cand:IDENTITY.cand,book:CLOUD.book,data:state,savedAt:new Date().toISOString()})});
+    setSync(r.ok?"ok":"bad"); }catch(e){ setSync("bad"); }
+  cloudBusy=false;
+}
+async function pullParent(){
+  try{ const r=await fetch(CLOUD.endpoint+"?key="+encodeURIComponent(parentKey())); if(!r.ok) return; const j=await r.json(); if(j&&j.data) PARENT=Object.assign(PARENT,j.data); }catch(e){}
+}
+function setSync(s){ $("sync").className=s; }
+
+/* ---------- XP, ranks, bank ---------- */
+function rankFor(xp){ let r=RANKS[0], next=null; for(let i=0;i<RANKS.length;i++){ if(xp>=RANKS[i][0]) r=RANKS[i]; else { next=RANKS[i]; break; } } return {r,next}; }
+function addXP(n, label){
+  if(n<=0) return; const before=rankFor(state.xp).r; state.xp+=n; const after=rankFor(state.xp).r;
+  floatXP("+"+n+" XP"+(label?" "+label:"")); SND.xp(); renderHeader();
+  if(after!==before){ setTimeout(()=>rankUp(after),600); }
+}
+function floatXP(txt){ const d=document.createElement("div"); d.className="xpfloat"; d.textContent=txt; document.body.appendChild(d); setTimeout(()=>d.remove(),1200); }
+function bankMinutes(){ const rate=Math.max(1,PARENT.rate||50); return Math.max(0,Math.floor((state.xp-(PARENT.redeemedXP||0))/rate)); }
+function renderHeader(){
+  const {r,next}=rankFor(state.xp); $("rankchip").textContent=r[2]+" "+r[1]; $("xpn").textContent=state.xp;
+  const lo=r[0], hi=next?next[0]:r[0]+1; const pct=next?Math.min(100,Math.round((state.xp-lo)/(hi-lo)*100)):100;
+  $("xpfill").style.width=pct+"%"; $("xplabel").textContent=next?(state.xp-lo)+" / "+(hi-lo)+" to "+next[1]:"MAX RANK";
+  $("ranknow").textContent=r[2]+" "+r[1]; $("ranknext").textContent=next?"Next: "+next[2]+" "+next[1]:"You've reached the top.";
+  $("bankmin").textContent=bankMinutes();
+}
+function rankUp(r){ SND.rank(); confetti(); overlay(`<div class="huge">${r[2]}</div><h2>RANK UP!</h2><p>You are now <b style="color:var(--gold)">${r[1]}</b>.</p><button class="btn mt" onclick="closeOv()">Let's go</button>`); }
+function overlay(html){ $("ovbox").innerHTML=html; $("ov").classList.add("on"); }
+function closeOv(){ $("ov").classList.remove("on"); }
+function confetti(){ const c=$("confetti"); const cols=["#ffcd3c","#7cf5a4","#5ec8ff","#ff7eb6","#ff9f1c","#c77dff"]; for(let i=0;i<70;i++){ const s=document.createElement("i"); s.style.left=Math.random()*100+"vw"; s.style.background=pick(cols); s.style.animationDelay=(Math.random()*.6)+"s"; s.style.transform="rotate("+Math.random()*360+"deg)"; c.appendChild(s); setTimeout(()=>s.remove(),3200);} }
+
+/* ---------- badges ---------- */
+function award(id){ if(state.badges.includes(id)) return; const b=BADGES.find(x=>x.id===id); if(!b) return; state.badges.push(id); setTimeout(()=>{ toast(b.icon+" Badge unlocked: "+b.name,2800); SND.win(); },500); }
+function checkBadges(){
+  if(state.answered>=1) award("first"); if(state.answered>=10) award("ten"); if(state.answered>=100) award("hundred"); if(state.answered>=500) award("fivehun");
+  if(state.bestCombo>=5) award("combo5"); if(state.bestCombo>=10) award("combo10");
+  if(state.comebacks>=1) award("comeback"); if(state.spelled>=50) award("speller50");
+  if(WORLD_IDS.every(w=>state.worlds[w].answered>0)) award("allworlds");
+  if(WORLD_IDS.some(w=>state.worlds[w].tier>=3)) award("tier3"); if(WORLD_IDS.some(w=>state.worlds[w].tier>=5)) award("tier5");
+  const beaten=BOSSES.filter(b=>b.id!=="grand"&&state.bosses[b.id]&&state.bosses[b.id].beaten);
+  if(beaten.length>=1) award("boss1"); if(beaten.length>=6) award("bossall"); if(state.bosses.grand&&state.bosses.grand.beaten) award("grand");
+  if(state.streak.days>=3) award("streak3"); if(state.streak.days>=7) award("streak7"); if(state.questsDone>=10) award("quests10");
+}
+
+/* ---------- streak + daily quests ---------- */
+function touchDay(){
+  const t=todayKey(); if(!state.playedDays.includes(t)){ state.playedDays.push(t); if(state.playedDays.length>400) state.playedDays.shift();
+    if(state.streak.last && dayDiff(state.streak.last,t)===1) state.streak.days++; else if(state.streak.last!==t) state.streak.days=1;
+    state.streak.last=t; if(state.answered>0) addXP(20,"daily bonus"); }
+}
+const QUEST_TEMPLATES = [
+  ()=>{ const w=pick(WORLD_IDS); return {id:"ans10_"+w, text:"Answer 10 questions in "+WORLDS[w].name, target:10, kind:"answered", world:w, icon:WORLDS[w].em}; },
+  ()=>({id:"right8", text:"Get 8 answers right anywhere", target:8, kind:"right", icon:"✅"}),
+  ()=>({id:"combo5", text:"Get 5 right in a row", target:1, kind:"combo5", icon:"🔥"}),
+  ()=>({id:"comeback", text:"Land a comeback card", target:1, kind:"comeback", icon:"🔁"}),
+  ()=>({id:"twoworlds", text:"Play in 2 different worlds", target:2, kind:"worlds", icon:"🌍"}),
+  ()=>({id:"run", text:"Finish a full run of 10", target:1, kind:"run", icon:"🏁"}),
+  ()=>({id:"boss", text:"Take on a boss (win or not)", target:1, kind:"boss", icon:"🥊"}),
+  ()=>({id:"spell10", text:"Spell 10 words in Brick Builder", target:10, kind:"answered", world:"brick", icon:"🧱"}),
+  ()=>({id:"grit3", text:"Keep going after 3 'not yet's", target:3, kind:"notyet", icon:"🪨"})
+];
+function ensureDaily(){
+  const t=todayKey(); if(state.daily.date===t && state.daily.quests.length) return;
+  const qs=[], ids=new Set(); let guard=0;
+  while(qs.length<3 && guard++<40){ const q=pick(QUEST_TEMPLATES)(); if(ids.has(q.id)) continue; ids.add(q.id); q.n=0; q.done=false; q.worldsSeen=[]; qs.push(q); }
+  state.daily={date:t,quests:qs,bonus:false};
+}
+function questEvent(kind, world, amount=1){
+  ensureDaily(); let changed=false;
+  state.daily.quests.forEach(q=>{ if(q.done) return;
+    if(q.kind==="worlds"&&kind==="answered"){ if(!q.worldsSeen.includes(world)){ q.worldsSeen.push(world); q.n=q.worldsSeen.length; } }
+    else if(q.kind===kind && (!q.world||q.world===world)) q.n+=amount;
+    if(q.n>=q.target){ q.done=true; state.questsDone++; changed=true; setTimeout(()=>{ toast("📜 Quest done: "+q.text); addXP(40,"quest"); },300); }
+  });
+  if(changed && state.daily.quests.every(q=>q.done) && !state.daily.bonus){ state.daily.bonus=true; setTimeout(()=>{ toast("🌟 All quests done today! +50 XP"); addXP(50); },1400); }
+}
+
+/* ---------- Dad's challenge ---------- */
+function dadProgress(){
+  const f=PARENT.focus; if(!f||!f.setAt) return null;
+  const since=f.setAt; const ws=f.worlds&&f.worlds.length?f.worlds:WORLD_IDS;
+  const n=state.log.filter(e=>e.at>since && ws.includes(e.w)).length; const target=f.target||30;
+  return {f, n:Math.min(n,target), target, done:!!state.dadDone[since], ws};
+}
+function dadCheck(){ const p=dadProgress(); if(!p||p.done) return; if(p.n>=p.target){ state.dadDone[p.f.setAt]=true; award("dad"); setTimeout(()=>{ confetti(); overlay(`<div class="huge">🎖️</div><h2>Dad's Challenge complete!</h2><p>${esc(p.f.text||"")}</p><p><b style="color:var(--gold)">+${p.f.xp||100} XP</b></p><button class="btn mt" onclick="closeOv()">Yes!</button>`); addXP(p.f.xp||100); persist(); },500); } }
+function dadMultiplier(world){ const p=dadProgress(); if(!p||p.done) return 1; return p.ws.includes(world)?1.5:1; }
+
+/* ---------- WORLDS ---------- */
+const WORLDS = {
+  mine:  {id:"mine",  name:"Block Mine",      subject:"Maths",              em:"⛏️", tag:"Mine ores with times tables and number facts", color:"var(--mine)"},
+  brick: {id:"brick", name:"Brick Builder",   subject:"Spelling",           em:"🧱", tag:"Build words brick by brick — watch those double letters", color:"var(--brick)"},
+  astro: {id:"astro", name:"Astro Lab",       subject:"Science",            em:"🤖", tag:"Space, forces, materials and living things", color:"var(--astro)"},
+  forza: {id:"forza", name:"Fraction Raceway",subject:"Fractions & decimals",em:"🏎️", tag:"Race your own ghost on fractions, decimals and %", color:"var(--forza)"},
+  words: {id:"words", name:"Word Wrestling",  subject:"Reading & grammar",  em:"💪", tag:"Pin the meaning, tag-team synonyms, grammar slams", color:"var(--words)"},
+  atlas: {id:"atlas", name:"Atlas Quest",     subject:"History & geography",em:"🗺️", tag:"Dates, capitals, Romans, Vikings and the world map", color:"var(--atlas)"}
+};
+const TIER_NAMES = ["","Wood","Stone","Iron","Diamond","Netherite"];
+const XP_BASE = [0,10,12,15,18,22];
+
+/* --- generators return {kind:'mc'|'type', q, opts?, a? (index), accept? [strings], hint, why, topic, memo?} --- */
+function mcFromBank(bank, tier, world){
+  const maxT = tier<=1?1 : tier<=3?2 : 3; const minT = tier>=5?2 : tier>=4?2 : 1;
+  let pool=bank.filter(x=>x.t>=minT&&x.t<=maxT); if(pool.length<8) pool=bank;
+  const seen=(state.worlds[world].recentQ||[]); let cand=pool.filter(x=>!seen.includes(x.q)); if(cand.length<4) cand=pool;
+  const it=pick(cand); state.worlds[world].recentQ=[...seen,it.q].slice(-25);
+  const idx=shuffle(it.o.map((_,i)=>i)); const opts=idx.map(i=>it.o[i]); const a=idx.indexOf(it.a);
+  return {kind:"mc", q:it.q, opts, a, why:it.why, hint:hintFromWhy(it), topic:it.k};
+}
+function hintFromWhy(it){ const right=it.o[it.a]; const wrong=it.o.filter((_,i)=>i!==it.a); return "It's not \""+pick(wrong)+"\". Think about "+it.k.toLowerCase()+"."; }
+
+function mineGen(t){
+  const K={1:["mul2510","add20","sub20","mul2510"],2:["mul346","add100","sub100","div2510","mul346"],3:["mul789","div346","add3d","sub3d","mulAll"],4:["mul1112","div789","missing","add4d","sub4d","mulAll"],5:["mul2x1","div1112","missing2","add4d","sub4d","sqr","mulAll"]};
+  const k=pick(K[t]); let a,b,q,ans,topic,hint,why;
+  const tbl=(set)=>{ a=pick(set); b=rnd(2,12); if(Math.random()<.5){ q=`${a} × ${b}`; } else { q=`${b} × ${a}`; } ans=a*b; topic="Times tables"; hint=`Count up in ${a}s: ${a}, ${a*2}, ${a*3}…`; why=`${a} × ${b} = ${a*b}.`; };
+  const div=(set)=>{ a=pick(set); b=rnd(2,12); q=`${a*b} ÷ ${a}`; ans=b; topic="Division facts"; hint=`Think: ${a} × ? = ${a*b}`; why=`${a*b} ÷ ${a} = ${b}, because ${a} × ${b} = ${a*b}.`; };
+  const add=(lo,hi)=>{ a=rnd(lo,hi); b=rnd(lo,hi); q=`${a} + ${b}`; ans=a+b; topic="Addition"; hint="Add the biggest place value first, then the rest."; why=`${a} + ${b} = ${a+b}.`; };
+  const sub=(lo,hi)=>{ a=rnd(lo,hi); b=rnd(lo,a); q=`${a} − ${b}`; ans=a-b; topic="Subtraction"; hint=`Count up from ${b} to ${a}.`; why=`${a} − ${b} = ${a-b}.`; };
+  switch(k){
+    case "mul2510": tbl([2,5,10]); break; case "mul346": tbl([3,4,6]); break; case "mul789": tbl([7,8,9]); break; case "mul1112": tbl([11,12]); break;
+    case "mulAll": tbl([3,4,6,7,8,9,12]); break;
+    case "div2510": div([2,5,10]); break; case "div346": div([3,4,6]); break; case "div789": div([7,8,9]); break; case "div1112": div([11,12]); break;
+    case "add20": add(2,20); break; case "add100": add(11,99); break; case "add3d": add(100,999); break; case "add4d": add(1000,9999); break;
+    case "sub20": sub(5,20); break; case "sub100": sub(20,99); break; case "sub3d": sub(100,999); break; case "sub4d": sub(1000,9999); break;
+    case "missing": a=rnd(3,12); b=rnd(2,12); if(Math.random()<.5){ q=`? × ${a} = ${a*b}`; ans=b; hint=`How many ${a}s make ${a*b}?`; why=`${b} × ${a} = ${a*b}.`; } else { q=`${a*b} ÷ ? = ${a}`; ans=b; hint=`${a} × ? = ${a*b}`; why=`${a*b} ÷ ${b} = ${a}.`; } topic="Missing numbers"; break;
+    case "missing2": a=rnd(6,12); b=rnd(6,12); q=`${a} × ? = ${a*b}`; ans=b; topic="Missing numbers"; hint=`${a} × 10 = ${a*10}. Adjust from there.`; why=`${a} × ${b} = ${a*b}.`; break;
+    case "mul2x1": a=rnd(13,49); b=rnd(3,9); q=`${a} × ${b}`; ans=a*b; topic="Written multiplication"; hint=`Split it: ${Math.floor(a/10)*10} × ${b} = ${Math.floor(a/10)*10*b}, then ${a%10} × ${b}.`; why=`${Math.floor(a/10)*10} × ${b} = ${Math.floor(a/10)*10*b} and ${a%10} × ${b} = ${(a%10)*b}; together ${a*b}.`; break;
+    case "sqr": a=rnd(2,12); if(Math.random()<.5){ q=`${a}² (${a} squared)`; ans=a*a; hint=`${a} × ${a}`; why=`${a}² = ${a} × ${a} = ${a*a}.`; } else { q=`√${a*a} (square root of ${a*a})`; ans=a; hint=`What number times itself makes ${a*a}?`; why=`${a} × ${a} = ${a*a}, so √${a*a} = ${a}.`; } topic="Square numbers"; break;
+  }
+  return {kind:"type", q:`<span class="big">${q}</span>`, accept:[String(ans)], numeric:true, hint, why, topic};
+}
+
+function forzaGen(t){
+  const K={1:["half","quarter","eqhalf","cmp1"],2:["fracof","tenths","round10","half2"],3:["equiv","addsame","round100","cmpdec"],4:["pct","improper","adddec","equiv"],5:["pct2","adddiff","round1dp","fractodec"]};
+  const k=pick(K[t]); let q,ans,opts,a,topic,hint,why,kind="type";
+  const mc=(arr,right)=>{ kind="mc"; const idx=shuffle(arr.map((_,i)=>i)); opts=idx.map(i=>arr[i]); a=idx.indexOf(right); };
+  switch(k){
+    case "half": { const n=rnd(2,20)*2; q=`Half of ${n}`; ans=n/2; topic="Halves and quarters"; hint="Half means ÷ 2."; why=`${n} ÷ 2 = ${n/2}.`; break; }
+    case "half2": { const n=rnd(21,60)*2; q=`Half of ${n}`; ans=n/2; topic="Halves and quarters"; hint=`Half of ${Math.floor(n/20)*20} is ${Math.floor(n/20)*10}; then half the rest.`; why=`${n} ÷ 2 = ${n/2}.`; break; }
+    case "quarter": { const n=rnd(2,15)*4; q=`A quarter of ${n}`; ans=n/4; topic="Halves and quarters"; hint="Halve it, then halve it again."; why=`${n} ÷ 4 = ${n/4}.`; break; }
+    case "eqhalf": { const d=pick([4,6,8,10,12]); q=`½ = ?/${d}`; ans=d/2; topic="Equivalent fractions"; hint=`What is half of ${d}?`; why=`½ = ${d/2}/${d}: the top and bottom are both multiplied by ${d/2}.`; break; }
+    case "cmp1": { const f=pick([["½","¼"],["¾","½"],["⅓","¼"],["½","⅓"],["⅔","⅓"]]); q=`Which is BIGGER?`; mc([f[0],f[1]],0); topic="Comparing fractions"; hint="Picture a pizza cut into those slices."; why=`${f[0]} is bigger than ${f[1]}.`; break; }
+    case "fracof": { const d=pick([3,4,5]); const n=rnd(1,d-1); const m=rnd(2,10); q=`${n}/${d} of ${d*m}`; ans=n*m; topic="Fractions of amounts"; hint=`Divide by ${d}, then multiply by ${n}.`; why=`${d*m} ÷ ${d} = ${m}; ${m} × ${n} = ${n*m}.`; break; }
+    case "tenths": { const n=rnd(1,9); q=`Which decimal equals ${n}/10?`; mc([`0.${n}`,`${n}.0`,`0.0${n}`,`${n}0`],0); topic="Decimals"; hint="Tenths go in the first place after the decimal point."; why=`${n}/10 = 0.${n}.`; break; }
+    case "round10": { const n=rnd(11,199); if(n%10===5) { } ans=Math.round(n/10)*10; q=`Round ${n} to the nearest 10`; topic="Rounding"; hint="Look at the ones digit: 5 or more rounds up."; why=`${n} → ${ans} (ones digit ${n%10}).`; break; }
+    case "round100": { const n=rnd(101,1999); ans=Math.round(n/100)*100; q=`Round ${n} to the nearest 100`; topic="Rounding"; hint="Look at the tens digit."; why=`${n} → ${ans}.`; break; }
+    case "equiv": { const pairs=[[1,2],[1,3],[2,3],[1,4],[3,4],[2,5],[3,5]]; const [n,d]=pick(pairs); const m=rnd(2,5); q=`${n}/${d} = ?/${d*m}`; ans=n*m; topic="Equivalent fractions"; hint=`${d} × ${m} = ${d*m}, so multiply the top by ${m} too.`; why=`${n}/${d} = ${n*m}/${d*m}.`; break; }
+    case "addsame": { const d=pick([5,6,7,8,9,10]); const x=rnd(1,d-2); const y=rnd(1,d-1-x); q=`${x}/${d} + ${y}/${d}`; mc([`${x+y}/${d}`,`${x+y}/${d*2}`,`${x*y}/${d}`,`${x+y+1}/${d}`],0); topic="Adding fractions"; hint="Same bottom number: just add the tops."; why=`${x}/${d} + ${y}/${d} = ${x+y}/${d}.`; break; }
+    case "cmpdec": { const p=pick([["0.7","0.65"],["0.5","0.45"],["0.9","0.09"],["0.25","0.2"],["1.1","1.09"],["0.8","0.75"]]); q=`Which is BIGGER?`; mc([p[0],p[1]],0); topic="Comparing decimals"; hint="Compare tenths first, then hundredths."; why=`${p[0]} is bigger than ${p[1]}.`; break; }
+    case "pct": { const p=pick([50,25,10]); const n=pick([20,40,60,80,100,120,200]); q=`${p}% of ${n}`; ans=n*p/100; topic="Percentages"; hint=p===50?"50% is a half.":p===25?"25% is a quarter.":"10% is ÷ 10."; why=`${p}% of ${n} = ${ans}.`; break; }
+    case "pct2": { const p=pick([5,20,30,75,15]); const n=pick([20,40,60,80,100,120]); q=`${p}% of ${n}`; ans=n*p/100; topic="Percentages"; hint=`Find 10% first (${n/10}), then build it up.`; why=`10% of ${n} is ${n/10}, so ${p}% is ${ans}.`; break; }
+    case "improper": { const d=pick([2,3,4,5]); const w=rnd(1,3); const r=rnd(1,d-1); const top=w*d+r; q=`${top}/${d} as a mixed number`; mc([`${w} ${r}/${d}`,`${w+1} ${r}/${d}`,`${w} ${d}/${r}`,`${r} ${w}/${d}`],0); topic="Mixed numbers"; hint=`How many whole ${d}/${d}s fit into ${top}/${d}?`; why=`${top} ÷ ${d} = ${w} remainder ${r}, so ${w} ${r}/${d}.`; break; }
+    case "adddec": { const x=pick([0.25,0.5,0.75,0.2,0.4,0.6]); const y=pick([0.25,0.5,0.1,0.3,0.2]); ans=Math.round((x+y)*100)/100; q=`${x} + ${y}`; topic="Adding decimals"; hint="Line up the decimal points."; why=`${x} + ${y} = ${ans}.`; break; }
+    case "adddiff": { const items=[["½ + ¼","¾"],["½ + ⅛","⅝"],["⅓ + ⅙","½"],["¼ + ⅛","⅜"],["½ + ⅙","⅔"],["⅔ + ⅙","⅚"]]; const it=pick(items); q=it[0]; mc(shuffle(["¾","⅝","½","⅜","⅔","⅚"]).filter(x=>x!==it[1]).slice(0,3).concat([it[1]]),3); topic="Adding fractions"; hint="Change the first fraction so both have the same bottom number."; why=`${it[0]} = ${it[1]}.`; break; }
+    case "round1dp": { const n=(rnd(10,99)/10 + rnd(1,9)/100); const s=n.toFixed(2); ans=Math.round(n*10)/10; q=`Round ${s} to one decimal place`; topic="Rounding"; hint="Look at the hundredths digit."; why=`${s} → ${ans}.`; break; }
+    case "fractodec": { const it=pick([["½","0.5"],["¼","0.25"],["¾","0.75"],["⅕","0.2"],["⅒","0.1"],["⅖","0.4"],["⅗","0.6"]]); q=`${it[0]} as a decimal`; ans=it[1]; topic="Fractions to decimals"; hint="¼ is 0.25, so build from that."; why=`${it[0]} = ${it[1]}.`; break; }
+  }
+  if(kind==="mc") return {kind, q, opts, a, hint, why, topic};
+  return {kind:"type", q:`<span class="big">${q}</span>`, accept:[String(ans)], numeric:true, hint, why, topic};
+}
+
+function misspellings(w){
+  const out=new Set(); const C=/[b-df-hj-np-tv-z]/, V=/[aeiouy]/;
+  for(let i=0;i<w.length-1;i++){ if(w[i]===w[i+1]&&C.test(w[i])) out.add(w.slice(0,i)+w.slice(i+1)); }
+  for(let i=1;i<w.length-1;i++){ const c=w[i]; if(C.test(c)&&w[i-1]!==c&&w[i+1]!==c&&V.test(w[i-1])&&V.test(w[i+1])) out.add(w.slice(0,i)+c+w.slice(i)); }
+  if(/ie/.test(w)) out.add(w.replace("ie","ei")); if(/ei/.test(w)) out.add(w.replace("ei","ie"));
+  if(/ary$/.test(w)) out.add(w.replace(/ary$/,"ery")); if(/ery$/.test(w)) out.add(w.replace(/ery$/,"ary"));
+  if(/ant$/.test(w)) out.add(w.replace(/ant$/,"ent")); if(/ent$/.test(w)) out.add(w.replace(/ent$/,"ant"));
+  if(/ible$/.test(w)) out.add(w.replace(/ible$/,"able")); if(/able$/.test(w)) out.add(w.replace(/able$/,"ible"));
+  out.delete(w); return [...out];
+}
+function doublesIn(w){ const d=[]; for(let i=0;i<w.length-1;i++) if(w[i]===w[i+1]) d.push(w[i]+w[i+1]); return d; }
+function brickGen(t){
+  const tmap={1:[1],2:[1,2],3:[2],4:[2,3],5:[3]}; let pool=SPELL.filter(x=>tmap[t].includes(x.t));
+  const seen=(state.worlds.brick.recentQ||[]); let cand=pool.filter(x=>!seen.includes(x.w)); if(cand.length<5) cand=pool;
+  const it=pick(cand); state.worlds.brick.recentQ=[...seen,it.w].slice(-30);
+  const w=it.w; const dbl=doublesIn(w);
+  const whyLine = dbl.length? `<b>${w}</b> — double ${dbl.map(d=>d[0]).join(" and double ")}: ${w.toUpperCase()}.` : `<b>${w}</b> — no double letters in this one. ${w.toUpperCase()}.`;
+  const modes = t<=1?["pick","pick","gap"] : t<=2?["pick","gap","type"] : t<=3?["gap","type","type"] : ["type","type","gap"];
+  const mode=pick(modes);
+  if(mode==="pick"){
+    const wrong=shuffle(misspellings(w)).slice(0,2); if(wrong.length<2) return brickGen(t);
+    const opts=shuffle([w,...wrong]); return {kind:"mc", q:`Which spelling is right?<br><small class="small">${esc(it.d)}</small>`, opts, a:opts.indexOf(w), why:whyLine, hint:dbl.length?`Listen for the short vowel sound — it needs a double letter after it.`:`Say it slowly: no doubled letters here.`, topic:"Spelling: choose", word:w};
+  }
+  if(mode==="gap"){
+    let i=-1; const C=/[b-df-hj-np-tv-z]/, V=/[aeiouy]/;
+    if(dbl.length){ const d=pick(dbl); i=w.indexOf(d); const shown=w.slice(0,i)+"__"+w.slice(i+2); const opts=shuffle([d, d[0]]);
+      return {kind:"mc", q:`Fill the gap:<span class="big">${shown.replace("__","<span style='color:var(--gold)'>__</span>")}</span><small class="small">${esc(it.d)}</small>`, opts, a:opts.indexOf(d), why:whyLine, hint:"Short vowel before it? Then it's usually doubled.", topic:"Spelling: double or single", word:w}; }
+    const spots=[]; for(let k=1;k<w.length-1;k++){ if(C.test(w[k])&&w[k-1]!==w[k]&&w[k+1]!==w[k]&&V.test(w[k-1])&&V.test(w[k+1])) spots.push(k); }
+    if(!spots.length) return brickGen(t); i=pick(spots); const c=w[i]; const shown=w.slice(0,i)+"__"+w.slice(i+1); const opts=shuffle([c, c+c]);
+    return {kind:"mc", q:`Fill the gap:<span class="big">${shown.replace("__","<span style='color:var(--gold)'>__</span>")}</span><small class="small">${esc(it.d)}</small>`, opts, a:opts.indexOf(c), why:whyLine, hint:"Only one of these letters is needed.", topic:"Spelling: double or single", word:w};
+  }
+  return {kind:"type", memo:w, q:`Now type it:<br><small class="small">${esc(it.d)} · ${w.length} letters</small>`, accept:[w], hint:dbl.length?`Remember the double ${dbl.map(d=>d[0]).join(" and ")}. ${w.length} letters.`:`No double letters. It starts with ${w[0].toUpperCase()}.`, why:whyLine, topic:"Spelling: write", word:w};
+}
+
+const GENS = { mine:mineGen, forza:forzaGen, brick:brickGen, astro:t=>mcFromBank(SCI,t,"astro"), words:t=>mcFromBank(WORDS,t,"words"), atlas:t=>mcFromBank(ATLAS,t,"atlas") };
+
+/* ---------- adaptive tier ---------- */
+function adapt(world, ok){
+  const w=state.worlds[world]; w.recent.push(ok?1:0); if(w.recent.length>6) w.recent.shift();
+  if(w.recent.length===6){ const s=w.recent.reduce((a,b)=>a+b,0);
+    if(s>=5 && w.tier<5){ w.tier++; w.recent=[]; setTimeout(()=>toast(`⬆️ ${WORLDS[world].name}: ${TIER_NAMES[w.tier]} level unlocked!`),900); }
+    else if(s<=2 && w.tier>1){ w.tier--; w.recent=[]; } }
+}
+
+/* ---------- PLAY (a run of 10) ---------- */
+let RUN=null, clockT=null;
+function startWorld(id){
+  touchDay(); const w=state.worlds[id];
+  RUN={world:id, n:0, total:10, results:[], xp:0, combo:0, notyet:0, queue:[], cur:null, attempt:0, start:Date.now(), qStart:0, ores:[]};
+  $("p-world").textContent=WORLDS[id].em+" "+WORLDS[id].name+" · "+TIER_NAMES[w.tier];
+  $("p-clock").style.display=id==="forza"?"inline":"none";
+  go("play"); nextQ();
+}
+function renderProg(){ const p=$("p-prog"); p.innerHTML=""; for(let i=0;i<RUN.total;i++){ const s=document.createElement("i"); const r=RUN.results[i]; if(r===2) s.className="ok"; else if(r===1) s.className="half"; else if(r===0) s.className="miss"; if(i===RUN.n) s.classList.add("now"); p.appendChild(s);} }
+function renderDeco(){
+  const d=$("p-deco"); const id=RUN.world;
+  if(id==="mine"){ d.innerHTML='<div class="ores">'+Array.from({length:RUN.total},(_,i)=>`<span class="${RUN.results[i]>=1?'got':''}">${["🪨","🪙","💎","🟩","🔶","🧊","⬛","🟪","🟨","💠"][i%10]}</span>`).join("")+'</div>'; }
+  else if(id==="forza"){ const best=state.worlds.forza.bestTime; d.innerHTML=`<div class="small">Race against your ghost${best?` · best ${(best/1000).toFixed(1)}s`:" · set your first time!"}</div><div class="ghost"><i id="ghostme"></i>${best?'<b id="ghostpb" style="left:0"></b>':''}</div>`; }
+  else d.innerHTML="";
+}
+function tickClock(){ if(!RUN||RUN.world!=="forza") return; const el=(Date.now()-RUN.start)/1000; $("p-clock").textContent=el.toFixed(1)+"s"; const best=state.worlds.forza.bestTime; const me=$("ghostme"); if(me){ const span=best?Math.max(best,el*1000)*1.15:60000; me.style.width=Math.min(100,(el*1000)/span*100)+"%"; const pb=$("ghostpb"); if(pb) pb.style.left=Math.min(100,best/span*100)+"%"; } }
+function nextQ(){
+  if(RUN.n>=RUN.total) return finishRun();
+  let q=null;
+  if(RUN.queue.length && RUN.queue[0].due<=RUN.n){ q=RUN.queue.shift().q; q.comeback=true; }
+  else { const t=state.worlds[RUN.world].tier; q=GENS[RUN.world](t); q.tier=t; }
+  RUN.cur=q; RUN.attempt=0; RUN.qStart=Date.now(); renderProg(); renderDeco(); $("p-fb").className="fb"; $("p-fb").innerHTML="";
+  if(RUN.world==="forza"&&!clockT) clockT=setInterval(tickClock,100);
+  renderQ($("p-card"), q, answerRun);
+}
+function renderQ(card, q, onAnswer){
+  const cb=q.comeback?'<span class="pill" style="background:#3a2a0f;color:var(--gold)">🔁 Comeback card · full XP</span> ':'';
+  if(q.memo){ card.innerHTML=`<div class="topic">${cb}${esc(q.topic)}</div><div class="memo"><div class="w">${esc(q.memo)}</div><div class="cnt">Look carefully… <span id="memocnt">4</span></div></div>`; let n=4;
+    const iv=setInterval(()=>{ n--; const c=card.querySelector("#memocnt"); if(c) c.textContent=n; if(n<=0){ clearInterval(iv); const m=q.memo; q.memo=null; renderQ(card,q,onAnswer); q.memo=m; } },1000); return; }
+  let html=`<div class="topic">${cb}${esc(q.topic)}</div><div class="q">${q.q}</div>`;
+  if(q.kind==="mc"){ html+='<div class="opts">'+q.opts.map((o,i)=>`<button class="opt" data-i="${i}">${esc(o)}</button>`).join("")+'</div>'; }
+  else { html+=`<div class="typerow"><input id="ans" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" ${q.numeric?'inputmode="numeric" pattern="[0-9.]*"':''} placeholder="${q.numeric?"Type the number":"Type the word"}"><button class="btn" id="go">Go</button></div>`; }
+  card.innerHTML=html;
+  if(q.kind==="mc"){ card.querySelectorAll(".opt").forEach(b=>b.onclick=()=>onAnswer(+b.dataset.i,b)); }
+  else { const inp=card.querySelector("#ans"); setTimeout(()=>inp.focus(),50); const submit=()=>{ const v=inp.value.trim(); if(!v) return; onAnswer(v,inp); }; card.querySelector("#go").onclick=submit; inp.onkeydown=e=>{ if(e.key==="Enter") submit(); }; }
+}
+function isRight(q, given){ if(q.kind==="mc") return given===q.a; const g=String(given).trim().toLowerCase().replace(/\s+/g,"").replace(/,/g,""); return q.accept.some(a=>{ const s=String(a).toLowerCase().replace(/\s+/g,""); if(s===g) return true; if(q.numeric){ const x=parseFloat(s), y=parseFloat(g); return !isNaN(x)&&!isNaN(y)&&Math.abs(x-y)<1e-9; } return false; }); }
+function givenText(q,given){ return q.kind==="mc"?q.opts[given]:String(given); }
+function logAnswer(world, q, ok, given, secs, boss){
+  state.answered++; if(ok>0) state.right++;
+  const w=state.worlds[world]; w.answered++; if(ok>0) w.right++; w.secs+=Math.min(60,secs);
+  const tk=q.topic||"General"; state.topics[tk]=state.topics[tk]||{a:0,r:0}; state.topics[tk].a++; if(ok>0) state.topics[tk].r++;
+  if(world==="brick"&&ok>0) state.spelled++;
+  state.log.push({at:new Date().toISOString(), w:world, k:tk, q:q.word||q.q.replace(/<[^>]+>/g," ").replace(/\s+/g," ").trim().slice(0,90), ok, given:String(given).slice(0,40), ans:q.kind==="mc"?q.opts[q.a]:q.accept[0], secs:Math.round(secs), tier:q.tier||0, boss:boss||0, cb:q.comeback?1:0});
+  if(state.log.length>700) state.log=state.log.slice(-700);
+}
+function answerRun(given, el){
+  const q=RUN.cur; const ok=isRight(q,given); const fb=$("p-fb"); const secs=(Date.now()-RUN.qStart)/1000;
+  if(q.kind==="mc") $("p-card").querySelectorAll(".opt").forEach(b=>b.disabled=true);
+  if(ok){
+    SND.good(); if(el&&el.classList) el.classList.add("right");
+    const first=RUN.attempt===0; const base=XP_BASE[q.tier||1]; let xp=Math.round((first?base:base*0.7)*dadMultiplier(RUN.world));
+    RUN.combo++; if(RUN.combo>state.bestCombo) state.bestCombo=RUN.combo; let comboTxt="";
+    if(RUN.combo>0&&RUN.combo%5===0){ xp+=25; comboTxt=` · 🔥 ${RUN.combo} in a row +25`; questEvent("combo5",RUN.world); }
+    if(q.comeback){ xp+=10; state.comebacks++; comboTxt+=" · 🔁 Comeback!"; questEvent("comeback",RUN.world); }
+    RUN.xp+=xp; RUN.results[RUN.n]=first?2:1; state.worlds[RUN.world].xp+=xp;
+    logAnswer(RUN.world,q,first?2:1,givenText(q,given),secs); adapt(RUN.world,first); questEvent("answered",RUN.world); questEvent("right",RUN.world);
+    fb.className="fb good on"; fb.innerHTML=`<h3>${first?pick(["Nailed it!","Yes!","Boom!","Too easy for you!","Diamond answer!"]):"That's it — second go counts!"}${comboTxt}</h3><div class="why">${q.why}</div><div class="row"><button class="btn ok" id="nx">Next ›</button></div>`;
+    addXP(xp); $("p-combo").textContent="🔥 "+RUN.combo; $("p-combo").classList.add("hot","pop"); setTimeout(()=>$("p-combo").classList.remove("pop"),250);
+    $("nx").onclick=()=>{ RUN.n++; nextQ(); }; $("nx").focus(); checkBadges(); dadCheck(); persist();
+  } else if(RUN.attempt===0){
+    RUN.attempt=1; SND.notyet(); RUN.notyet++; questEvent("notyet",RUN.world); if(RUN.notyet>=5) award("grit");
+    if(RUN.combo>0){ /* bank the combo — nothing lost */ }
+    RUN.combo=0; $("p-combo").textContent="🔥 0"; $("p-combo").classList.remove("hot");
+    $("p-card").classList.add("shake"); setTimeout(()=>$("p-card").classList.remove("shake"),400);
+    if(q.kind==="mc"){ if(el) el.classList.add("notyet"); $("p-card").querySelectorAll(".opt").forEach(b=>{ if(b!==el) b.disabled=false; }); }
+    else { const inp=$("p-card").querySelector("#ans"); if(inp){ inp.value=""; inp.focus(); } }
+    fb.className="fb hint on"; fb.innerHTML=`<h3>Not yet — have another go</h3><div class="why">💡 ${esc(q.hint)}</div><div class="small mt">Second go still earns most of the XP.</div>`;
+  } else {
+    SND.notyet(); RUN.results[RUN.n]=0; RUN.xp+=3; state.worlds[RUN.world].xp+=3;
+    logAnswer(RUN.world,q,0,givenText(q,given),secs); adapt(RUN.world,false); questEvent("answered",RUN.world);
+    if(!q.comeback){ const copy=Object.assign({},q,{comeback:true,memo:null}); RUN.queue.push({q:copy, due:RUN.n+rnd(2,4)}); if(RUN.total<14) RUN.total++; }
+    if(q.kind==="mc"){ $("p-card").querySelectorAll(".opt").forEach(b=>{ if(+b.dataset.i===q.a) b.classList.add("right"); else b.classList.add("dim"); }); }
+    fb.className="fb show on"; fb.innerHTML=`<h3>Here's the answer: <span style="color:var(--gold)">${esc(q.kind==="mc"?q.opts[q.a]:q.accept[0])}</span></h3><div class="why">${q.why}</div><div class="small mt">+3 Grit XP for sticking with it. ${q.comeback?"":"This one comes back as a <b>Comeback card</b> in a minute — get it then for full XP."}</div><div class="row"><button class="btn ok" id="nx">Next ›</button></div>`;
+    addXP(3,"grit"); $("nx").onclick=()=>{ RUN.n++; nextQ(); }; $("nx").focus(); checkBadges(); persist();
+  }
+  renderProg(); renderDeco();
+}
+function finishRun(){
+  clearInterval(clockT); clockT=null; const w=state.worlds[RUN.world]; w.runs++; questEvent("run",RUN.world);
+  const right=RUN.results.filter(r=>r>=1).length, first=RUN.results.filter(r=>r===2).length; const secs=(Date.now()-RUN.start)/1000;
+  let pbLine=""; if(RUN.world==="forza"){ const ms=Math.round(secs*1000); if(right>=RUN.total-2){ if(!w.bestTime||ms<w.bestTime){ const old=w.bestTime; w.bestTime=ms; if(old){ pbLine=`<div class="loot">⏱️</div><p style="color:var(--forza)"><b>NEW PERSONAL BEST!</b> ${(ms/1000).toFixed(1)}s (was ${(old/1000).toFixed(1)}s)</p>`; award("pb"); addXP(40,"PB"); } else pbLine=`<p style="color:var(--forza)">First lap time set: <b>${(ms/1000).toFixed(1)}s</b>. Beat it next time!</p>`; } else pbLine=`<p class="small">Lap: ${(secs).toFixed(1)}s · your ghost: ${(w.bestTime/1000).toFixed(1)}s. The ghost only moves when you beat it — it never gets faster.</p>`; } else pbLine=`<p class="small">Lap times only count with 8+ right — accuracy first, speed second.</p>`; }
+  if(right>w.bestRun) w.bestRun=right;
+  const loot=pick(["🧰","🎁","📦","💎","🏅","🔑","🪙","🧪","🎟️"]);
+  const lines = first===RUN.total?"PERFECT RUN. Not one wobble.": right===RUN.total?"Every single one — comebacks included. That's grit.": right>=7?"Strong run. The hard ones are getting easier.": right>=4?"Good work — every 'not yet' taught you something.":"Tough run — and you finished it. That's the whole point.";
+  $("v-sum").innerHTML=`<div class="card summary"><div class="loot">${loot}</div><h2>Run complete — ${WORLDS[RUN.world].name}</h2><div class="bigxp">+${RUN.xp} XP</div><p>${lines}</p>
+    <div><span class="stat"><b>${right}/${RUN.total}</b>answered right</span><span class="stat"><b>${first}</b>first time</span><span class="stat"><b>${state.bestCombo}</b>best ever combo</span><span class="stat"><b>${TIER_NAMES[w.tier]}</b>level</span></div>${pbLine}
+    <div class="row mt" style="justify-content:center"><button class="btn" onclick="startWorld('${RUN.world}')">Another run ›</button><button class="btn sec" onclick="go('hub')">Back to the Arena</button></div></div>`;
+  $("p-card").innerHTML=""; $("p-fb").className="fb"; go("sum"); checkBadges(); persist(); RUN=null;
+}
+function endRun(back){ clearInterval(clockT); clockT=null; if(RUN&&RUN.n>0){ toast("Run saved — your XP is banked."); } RUN=null; $("p-card").innerHTML=""; $("p-fb").className="fb"; persist(); go("hub"); }
+
+/* ---------- BOSSES ---------- */
+let BF=null;
+function bossState(id){ state.bosses[id]=state.bosses[id]||{hp:null,beaten:0,attempts:0,best:0}; return state.bosses[id]; }
+function renderBosses(){
+  $("bosslist").innerHTML=BOSSES.map(b=>{ const s=bossState(b.id); const hp=s.hp===null?b.hp:s.hp; const locked=b.id==="grand"&&!BOSSES.filter(x=>x.id!=="grand").every(x=>bossState(x.id).beaten);
+    return `<button class="tile boss ${b.world!=="all"?b.world:""}" ${locked?'disabled style="opacity:.45"':''} onclick="startBoss('${b.id}')"><span class="em">${b.icon}</span><div class="t"><h3>${esc(b.name)}</h3><small>${b.world==="all"?"All worlds":WORLDS[b.world].name}</small></div>
+      <div class="meta">${s.beaten?`<span>🏆 Beaten ×${s.beaten}</span>`:""}<span>❤️ ${hp}/${b.hp}</span>${s.attempts&&!s.beaten?`<span>${s.attempts} ${s.attempts===1?"try":"tries"}</span>`:""}${locked?"<span>🔒 Beat all six first</span>":""}</div></button>`; }).join("");
+}
+function startBoss(id){
+  touchDay(); const b=BOSSES.find(x=>x.id===id); const s=bossState(id); s.attempts++; questEvent("boss","all");
+  BF={b, hp:s.hp===null?b.hp:s.hp, shields:3, n:0, cur:null, qStart:0, hits:0};
+  $("b-name").textContent=b.name; $("b-icon").textContent=b.icon; $("b-speech").textContent=s.hp!==null&&s.hp<b.hp?`"You again?! I'm still hurt from last time…"`:`"${b.intro}"`;
+  go("boss"); renderBossBars(); bossQ();
+}
+function renderBossBars(){ $("b-hp").style.width=(BF.hp/BF.b.hp*100)+"%"; $("b-shields").textContent="🛡️".repeat(BF.shields)+"▫️".repeat(3-BF.shields); }
+function bossWorld(){ return BF.b.world==="all"?pick(WORLD_IDS):BF.b.world; }
+function bossQ(){
+  const w=bossWorld(); const t=Math.min(5,Math.max(2,state.worlds[w].tier)); const q=GENS[w](t); q.tier=t; q.bw=w; BF.cur=q; BF.qStart=Date.now();
+  $("b-fb").className="fb"; $("b-fb").innerHTML=""; renderQ($("b-card"), q, answerBoss);
+}
+function answerBoss(given, el){
+  const q=BF.cur; const ok=isRight(q,given); const fb=$("b-fb"); const secs=(Date.now()-BF.qStart)/1000; const s=bossState(BF.b.id);
+  if(q.kind==="mc") $("b-card").querySelectorAll(".opt").forEach(b=>b.disabled=true);
+  logAnswer(q.bw,q,ok?2:0,givenText(q,given),secs,1); questEvent("answered",q.bw); if(ok) questEvent("right",q.bw);
+  if(ok){ SND.hit(); BF.hp--; BF.hits++; s.hp=BF.hp; if(el&&el.classList) el.classList.add("right"); const xp=Math.round(XP_BASE[q.tier]*1.2); addXP(xp,"hit"); $("b-speech").textContent=`"${pick(BF.b.hurt)}"`;
+    fb.className="fb good on"; fb.innerHTML=`<h3>HIT! ${BF.b.name} takes damage.</h3><div class="why">${q.why}</div><div class="row"><button class="btn ok" id="bnx">${BF.hp<=0?"Finish him ›":"Next ›"}</button></div>`;
+    $("bnx").onclick=()=>{ if(BF.hp<=0) bossWin(); else bossQ(); };
+  } else { SND.notyet(); BF.shields--; $("b-speech").textContent=`"${pick(BF.b.taunt)}"`;
+    if(q.kind==="mc"){ $("b-card").querySelectorAll(".opt").forEach(b=>{ if(+b.dataset.i===q.a) b.classList.add("right"); else b.classList.add("dim"); }); }
+    fb.className="fb show on"; fb.innerHTML=`<h3>Blocked! The answer was <span style="color:var(--gold)">${esc(q.kind==="mc"?q.opts[q.a]:q.accept[0])}</span></h3><div class="why">${q.why}</div><div class="small mt">+3 Grit XP. ${BF.shields>0?`${BF.shields} shield${BF.shields===1?"":"s"} left.`:"Shields down — but every hit you landed stays."}</div><div class="row"><button class="btn ok" id="bnx">${BF.shields<=0?"See what happened ›":"Next ›"}</button></div>`;
+    addXP(3,"grit"); $("bnx").onclick=()=>{ if(BF.shields<=0) bossEscape(); else bossQ(); };
+  }
+  renderBossBars(); checkBadges(); persist();
+}
+function bossWin(){ const s=bossState(BF.b.id); s.beaten++; s.hp=null; const xp=BF.b.id==="grand"?400:150; confetti(); SND.win();
+  overlay(`<div class="huge">🏆</div><h2>${esc(BF.b.name)} is DOWN!</h2><p>${BF.b.id==="grand"?"You hold the Arena belt. Nobody can take it away.":"You've won the "+WORLDS[BF.b.world].name+" belt."}${s.attempts>1?` It took ${s.attempts} tries — that's exactly how champions do it.`:""}</p><p><b style="color:var(--gold)">+${xp} XP</b></p><button class="btn mt" onclick="closeOv();go('bosses')">Back to the bosses</button>`);
+  addXP(xp,"boss"); checkBadges(); persist(); BF=null; $("b-card").innerHTML=""; $("b-fb").className="fb"; }
+function bossEscape(){ const s=bossState(BF.b.id); s.hp=BF.hp; if(BF.hits>s.best) s.best=BF.hits;
+  overlay(`<div class="huge">💨</div><h2>${esc(BF.b.name)} escaped…</h2><p>…but you landed <b style="color:var(--xp)">${BF.hits} hit${BF.hits===1?"":"s"}</b> and that damage STAYS. ${BF.b.name} comes back with only ${BF.hp}/${BF.b.hp} health. Next time you only need ${BF.hp} more.</p><p class="small">Tip: a run in ${BF.b.world==="all"?"any world":WORLDS[BF.b.world].name} sharpens you up before the rematch.</p><button class="btn mt" onclick="closeOv();go('bosses')">Rematch soon</button>`);
+  persist(); BF=null; $("b-card").innerHTML=""; $("b-fb").className="fb"; }
+function fleeBoss(){ $("b-card").innerHTML=""; $("b-fb").className="fb"; if(BF){ const s=bossState(BF.b.id); s.hp=BF.hp; persist(); toast("Retreat! Your damage is saved."); } BF=null; go("bosses"); }
+
+/* ---------- HUB ---------- */
+function renderHub(){
+  ensureDaily(); renderHeader();
+  const d=dadProgress(); const dc=$("dadcard");
+  if(d){ dc.style.display="block"; const pct=Math.round(d.n/d.target*100); dc.innerHTML=`<h2>🎖️ Dad's Challenge</h2><div>${esc(d.f.text||"")}</div><div class="small mt">${d.ws.map(w=>WORLDS[w].em+" "+WORLDS[w].name).join(" · ")} · <b>1.5× XP</b></div><div class="quest ${d.done?"done":""}" style="border:0"><div class="ic">${d.done?"✅":"🎯"}</div><div class="tx">${d.done?"Complete!":`${d.n} / ${d.target} questions`}<small>Reward: +${d.f.xp||100} XP</small></div><div class="bar"><i style="width:${pct}%"></i></div></div>`; }
+  else dc.style.display="none";
+  const qc=$("questcard"); qc.innerHTML=`<h2>📜 Today's quests</h2>`+state.daily.quests.map(q=>`<div class="quest ${q.done?"done":""}"><div class="ic">${q.icon}</div><div class="tx">${esc(q.text)}<small>+40 XP</small></div><div class="bar"><i style="width:${Math.min(100,q.n/q.target*100)}%"></i></div></div>`).join("")+`<div class="small mt">${state.daily.bonus?"🌟 Bonus claimed — all three done!":"All three done = +50 bonus XP"}</div>`;
+  const sc=$("streakcard"); const acc=state.answered?Math.round(state.right/state.answered*100):0;
+  sc.innerHTML=`<h2>📅 Your streak</h2><div style="font-size:2rem;font-weight:700">${state.streak.days} day${state.streak.days===1?"":"s"} 🔥</div><div class="small">Play on ${state.playedDays.length} different day${state.playedDays.length===1?"":"s"} so far · best combo ${state.bestCombo} · ${state.answered} questions answered</div><div class="small mt">⏱ iPad time earned: <b style="color:#8fd6ff">${bankMinutes()} min</b> <span class="pill">ask Dad to cash out</span></div>`;
+  const focusWs=(d&&!d.done)?d.ws:[];
+  $("worlds").innerHTML=WORLD_IDS.map(id=>{ const W=WORLDS[id], w=state.worlds[id]; const a=w.answered?Math.round(w.right/w.answered*100):null;
+    return `<button class="tile ${id} ${focusWs.includes(id)?"focus":""}" onclick="startWorld('${id}')"><img src="images/world-${id}.jpg" alt="" onerror="this.remove()"><span class="em">${W.em}</span><div class="t"><h3>${W.name}</h3><small>${W.subject}</small></div><div class="meta"><span class="stars">${"★".repeat(w.tier)}${"☆".repeat(5-w.tier)}</span><span>${TIER_NAMES[w.tier]}</span>${w.answered?`<span>${w.answered} done</span>`:"<span>New!</span>"}${id==="forza"&&w.bestTime?`<span>PB ${(w.bestTime/1000).toFixed(1)}s</span>`:""}</div></button>`; }).join("");
+  const beaten=BOSSES.filter(b=>bossState(b.id).beaten).length;
+  $("extra").innerHTML=`<button class="tile boss" onclick="go('bosses')"><img src="images/bosses.jpg" alt="" onerror="this.remove()"><span class="em">🥊</span><div class="t"><h3>Boss Battles</h3><small>Seven champions to beat</small></div><div class="meta"><span>🏆 ${beaten}/7 belts</span></div></button>
+    <button class="tile" style="background:linear-gradient(160deg,#4a3a7a,#1e1540)" onclick="go('trophies')"><span class="em">🏆</span><div class="t"><h3>Trophy Room</h3><small>Badges and belts</small></div><div class="meta"><span>${state.badges.length}/${BADGES.length} badges</span></div></button>`;
+}
+function renderTrophies(){
+  const acc=state.answered?Math.round(state.right/state.answered*100):0; const {r}=rankFor(state.xp);
+  $("trophystats").innerHTML=`<h2>${r[2]} ${r[1]} · ${state.xp} XP</h2><div class="row"><span class="stat"><b>${state.answered}</b> answered</span><span class="stat"><b>${acc}%</b> right</span><span class="stat"><b>${state.bestCombo}</b> best combo</span><span class="stat"><b>${state.comebacks}</b> comebacks</span><span class="stat"><b>${state.questsDone}</b> quests</span></div>`;
+  $("badges").innerHTML=BADGES.map(b=>`<div class="badge ${state.badges.includes(b.id)?"":"lock"}"><div class="i">${b.icon}</div><b>${b.name}</b><small>${b.how}</small></div>`).join("");
+  $("belts").innerHTML=BOSSES.map(b=>{ const s=bossState(b.id); return `<div class="badge ${s.beaten?"":"lock"}" style="min-width:120px"><div class="i">${s.beaten?"🏆":b.icon}</div><b>${esc(b.name)}</b><small>${s.beaten?"Beaten ×"+s.beaten:"Not yet"}</small></div>`; }).join("");
+  $("whoami").textContent=`Signed in as ${IDENTITY.cand} (${IDENTITY.cls}).`;
+}
+
+/* ---------- navigation ---------- */
+function go(v){ document.querySelectorAll(".view").forEach(x=>x.classList.remove("on")); $("v-"+v).classList.add("on"); window.scrollTo({top:0});
+  if(v==="hub") renderHub(); if(v==="bosses") renderBosses(); if(v==="trophies") renderTrophies(); }
+
+/* ---------- boot ---------- */
+async function signIn(name){
+  IDENTITY={cls:CLS,cand:name}; load(); setSync("busy");
+  const [cloud]=await Promise.all([cloudPull(), pullParent()]);
+  if(cloud&&cloud.v&&(!state.updatedAt||(cloud.updatedAt||"")>state.updatedAt)) state=Object.assign(freshState(),cloud);
+  state.name=name; $("gate").classList.remove("on"); setSync(cloud?"ok":"bad");
+  ensureDaily(); checkBadges(); go("hub"); persist();
+  if(CLS==="TEST") $("subtitle").textContent="TEST MODE — nothing here counts";
+}
+function boot(){
+  $("mutebtn").textContent=muted?"🔇":"🔊";
+  $("who").innerHTML=PLAYERS.map(p=>`<button onclick="signIn('${p}')">🎮 ${p}</button>`).join("");
+  const auto=QS.get("player"); if(auto&&PLAYERS.includes(auto)) signIn(auto); else $("gate").classList.add("on");
+  setInterval(()=>{ pullParent().then(()=>{ if($("v-hub").classList.contains("on")) renderHeader(); }); },120000);
+}
+document.addEventListener("visibilitychange",()=>{ if(document.hidden&&IDENTITY) cloudPush(); });
+boot();
+
+</script>
+</body>
+</html>

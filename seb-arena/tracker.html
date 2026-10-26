@@ -1,0 +1,522 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Seb's Arena — Parent Tracker</title>
+<style>
+:root{--bg:#0f1424;--card:#171f3a;--card2:#1f2a4d;--line:#2b3764;--ink:#f3f5ff;--mute:#9fb0e6;--gold:#ffcd3c;--xp:#7cf5a4;--warn:#ffb15c;--bad:#ff6b8a}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,Segoe UI,sans-serif;font-size:15px}
+.wrap{max-width:1040px;margin:0 auto;padding:16px}
+header{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+h1{font-size:1.3rem;margin:0}h2{font-size:1.05rem;margin:0 0 10px}h3{font-size:.95rem;margin:14px 0 6px;color:var(--mute)}
+.spacer{flex:1}
+button{font:inherit;color:inherit;border:0;background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:8px 14px;cursor:pointer}
+button.pri{background:var(--gold);color:#1a1200;font-weight:700;border-color:var(--gold)}
+button.danger{background:#3a1a22;border-color:#6b2f3a}
+input,select,textarea{font:inherit;color:inherit;background:#0a1222;border:1px solid var(--line);border-radius:10px;padding:8px 10px}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0 14px}
+.tabs button.on{background:var(--gold);color:#1a1200;font-weight:700;border-color:var(--gold)}
+.panel{display:none}.panel.on{display:block}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:14px}
+.grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
+.stat{background:var(--card2);border-radius:12px;padding:12px}
+.stat b{display:block;font-size:1.6rem}.stat small{color:var(--mute)}
+table{width:100%;border-collapse:collapse;font-size:.92rem}
+th,td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+th{color:var(--mute);font-weight:600;font-size:.8rem;text-transform:uppercase;letter-spacing:.3px}
+.bar{height:10px;border-radius:99px;background:#0a1222;overflow:hidden;min-width:80px}
+.bar i{display:block;height:100%;background:var(--xp)}
+.bar i.warn{background:var(--warn)}.bar i.bad{background:var(--bad)}
+.chart{display:flex;align-items:flex-end;gap:4px;height:120px;padding-top:10px}
+.chart div{flex:1;background:var(--card2);border-radius:4px 4px 0 0;position:relative;min-width:8px}
+.chart div i{position:absolute;left:0;right:0;bottom:0;background:var(--xp);border-radius:4px 4px 0 0}
+.chart div span{position:absolute;top:-18px;left:0;right:0;text-align:center;font-size:.7rem;color:var(--mute)}
+.axis{display:flex;gap:4px;font-size:.65rem;color:var(--mute)}.axis span{flex:1;text-align:center;min-width:8px;overflow:hidden}
+.pill{display:inline-block;background:var(--card2);border-radius:999px;padding:2px 9px;font-size:.78rem;color:var(--mute);margin:1px}
+.good{color:var(--xp)}.warnc{color:var(--warn)}.badc{color:var(--bad)}.mute{color:var(--mute)}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+label.ck{display:inline-flex;align-items:center;gap:6px;background:var(--card2);border-radius:10px;padding:6px 10px;margin:2px}
+.note{color:var(--mute);font-size:.85rem}
+#status{font-size:.85rem;color:var(--mute)}
+pre{background:#0a1222;border-radius:10px;padding:10px;overflow:auto;max-height:300px;font-size:.78rem}
+</style>
+</head>
+<body><div class="wrap">
+<header><h1>🏟️ Seb's Arena — Parent Tracker</h1><span id="status">loading…</span><div class="spacer"></div><button onclick="loadAll()">↻ Refresh</button></header>
+<div class="tabs" id="tabs"></div>
+<div class="panel" id="p-over"></div>
+<div class="panel" id="p-subj"></div>
+<div class="panel" id="p-need"></div>
+<div class="panel" id="p-boss"></div>
+<div class="panel" id="p-bank"></div>
+<div class="panel" id="p-dad"></div>
+<div class="panel" id="p-data"></div>
+</div>
+<script>
+/* ===================== SEB'S ARENA — CONTENT BANKS ===================== */
+/* Everything Seb can be asked lives here. Tiers: 1 (easy) … 5 (hard).      */
+
+const RANKS = [
+  [0,"Rookie","🥾"],[500,"Apprentice","🔧"],[1500,"Explorer","🧭"],[3000,"Builder","🧱"],
+  [5000,"Racer","🏎️"],[7500,"Contender","🥊"],[11000,"Champion","🏆"],[15000,"Legend","⚡"],
+  [20000,"Grand Master","👑"],[28000,"Mythic","🐉"],[40000,"Immortal","🌌"]
+];
+
+/* ---------- SPELLING (Brick Builder) ---------- */
+/* w = word, d = short meaning, t = tier 1-3, f = focus: "dbl" (has a double consonant Seb must keep),
+   "sgl" (a single consonant people wrongly double), "y56" (Year 5/6 word) */
+const SPELL = [
+ // tier 1 — common double-consonant words
+ {w:"rabbit",d:"a furry animal with long ears",t:1,f:"dbl"},{w:"butter",d:"spread on toast",t:1,f:"dbl"},
+ {w:"letter",d:"you post it, or A, B, C",t:1,f:"dbl"},{w:"dinner",d:"evening meal",t:1,f:"dbl"},
+ {w:"summer",d:"the hot season",t:1,f:"dbl"},{w:"yellow",d:"the colour of a banana",t:1,f:"dbl"},
+ {w:"happy",d:"feeling glad",t:1,f:"dbl"},{w:"little",d:"small",t:1,f:"dbl"},
+ {w:"bottle",d:"holds a drink",t:1,f:"dbl"},{w:"puppy",d:"a young dog",t:1,f:"dbl"},
+ {w:"kitten",d:"a young cat",t:1,f:"dbl"},{w:"hidden",d:"out of sight",t:1,f:"dbl"},
+ {w:"ladder",d:"you climb it",t:1,f:"dbl"},{w:"mirror",d:"shows your reflection",t:1,f:"dbl"},
+ {w:"carry",d:"take something in your arms",t:1,f:"dbl"},{w:"hurry",d:"go fast",t:1,f:"dbl"},
+ {w:"sorry",d:"what you say when you apologise",t:1,f:"dbl"},{w:"funny",d:"makes you laugh",t:1,f:"dbl"},
+ {w:"pretty",d:"nice to look at",t:1,f:"dbl"},{w:"jelly",d:"wobbly pudding",t:1,f:"dbl"},
+ {w:"coffee",d:"a hot drink grown-ups like",t:1,f:"dbl"},{w:"balloon",d:"filled with air at a party",t:1,f:"dbl"},
+ {w:"pepper",d:"black powder you shake on food",t:1,f:"dbl"},{w:"ribbon",d:"a strip of fabric for tying",t:1,f:"dbl"},
+ {w:"tunnel",d:"a passage underground",t:1,f:"dbl"},{w:"village",d:"a small group of houses",t:1,f:"dbl"},
+ {w:"swimming",d:"moving through water",t:1,f:"dbl"},{w:"running",d:"going fast on foot",t:1,f:"dbl"},
+ {w:"shopping",d:"buying things",t:1,f:"dbl"},{w:"skipping",d:"jumping over a rope",t:1,f:"dbl"},
+ {w:"middle",d:"the centre",t:1,f:"dbl"},{w:"puzzle",d:"a problem to solve",t:1,f:"dbl"},
+ {w:"follow",d:"go after someone",t:1,f:"dbl"},{w:"better",d:"more good",t:1,f:"dbl"},
+ // tier 1 — single consonants that get wrongly doubled
+ {w:"until",d:"up to the time when",t:1,f:"sgl"},{w:"always",d:"every time",t:1,f:"sgl"},
+ {w:"robot",d:"a machine that can move by itself",t:1,f:"sgl"},{w:"lemon",d:"a sour yellow fruit",t:1,f:"sgl"},
+ {w:"planet",d:"Earth or Mars, for example",t:1,f:"sgl"},{w:"visit",d:"go to see someone",t:1,f:"sgl"},
+ {w:"finish",d:"come to the end",t:1,f:"sgl"},{w:"animal",d:"a living creature",t:1,f:"sgl"},
+ {w:"camel",d:"a desert animal with humps",t:1,f:"sgl"},{w:"habit",d:"something you do without thinking",t:1,f:"sgl"},
+ {w:"salad",d:"a cold dish of leaves and vegetables",t:1,f:"sgl"},{w:"holiday",d:"time off school",t:1,f:"sgl"},
+ {w:"already",d:"before now",t:1,f:"sgl"},{w:"body",d:"all of you from head to toe",t:1,f:"sgl"},
+ {w:"money",d:"coins and notes",t:1,f:"sgl"},{w:"river",d:"a long flowing body of water",t:1,f:"sgl"},
+ // tier 2
+ {w:"beginning",d:"the start",t:2,f:"dbl"},{w:"tomorrow",d:"the day after today",t:2,f:"dbl"},
+ {w:"different",d:"not the same",t:2,f:"dbl"},{w:"difficult",d:"hard to do",t:2,f:"dbl"},
+ {w:"happen",d:"take place",t:2,f:"dbl"},{w:"sudden",d:"happening quickly without warning",t:2,f:"dbl"},
+ {w:"suddenly",d:"all at once",t:2,f:"dbl"},{w:"terrible",d:"very bad",t:2,f:"dbl"},
+ {w:"horrible",d:"nasty, awful",t:2,f:"dbl"},{w:"possible",d:"can be done",t:2,f:"dbl"},
+ {w:"collect",d:"gather things together",t:2,f:"dbl"},{w:"common",d:"found everywhere, usual",t:2,f:"dbl"},
+ {w:"address",d:"where you live",t:2,f:"dbl"},{w:"arrive",d:"get to a place",t:2,f:"dbl"},
+ {w:"appear",d:"come into view",t:2,f:"dbl"},{w:"disappear",d:"vanish",t:2,f:"dbl"},
+ {w:"accident",d:"something bad that happens by chance",t:2,f:"dbl"},{w:"written",d:"put down in words",t:2,f:"dbl"},
+ {w:"forgotten",d:"gone from your memory",t:2,f:"dbl"},{w:"grammar",d:"the rules of a language",t:2,f:"dbl"},
+ {w:"traffic",d:"cars on the road",t:2,f:"dbl"},{w:"rubbish",d:"things you throw away",t:2,f:"dbl"},
+ {w:"scissors",d:"they cut paper",t:2,f:"dbl"},{w:"narrow",d:"not wide",t:2,f:"dbl"},
+ {w:"pattern",d:"a repeated design",t:2,f:"dbl"},{w:"passenger",d:"someone riding in a vehicle",t:2,f:"dbl"},
+ {w:"mammal",d:"a warm-blooded animal that feeds milk to its young",t:2,f:"dbl"},{w:"settle",d:"come to rest",t:2,f:"dbl"},
+ {w:"excellent",d:"extremely good",t:2,f:"dbl"},{w:"opposite",d:"completely different",t:2,f:"dbl"},
+ {w:"mission",d:"an important job to do",t:2,f:"dbl"},{w:"pressure",d:"a pushing force",t:2,f:"dbl"},
+ {w:"success",d:"doing well",t:2,f:"dbl"},{w:"suppose",d:"think something is probably true",t:2,f:"dbl"},
+ {w:"worry",d:"feel anxious",t:2,f:"dbl"},{w:"cabbage",d:"a round green vegetable",t:2,f:"dbl"},
+ {w:"interrupt",d:"break in while someone is talking",t:2,f:"dbl"},{w:"immediately",d:"right now",t:2,f:"dbl"},
+ {w:"occasion",d:"a special event",t:2,f:"dbl"},{w:"actually",d:"in fact, really",t:2,f:"sgl"},
+ {w:"famous",d:"known by lots of people",t:2,f:"sgl"},{w:"natural",d:"from nature, not made by people",t:2,f:"sgl"},
+ {w:"medicine",d:"what you take to get better",t:2,f:"sgl"},{w:"promise",d:"say you will definitely do something",t:2,f:"sgl"},
+ {w:"imagine",d:"picture it in your mind",t:2,f:"sgl"},{w:"popular",d:"liked by many people",t:2,f:"sgl"},
+ {w:"minute",d:"sixty seconds",t:2,f:"sgl"},{w:"separate",d:"apart, not joined",t:2,f:"sgl"},
+ {w:"decide",d:"make up your mind",t:2,f:"sgl"},{w:"experiment",d:"a scientific test",t:2,f:"sgl"},
+ // tier 3 — Year 5/6 words
+ {w:"necessary",d:"needed",t:3,f:"y56"},{w:"occasionally",d:"now and then",t:3,f:"y56"},
+ {w:"embarrass",d:"make someone feel awkward",t:3,f:"y56"},{w:"recommend",d:"say something is good",t:3,f:"y56"},
+ {w:"accommodate",d:"have room for",t:3,f:"y56"},{w:"accompany",d:"go along with",t:3,f:"y56"},
+ {w:"aggressive",d:"fierce, ready to attack",t:3,f:"y56"},{w:"apparent",d:"clear, obvious",t:3,f:"y56"},
+ {w:"committee",d:"a group that makes decisions",t:3,f:"y56"},{w:"communicate",d:"share information",t:3,f:"y56"},
+ {w:"community",d:"people living in one place",t:3,f:"y56"},{w:"correspond",d:"match up; write letters to",t:3,f:"y56"},
+ {w:"exaggerate",d:"make something sound bigger than it is",t:3,f:"y56"},{w:"opportunity",d:"a chance",t:3,f:"y56"},
+ {w:"parallel",d:"lines that never meet",t:3,f:"y56"},{w:"profession",d:"a job needing training",t:3,f:"y56"},
+ {w:"programme",d:"a TV show or a plan",t:3,f:"y56"},{w:"sufficient",d:"enough",t:3,f:"y56"},
+ {w:"attached",d:"joined on",t:3,f:"y56"},{w:"available",d:"ready to use",t:3,f:"y56"},
+ {w:"according",d:"as stated by",t:3,f:"y56"},{w:"possession",d:"something you own",t:3,f:"y56"},
+ {w:"occur",d:"happen",t:3,f:"y56"},{w:"occupy",d:"fill a space",t:3,f:"y56"},
+ {w:"harass",d:"keep bothering someone",t:3,f:"y56"},{w:"immediately",d:"at once",t:3,f:"y56"},
+ {w:"desperate",d:"wanting something very badly",t:3,f:"y56"},{w:"develop",d:"grow or build up",t:3,f:"y56"},
+ {w:"definite",d:"certain",t:3,f:"y56"},{w:"category",d:"a group of similar things",t:3,f:"y56"},
+ {w:"competition",d:"a contest",t:3,f:"y56"},{w:"vegetable",d:"a carrot or a pea",t:3,f:"y56"},
+ {w:"temperature",d:"how hot or cold",t:3,f:"y56"},{w:"environment",d:"the world around us",t:3,f:"y56"},
+ {w:"government",d:"the people who run the country",t:3,f:"y56"},{w:"equipment",d:"the kit you need",t:3,f:"y56"},
+ {w:"marvellous",d:"wonderful",t:3,f:"y56"},{w:"muscle",d:"it moves your bones",t:3,f:"y56"},
+ {w:"physical",d:"to do with the body",t:3,f:"y56"},{w:"relevant",d:"connected to the matter",t:3,f:"y56"},
+ {w:"sincerely",d:"truly, from the heart",t:3,f:"y56"},{w:"thorough",d:"careful and complete",t:3,f:"y56"},
+ {w:"vehicle",d:"a car, bus or lorry",t:3,f:"y56"},{w:"yacht",d:"a sailing boat",t:3,f:"y56"},
+ {w:"rhythm",d:"the beat in music",t:3,f:"y56"},{w:"stomach",d:"where your food goes",t:3,f:"y56"},
+ {w:"soldier",d:"a person in the army",t:3,f:"y56"},{w:"language",d:"English, Latin, Spanish",t:3,f:"y56"},
+ {w:"knowledge",d:"what you know",t:3,f:"y56"},{w:"guarantee",d:"a firm promise",t:3,f:"y56"}
+];
+
+/* ---------- SCIENCE (Astro Lab) ---------- */
+/* {q, o:[4 options], a: index, why, t: tier 1-3, k: topic} */
+const SCI = [
+ {q:"Which planet is closest to the Sun?",o:["Mercury","Venus","Earth","Mars"],a:0,why:"Mercury is the innermost planet, then Venus, Earth, Mars.",t:1,k:"Space"},
+ {q:"How long does the Earth take to orbit the Sun once?",o:["One day","One month","One year","Ten years"],a:2,why:"One full orbit of the Sun is one year (about 365 days).",t:1,k:"Space"},
+ {q:"What causes day and night?",o:["The Sun moving around Earth","Earth spinning on its axis","The Moon blocking the Sun","Clouds covering the Sun"],a:1,why:"Earth spins once every 24 hours; the side facing the Sun has day.",t:1,k:"Space"},
+ {q:"What does the Moon orbit?",o:["The Sun","Mars","The Earth","Jupiter"],a:2,why:"The Moon goes round the Earth about once a month.",t:1,k:"Space"},
+ {q:"The Sun is a…",o:["planet","star","moon","comet"],a:1,why:"The Sun is a star — a huge ball of burning gas.",t:1,k:"Space"},
+ {q:"Which is the largest planet in our solar system?",o:["Saturn","Earth","Neptune","Jupiter"],a:3,why:"Jupiter is so big that over 1,300 Earths would fit inside it.",t:1,k:"Space"},
+ {q:"Which planet is famous for its rings?",o:["Mars","Saturn","Venus","Mercury"],a:1,why:"Saturn's rings are made of ice and rock.",t:1,k:"Space"},
+ {q:"Which planet is called the Red Planet?",o:["Mars","Jupiter","Venus","Uranus"],a:0,why:"Mars looks red because of iron-rich dust on its surface.",t:1,k:"Space"},
+ {q:"What shape is the Earth?",o:["A flat disc","A cube","Roughly a sphere","A cylinder"],a:2,why:"Earth is a slightly squashed sphere.",t:1,k:"Space"},
+ {q:"Which force pulls everything towards the ground?",o:["Friction","Magnetism","Gravity","Air resistance"],a:2,why:"Gravity pulls objects towards the centre of the Earth.",t:1,k:"Forces"},
+ {q:"Air resistance is a kind of…",o:["gravity","friction","magnetism","electricity"],a:1,why:"Air resistance is friction between an object and the air.",t:2,k:"Forces"},
+ {q:"Which shape cuts through the air with the LEAST air resistance?",o:["A flat square","A pointed, streamlined shape","A big open parachute","A round ball of fluff"],a:1,why:"Streamlined shapes let air flow past smoothly — like a racing car's nose.",t:2,k:"Forces"},
+ {q:"Levers, pulleys and gears all let…",o:["a smaller force have a bigger effect","objects float","magnets stick","water boil faster"],a:0,why:"Simple machines multiply a force — a small push moves a heavy load.",t:2,k:"Forces"},
+ {q:"Friction is a force that…",o:["makes things speed up","slows things that rub together","pulls things to the Moon","makes things lighter"],a:1,why:"Friction acts when two surfaces rub, slowing movement.",t:1,k:"Forces"},
+ {q:"Weight is a force. It is measured in…",o:["kilograms","metres","newtons","litres"],a:2,why:"Weight (a force) is measured in newtons; mass is in kilograms.",t:3,k:"Forces"},
+ {q:"On the Moon, gravity is…",o:["stronger than on Earth","the same as Earth","weaker than on Earth","zero"],a:2,why:"Moon gravity is about a sixth of Earth's — that's why astronauts bounce.",t:2,k:"Forces"},
+ {q:"In a vacuum (no air), a feather and a hammer dropped together would…",o:["hammer lands first","feather lands first","land at the same time","both float"],a:2,why:"Without air resistance, gravity pulls everything down at the same rate.",t:3,k:"Forces"},
+ {q:"Which of these is a mammal?",o:["Shark","Whale","Lizard","Frog"],a:1,why:"Whales breathe air and feed milk to their young — they are mammals.",t:1,k:"Living things"},
+ {q:"Amphibians such as frogs begin their lives…",o:["in the air","in water","underground","in trees"],a:1,why:"Frogs start as eggs in water, then tadpoles, then grow legs and lungs.",t:1,k:"Living things"},
+ {q:"Which is NOT a stage in a butterfly's life cycle?",o:["Egg","Caterpillar","Chrysalis","Tadpole"],a:3,why:"Tadpoles are baby frogs. A butterfly goes egg → caterpillar → chrysalis → butterfly.",t:1,k:"Living things"},
+ {q:"Metamorphosis means…",o:["growing taller","a complete change of body form","sleeping through winter","laying eggs"],a:1,why:"A caterpillar becoming a butterfly is metamorphosis.",t:2,k:"Living things"},
+ {q:"An animal that eats only plants is a…",o:["carnivore","omnivore","herbivore","predator"],a:2,why:"Herb = plant. Herbivores eat plants only.",t:1,k:"Living things"},
+ {q:"An animal that eats both plants and animals is an…",o:["omnivore","herbivore","carnivore","insectivore"],a:0,why:"Omni = all. Humans are omnivores.",t:1,k:"Living things"},
+ {q:"In a food chain, what does every chain start with?",o:["A predator","A producer (a plant)","A prey animal","A human"],a:1,why:"Plants make their own food using sunlight, so they start every chain.",t:2,k:"Living things"},
+ {q:"A fox eats a rabbit. The fox is the…",o:["prey","producer","predator","plant"],a:2,why:"The hunter is the predator; the hunted is the prey.",t:1,k:"Living things"},
+ {q:"Insects have how many legs?",o:["4","6","8","10"],a:1,why:"All insects have six legs. Spiders have eight — they are arachnids.",t:1,k:"Living things"},
+ {q:"Spiders belong to which group?",o:["Insects","Arachnids","Reptiles","Amphibians"],a:1,why:"Arachnids have eight legs and two body parts.",t:2,k:"Living things"},
+ {q:"Which of these do all birds have?",o:["Fur","Feathers","Scales","Fins"],a:1,why:"Birds are warm-blooded, lay eggs and have feathers.",t:1,k:"Living things"},
+ {q:"Which organs do you breathe with?",o:["Kidneys","Lungs","Liver","Stomach"],a:1,why:"Lungs take in oxygen and give out carbon dioxide.",t:1,k:"Human body"},
+ {q:"What does the heart pump around the body?",o:["Air","Water","Blood","Food"],a:2,why:"The heart pumps blood, carrying oxygen to every part of you.",t:1,k:"Human body"},
+ {q:"Which teeth are pointed and used for tearing food?",o:["Incisors","Canines","Molars","Wisdom teeth"],a:1,why:"Canines are the pointed teeth next to the front ones.",t:2,k:"Human body"},
+ {q:"Which teeth are flat and used for grinding?",o:["Molars","Canines","Incisors","Baby teeth"],a:0,why:"Molars at the back crush and grind food.",t:2,k:"Human body"},
+ {q:"Muscles work in…",o:["threes","pairs","single units","groups of ten"],a:1,why:"One muscle pulls a bone one way, its partner pulls it back (like biceps and triceps).",t:2,k:"Human body"},
+ {q:"Which gas do we need from the air we breathe in?",o:["Carbon dioxide","Nitrogen","Oxygen","Helium"],a:2,why:"Our bodies use oxygen to release energy from food.",t:1,k:"Human body"},
+ {q:"Which gas do we breathe OUT more of than we breathe in?",o:["Oxygen","Carbon dioxide","Hydrogen","Neon"],a:1,why:"Breathing out releases the carbon dioxide our bodies make.",t:2,k:"Human body"},
+ {q:"The skeleton's three main jobs are support, movement and…",o:["digestion","protection","breathing","hearing"],a:1,why:"The skull protects the brain and the ribs protect the heart and lungs.",t:1,k:"Human body"},
+ {q:"The correct order of the human life cycle is…",o:["baby, adult, child, teenager","baby, child, teenager, adult","child, baby, adult, teenager","teenager, child, baby, adult"],a:1,why:"We grow from baby to child to adolescent (teenager) to adult.",t:1,k:"Human body"},
+ {q:"Which material is magnetic?",o:["Plastic","Iron","Wood","Glass"],a:1,why:"Iron, steel, nickel and cobalt are magnetic. Most metals (like copper) are not.",t:1,k:"Materials"},
+ {q:"Which is the best conductor of electricity?",o:["Rubber","Copper","Wood","Paper"],a:1,why:"Metals such as copper let electricity flow — that's why wires are copper.",t:1,k:"Materials"},
+ {q:"Which material is an electrical INSULATOR?",o:["Plastic","Steel","Copper","Aluminium"],a:0,why:"Plastic stops electricity flowing — it coats the wires to keep us safe.",t:1,k:"Materials"},
+ {q:"Which material is a good THERMAL insulator (keeps heat in)?",o:["Metal","Wool","Glass","Water"],a:1,why:"Wool traps air, and trapped air is a poor conductor of heat.",t:2,k:"Materials"},
+ {q:"Sugar stirred into water seems to vanish. It has…",o:["melted","evaporated","dissolved","frozen"],a:2,why:"The sugar dissolves to make a solution; it is still there.",t:1,k:"Materials"},
+ {q:"How could you get the salt back out of salt water?",o:["Filtering","Sieving","Evaporation","Freezing"],a:2,why:"Evaporate the water and the salt is left behind.",t:2,k:"Materials"},
+ {q:"How would you separate sand from water?",o:["Evaporation","Filtering","Magnet","Stirring"],a:1,why:"Sand does not dissolve, so a filter catches it and lets the water through.",t:2,k:"Materials"},
+ {q:"Which change is REVERSIBLE?",o:["Burning wood","Baking a cake","Melting ice","Frying an egg"],a:2,why:"Ice can melt and freeze again. Burning and baking cannot be undone.",t:1,k:"Materials"},
+ {q:"Which change is IRREVERSIBLE?",o:["Freezing water","Dissolving salt","Burning paper","Melting chocolate"],a:2,why:"Burning makes new substances (ash, smoke). You cannot get the paper back.",t:2,k:"Materials"},
+ {q:"Which is a TRANSPARENT material?",o:["Wood","Clear glass","Brick","Cardboard"],a:1,why:"Transparent means light passes straight through, so you can see clearly.",t:1,k:"Materials"},
+ {q:"A rock that lets water pass through it is…",o:["permeable","impermeable","invisible","magnetic"],a:0,why:"Permeable rocks like sandstone soak up water; impermeable rocks like slate do not.",t:3,k:"Materials"},
+ {q:"At what temperature does water boil?",o:["0 °C","50 °C","100 °C","200 °C"],a:2,why:"Water boils at 100 °C and freezes at 0 °C.",t:1,k:"States of matter"},
+ {q:"At what temperature does water freeze?",o:["0 °C","10 °C","32 °C","100 °C"],a:0,why:"Water freezes at 0 °C.",t:1,k:"States of matter"},
+ {q:"Water vapour turning back into liquid water is called…",o:["evaporation","condensation","melting","freezing"],a:1,why:"Condensation — like water droplets on a cold window.",t:2,k:"States of matter"},
+ {q:"A liquid turning into a gas is called…",o:["condensation","freezing","evaporation","melting"],a:2,why:"Puddles disappear because the water evaporates.",t:1,k:"States of matter"},
+ {q:"Which is NOT one of the three states of matter?",o:["Solid","Liquid","Gas","Light"],a:3,why:"Solid, liquid and gas are the three states. Light is energy.",t:1,k:"States of matter"},
+ {q:"Which of these is a GAS at room temperature?",o:["Oxygen","Ice","Milk","Iron"],a:0,why:"Oxygen is a gas in the air around us.",t:1,k:"States of matter"},
+ {q:"Sound is made when something…",o:["gets hot","vibrates","glows","melts"],a:1,why:"Vibrations push the air, and those waves reach your ears.",t:1,k:"Sound & light"},
+ {q:"Sound cannot travel through…",o:["water","wood","empty space (a vacuum)","air"],a:2,why:"Sound needs something to vibrate — in space there is nothing, so it is silent.",t:2,k:"Sound & light"},
+ {q:"A higher-pitched sound is made by…",o:["slower vibrations","faster vibrations","louder vibrations","no vibrations"],a:1,why:"Faster vibrations = higher pitch (like a short, tight guitar string).",t:2,k:"Sound & light"},
+ {q:"Light travels in…",o:["curves","circles","straight lines","zigzags"],a:2,why:"Light travels in straight lines — that's why shadows have sharp edges.",t:1,k:"Sound & light"},
+ {q:"A shadow is made when light is…",o:["reflected","blocked by an opaque object","bent by water","switched off"],a:1,why:"Opaque objects block light, leaving a dark shape behind them.",t:1,k:"Sound & light"},
+ {q:"We see objects because light…",o:["comes out of our eyes","reflects off them into our eyes","makes them warm","passes through them"],a:1,why:"Light bounces (reflects) off objects and travels into our eyes.",t:2,k:"Sound & light"},
+ {q:"For a bulb to light up, a circuit must be…",o:["broken","complete (a full loop)","made of plastic","very long"],a:1,why:"Electricity only flows round a complete loop.",t:1,k:"Electricity"},
+ {q:"What is a switch for?",o:["Making the bulb brighter","Breaking or completing the circuit","Storing electricity","Cooling the wires"],a:1,why:"A switch opens a gap (off) or closes it (on).",t:1,k:"Electricity"},
+ {q:"Adding more batteries (cells) to a bulb circuit makes the bulb…",o:["dimmer","brighter","change colour","go silent"],a:1,why:"More cells push more electricity round, so the bulb glows brighter.",t:2,k:"Electricity"},
+ {q:"Which part of a plant takes in water from the soil?",o:["Leaves","Flowers","Roots","Petals"],a:2,why:"Roots absorb water and nutrients and anchor the plant.",t:1,k:"Plants"},
+ {q:"Which part of a plant makes food using sunlight?",o:["Roots","Leaves","Stem","Seeds"],a:1,why:"Leaves use light, water and carbon dioxide to make food.",t:2,k:"Plants"},
+ {q:"Pollination is when pollen moves from one flower to…",o:["the roots","the soil","another flower","the leaves"],a:2,why:"Insects and wind carry pollen between flowers so seeds can form.",t:2,k:"Plants"},
+ {q:"Which is NOT a way seeds are spread?",o:["Wind","Animals","Water","Telephone"],a:3,why:"Seeds travel by wind, animals, water and exploding pods.",t:1,k:"Plants"},
+ {q:"Which do plants NOT need to grow well?",o:["Light","Water","Chocolate","Air"],a:2,why:"Plants need light, water, air, nutrients and the right temperature.",t:1,k:"Plants"},
+ {q:"Fossils are…",o:["new rocks","the remains or traces of living things from long ago","frozen water","pieces of meteorite"],a:1,why:"Fossils form over millions of years when remains are buried and turn to rock.",t:2,k:"Rocks"},
+ {q:"Soil is made mostly of tiny rock pieces mixed with…",o:["plastic","dead plants and animals","metal","glass"],a:1,why:"Organic matter (rotted plants and animals) mixes with rock pieces to make soil.",t:2,k:"Rocks"},
+ {q:"A pond, a desert and a rainforest are all examples of…",o:["habitats","planets","materials","forces"],a:0,why:"A habitat is where a living thing lives.",t:1,k:"Living things"},
+ {q:"Which planet is furthest from the Sun?",o:["Uranus","Neptune","Saturn","Jupiter"],a:1,why:"Order: Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, Neptune.",t:2,k:"Space"},
+ {q:"The Moon seems to change shape each month because…",o:["it is getting smaller","we see different amounts of its sunlit side","clouds hide it","it spins very fast"],a:1,why:"The Moon's phases come from how much of its lit side faces Earth.",t:3,k:"Space"},
+ {q:"A year on Mercury is shorter than a year on Earth because Mercury…",o:["is smaller","is closer to the Sun, so its orbit is shorter","spins faster","is colder"],a:1,why:"Planets near the Sun have shorter orbits — Mercury's year is 88 days.",t:3,k:"Space"},
+ {q:"What is a solution?",o:["A solid that has melted","A liquid with a solid dissolved in it","A gas that has frozen","A mixture you can sieve"],a:1,why:"Salt water is a solution: the salt is dissolved and spread evenly through the water.",t:3,k:"Materials"},
+ {q:"Which of these is a solid, a liquid AND a gas depending on temperature?",o:["Wood","Water","Paper","Rubber"],a:1,why:"Ice, water and steam are the same substance in three states.",t:2,k:"States of matter"},
+ {q:"Why do you see lightning before you hear thunder?",o:["Light travels faster than sound","Sound travels faster than light","Thunder happens later","Your eyes are closer to the sky"],a:0,why:"Light reaches you almost instantly; sound takes about 3 seconds per kilometre.",t:3,k:"Sound & light"},
+ {q:"The force that makes a parachute fall slowly is…",o:["gravity","air resistance","magnetism","water resistance"],a:1,why:"The big canopy catches lots of air, so air resistance pushes up against gravity.",t:2,k:"Forces"}
+];
+
+/* ---------- ATLAS (History & Geography) ---------- */
+const ATLAS = [
+ {q:"How many continents are there?",o:["5","6","7","8"],a:2,why:"Africa, Antarctica, Asia, Australia (Oceania), Europe, North America, South America.",t:1,k:"Geography"},
+ {q:"Which is the largest ocean?",o:["Atlantic","Pacific","Indian","Arctic"],a:1,why:"The Pacific is bigger than all the land on Earth put together.",t:1,k:"Geography"},
+ {q:"What is the capital city of the United Kingdom?",o:["Manchester","Birmingham","London","Edinburgh"],a:2,why:"London is the UK's capital.",t:1,k:"Geography"},
+ {q:"What is the capital of Scotland?",o:["Glasgow","Edinburgh","Aberdeen","Dundee"],a:1,why:"Edinburgh, home of the Scottish Parliament.",t:1,k:"Geography"},
+ {q:"What is the capital of Wales?",o:["Swansea","Cardiff","Newport","Bangor"],a:1,why:"Cardiff is the capital of Wales.",t:1,k:"Geography"},
+ {q:"What is the capital of Northern Ireland?",o:["Dublin","Belfast","Derry","Cork"],a:1,why:"Belfast. (Dublin is the capital of the Republic of Ireland.)",t:2,k:"Geography"},
+ {q:"How many countries make up the United Kingdom?",o:["2","3","4","5"],a:2,why:"England, Scotland, Wales and Northern Ireland.",t:1,k:"Geography"},
+ {q:"Birmingham is in which region of England?",o:["The South West","The West Midlands","The North East","East Anglia"],a:1,why:"Birmingham is the biggest city in the West Midlands.",t:1,k:"Geography"},
+ {q:"Which river flows through London?",o:["The Severn","The Trent","The Thames","The Mersey"],a:2,why:"The Thames flows through London to the North Sea.",t:1,k:"Geography"},
+ {q:"The longest river in the UK is the…",o:["Thames","Severn","Trent","Tyne"],a:1,why:"The Severn is about 354 km long, a little longer than the Thames.",t:2,k:"Geography"},
+ {q:"The highest mountain in the UK is…",o:["Snowdon (Yr Wyddfa)","Scafell Pike","Ben Nevis","Helvellyn"],a:2,why:"Ben Nevis in Scotland, 1,345 m.",t:2,k:"Geography"},
+ {q:"The highest mountain in the world is…",o:["K2","Mont Blanc","Kilimanjaro","Mount Everest"],a:3,why:"Everest, in the Himalayas, is 8,849 m high.",t:1,k:"Geography"},
+ {q:"The imaginary line around the middle of the Earth is the…",o:["Prime Meridian","Equator","Tropic of Cancer","Arctic Circle"],a:1,why:"The Equator divides the Northern and Southern Hemispheres.",t:1,k:"Geography"},
+ {q:"The UK is in which hemisphere?",o:["Southern","Northern","Eastern only","Neither"],a:1,why:"The UK is north of the Equator.",t:1,k:"Geography"},
+ {q:"Which compass direction is between North and East?",o:["North-west","South-east","North-east","South-west"],a:2,why:"NE sits halfway between N and E.",t:1,k:"Geography"},
+ {q:"How many points are there on an 8-point compass?",o:["4","6","8","12"],a:2,why:"N, NE, E, SE, S, SW, W, NW.",t:1,k:"Geography"},
+ {q:"Which is the largest hot desert in the world?",o:["Gobi","Sahara","Kalahari","Atacama"],a:1,why:"The Sahara covers most of North Africa.",t:2,k:"Geography"},
+ {q:"Which continent is also the coldest desert?",o:["Europe","Asia","Antarctica","Australia"],a:2,why:"Antarctica gets very little rain or snow, so it counts as a desert.",t:2,k:"Geography"},
+ {q:"The capital of France is…",o:["Lyon","Paris","Marseille","Nice"],a:1,why:"Paris.",t:1,k:"Geography"},
+ {q:"The capital of Italy is…",o:["Milan","Venice","Rome","Naples"],a:2,why:"Rome — also the capital of the ancient Roman Empire.",t:1,k:"Geography"},
+ {q:"The capital of Spain is…",o:["Barcelona","Madrid","Seville","Valencia"],a:1,why:"Madrid, in the centre of Spain.",t:1,k:"Geography"},
+ {q:"The capital of Germany is…",o:["Munich","Hamburg","Berlin","Frankfurt"],a:2,why:"Berlin.",t:1,k:"Geography"},
+ {q:"The capital of the USA is…",o:["New York","Los Angeles","Washington, D.C.","Chicago"],a:2,why:"Washington, D.C. — New York is bigger but is not the capital.",t:2,k:"Geography"},
+ {q:"The capital of Australia is…",o:["Sydney","Melbourne","Canberra","Perth"],a:2,why:"Canberra was built to be the capital because Sydney and Melbourne both wanted it.",t:3,k:"Geography"},
+ {q:"The capital of Japan is…",o:["Kyoto","Tokyo","Osaka","Beijing"],a:1,why:"Tokyo.",t:1,k:"Geography"},
+ {q:"The Amazon river is in…",o:["Africa","Asia","South America","Europe"],a:2,why:"The Amazon flows through Brazil and carries more water than any other river.",t:1,k:"Geography"},
+ {q:"The river Nile is in…",o:["Africa","South America","Europe","Australia"],a:0,why:"The Nile flows north through Egypt to the Mediterranean.",t:1,k:"Geography"},
+ {q:"The Alps are a mountain range in…",o:["Africa","Europe","Asia","North America"],a:1,why:"The Alps run through France, Switzerland, Italy, Austria and more.",t:2,k:"Geography"},
+ {q:"The Prime Meridian (0° longitude) passes through…",o:["Paris","Greenwich, London","New York","Rome"],a:1,why:"Greenwich — that's why world time is measured from GMT.",t:3,k:"Geography"},
+ {q:"Lines of latitude run…",o:["from top to bottom","from side to side (parallel to the Equator)","diagonally","in circles round the poles only"],a:1,why:"Latitude lines are like rungs on a ladder; longitude lines go pole to pole.",t:3,k:"Geography"},
+ {q:"Earthquakes happen mostly where…",o:["it rains a lot","tectonic plates meet","there are big cities","the sea is deep"],a:1,why:"The Earth's crust is in plates; where they push and grind, the ground shakes.",t:2,k:"Geography"},
+ {q:"Which of these is a volcano in Italy?",o:["Ben Nevis","Mount Vesuvius","Mont Blanc","Mount Fuji"],a:1,why:"Vesuvius buried Pompeii in AD 79.",t:2,k:"Geography"},
+ {q:"In the water cycle, water rising from the sea as vapour is called…",o:["precipitation","condensation","evaporation","collection"],a:2,why:"Evaporation → condensation (clouds) → precipitation (rain) → collection.",t:2,k:"Geography"},
+ {q:"Rain, snow and hail are all types of…",o:["evaporation","precipitation","condensation","erosion"],a:1,why:"Precipitation is any water falling from clouds.",t:2,k:"Geography"},
+ {q:"The Romans invaded Britain successfully in which year?",o:["55 BC","AD 43","AD 410","1066"],a:1,why:"Emperor Claudius sent the army in AD 43. (Caesar had tried in 55 and 54 BC.)",t:2,k:"History"},
+ {q:"Which Roman general first tried to invade Britain in 55 BC?",o:["Julius Caesar","Hadrian","Claudius","Nero"],a:0,why:"Caesar came twice, in 55 and 54 BC, but did not stay.",t:3,k:"History"},
+ {q:"Who led a rebellion against the Romans in Britain?",o:["Cleopatra","Boudica","Queen Victoria","Elizabeth I"],a:1,why:"Boudica, queen of the Iceni, burned Colchester, London and St Albans.",t:1,k:"History"},
+ {q:"Hadrian's Wall was built to…",o:["keep the sea out","mark the northern edge of Roman Britain","hold up a road","protect a city"],a:1,why:"Emperor Hadrian had it built in AD 122 across northern England.",t:2,k:"History"},
+ {q:"After the Romans left Britain (about AD 410), who settled next?",o:["The Normans","The Anglo-Saxons","The Tudors","The Victorians"],a:1,why:"Angles, Saxons and Jutes came from Germany and Denmark.",t:2,k:"History"},
+ {q:"Sutton Hoo is famous for…",o:["a Roman bath","an Anglo-Saxon ship burial","a Viking longship","a castle"],a:1,why:"A king (probably Raedwald) was buried in a ship full of treasure in Suffolk.",t:3,k:"History"},
+ {q:"The Vikings' first big raid on England was on the monastery at…",o:["Canterbury","Lindisfarne","York","Winchester"],a:1,why:"Lindisfarne, AD 793 — monks were killed and treasure stolen.",t:2,k:"History"},
+ {q:"The Vikings came from…",o:["Spain and Portugal","Scandinavia (Norway, Denmark, Sweden)","Italy","Egypt"],a:1,why:"Viking means 'raider' — they sailed from Scandinavia.",t:1,k:"History"},
+ {q:"Which English king fought the Vikings and is called 'the Great'?",o:["Alfred","Harold","John","Henry"],a:0,why:"Alfred the Great, king of Wessex, defeated the Vikings at Edington in 878.",t:2,k:"History"},
+ {q:"The Battle of Hastings was in…",o:["1066","1666","1215","793"],a:0,why:"William of Normandy beat King Harold in 1066.",t:1,k:"History"},
+ {q:"Who won the Battle of Hastings?",o:["King Harold","William the Conqueror","Alfred the Great","Boudica"],a:1,why:"William became the first Norman king of England.",t:1,k:"History"},
+ {q:"Put these in order from oldest: ",o:["Iron Age, Bronze Age, Stone Age","Stone Age, Bronze Age, Iron Age","Bronze Age, Stone Age, Iron Age","Iron Age, Stone Age, Bronze Age"],a:1,why:"Stone tools came first, then bronze (copper + tin), then iron.",t:2,k:"History"},
+ {q:"Stonehenge was built in…",o:["the Stone Age and Bronze Age","Roman times","Viking times","Victorian times"],a:0,why:"It was built in stages from about 3000 BC — before the Romans.",t:2,k:"History"},
+ {q:"Which Ancient Greek city is called the birthplace of democracy?",o:["Sparta","Athens","Troy","Olympia"],a:1,why:"In Athens, citizens voted on laws.",t:2,k:"History"},
+ {q:"The first Olympic Games were held at…",o:["Athens","Rome","Olympia","Sparta"],a:2,why:"At Olympia, in honour of Zeus, from 776 BC.",t:2,k:"History"},
+ {q:"Egyptian picture-writing is called…",o:["hieroglyphs","runes","the alphabet","cuneiform"],a:0,why:"Hieroglyphs were carved on temples and tombs.",t:1,k:"History"},
+ {q:"An Egyptian king was called a…",o:["caesar","pharaoh","sultan","emperor"],a:1,why:"Pharaohs such as Tutankhamun were buried in tombs full of treasure.",t:1,k:"History"},
+ {q:"The pyramids of Giza were built as…",o:["palaces","tombs for pharaohs","shops","schools"],a:1,why:"The Great Pyramid was the tomb of Pharaoh Khufu.",t:1,k:"History"},
+ {q:"The Ancient Maya lived in…",o:["Central America","Northern Europe","Australia","India"],a:0,why:"The Maya built stone cities in Mexico, Guatemala and Belize.",t:3,k:"History"},
+ {q:"The Great Fire of London happened in…",o:["1066","1666","1966","1266"],a:1,why:"It started in a bakery on Pudding Lane in September 1666.",t:1,k:"History"},
+ {q:"Which Tudor king had six wives?",o:["Henry VII","Henry VIII","Edward VI","Richard III"],a:1,why:"Henry VIII: divorced, beheaded, died, divorced, beheaded, survived.",t:1,k:"History"},
+ {q:"The Second World War lasted from…",o:["1914 to 1918","1939 to 1945","1950 to 1953","1900 to 1910"],a:1,why:"Britain declared war on Germany in September 1939; the war ended in 1945.",t:1,k:"History"},
+ {q:"During WW2, children moved out of cities to the countryside were called…",o:["refugees","evacuees","soldiers","spies"],a:1,why:"Evacuees were sent away to be safe from the bombing (the Blitz).",t:2,k:"History"},
+ {q:"Florence Nightingale is famous as a…",o:["queen","nurse","pilot","scientist"],a:1,why:"The 'Lady with the Lamp' improved hospitals during the Crimean War.",t:1,k:"History"},
+ {q:"Queen Victoria reigned for about…",o:["6 years","24 years","64 years","100 years"],a:2,why:"From 1837 to 1901 — the Victorian era.",t:2,k:"History"},
+ {q:"Roman roads were famous for being…",o:["straight","made of wood","very narrow","built on water"],a:0,why:"Straight roads let the army march quickly between forts and towns.",t:1,k:"History"},
+ {q:"Which was NOT brought to Britain by the Romans?",o:["Baths","Straight roads","Towns with forums","Television"],a:3,why:"The Romans brought roads, baths, towns, coins and Latin — not TV.",t:1,k:"History"},
+ {q:"The Danelaw was…",o:["a Roman tax","the part of England ruled by Vikings","a type of Saxon sword","a Norman castle"],a:1,why:"After Alfred's treaty, the Vikings ruled the north and east — the Danelaw.",t:3,k:"History"},
+ {q:"The Shang Dynasty ruled in ancient…",o:["Egypt","China","Greece","Mexico"],a:1,why:"The Shang ruled part of China about 3,500 years ago and used oracle bones.",t:3,k:"History"},
+ {q:"Which ocean lies between the UK and the USA?",o:["Pacific","Atlantic","Indian","Southern"],a:1,why:"The Atlantic separates Europe from the Americas.",t:1,k:"Geography"},
+ {q:"The capital of Brazil is…",o:["Rio de Janeiro","São Paulo","Brasília","Lima"],a:2,why:"Brasília was purpose-built as the capital in 1960.",t:3,k:"Geography"},
+ {q:"Which country is NOT in Europe?",o:["Poland","Greece","Egypt","Portugal"],a:2,why:"Egypt is in Africa.",t:2,k:"Geography"},
+ {q:"The Tropics are…",o:["very cold regions near the poles","hot regions either side of the Equator","mountain areas","the deep sea"],a:1,why:"Between the Tropic of Cancer and the Tropic of Capricorn it is hot all year.",t:3,k:"Geography"}
+];
+
+/* ---------- WORD WRESTLING (Reading, vocabulary, grammar) ---------- */
+/* kinds: syn (closest meaning), ant (opposite), cls (word class), gram (grammar/punctuation), vocab, fig (figurative) */
+const WORDS = [
+ {q:"Which word means almost the same as ENORMOUS?",o:["tiny","huge","angry","quick"],a:1,why:"Enormous = huge, gigantic, massive.",t:1,k:"Synonyms"},
+ {q:"Which word means almost the same as FURIOUS?",o:["sleepy","very angry","hungry","polite"],a:1,why:"Furious is a stronger word for angry.",t:1,k:"Synonyms"},
+ {q:"Which word means almost the same as BRAVE?",o:["courageous","nervous","careful","lazy"],a:0,why:"Courageous = brave, fearless, bold.",t:1,k:"Synonyms"},
+ {q:"Which word means almost the same as ANCIENT?",o:["modern","very old","broken","shiny"],a:1,why:"Ancient = from a very long time ago.",t:1,k:"Synonyms"},
+ {q:"Which word means almost the same as RAPID?",o:["slow","fast","wet","loud"],a:1,why:"Rapid = fast, quick, swift.",t:1,k:"Synonyms"},
+ {q:"Which word means almost the same as GLOOMY?",o:["bright","dark and sad","noisy","tidy"],a:1,why:"Gloomy = dark, dull, miserable.",t:2,k:"Synonyms"},
+ {q:"Which word means almost the same as EXHAUSTED?",o:["excited","very tired","hungry","lost"],a:1,why:"Exhausted = completely worn out.",t:2,k:"Synonyms"},
+ {q:"Which word means almost the same as FRAGILE?",o:["strong","easily broken","heavy","sticky"],a:1,why:"Fragile = delicate, breakable.",t:2,k:"Synonyms"},
+ {q:"Which word means almost the same as RELUCTANT?",o:["eager","unwilling","cheerful","fast"],a:1,why:"Reluctant = not wanting to do something.",t:3,k:"Synonyms"},
+ {q:"Which word means almost the same as ABUNDANT?",o:["rare","plentiful","expensive","hidden"],a:1,why:"Abundant = lots of it, in large amounts.",t:3,k:"Synonyms"},
+ {q:"Which word means almost the same as HESITATE?",o:["rush","pause","shout","sleep"],a:1,why:"To hesitate is to pause before doing something.",t:2,k:"Synonyms"},
+ {q:"Which word means almost the same as CAUTIOUS?",o:["careless","careful","sad","clever"],a:1,why:"Cautious = careful to avoid danger.",t:2,k:"Synonyms"},
+ {q:"Which word means almost the same as ASTONISHED?",o:["bored","amazed","annoyed","calm"],a:1,why:"Astonished = very surprised.",t:2,k:"Synonyms"},
+ {q:"Which word means almost the same as PECULIAR?",o:["normal","strange","tasty","tall"],a:1,why:"Peculiar = odd, unusual.",t:2,k:"Synonyms"},
+ {q:"Which word means almost the same as DEMOLISH?",o:["build","knock down","paint","measure"],a:1,why:"Demolish = destroy completely.",t:2,k:"Synonyms"},
+ {q:"Which word means almost the same as VACANT?",o:["full","empty","clean","high"],a:1,why:"A vacant room has no one in it.",t:3,k:"Synonyms"},
+ {q:"Which word means almost the same as TRIUMPH?",o:["defeat","victory","journey","problem"],a:1,why:"A triumph is a great success or win.",t:2,k:"Synonyms"},
+ {q:"Which word means almost the same as GRIT?",o:["giving up","determination to keep going","speed","luck"],a:1,why:"Grit is sticking at something hard — the Arena's favourite word.",t:1,k:"Synonyms"},
+ {q:"What is the OPPOSITE of GENEROUS?",o:["kind","selfish","happy","rich"],a:1,why:"Generous people give; selfish people keep it all.",t:1,k:"Antonyms"},
+ {q:"What is the OPPOSITE of ANCIENT?",o:["old","modern","heavy","broken"],a:1,why:"Ancient = very old; modern = new.",t:1,k:"Antonyms"},
+ {q:"What is the OPPOSITE of EXPAND?",o:["grow","shrink","explode","stretch"],a:1,why:"Expand = get bigger; shrink/contract = get smaller.",t:2,k:"Antonyms"},
+ {q:"What is the OPPOSITE of VICTORY?",o:["defeat","win","prize","battle"],a:0,why:"Victory = winning; defeat = losing.",t:1,k:"Antonyms"},
+ {q:"What is the OPPOSITE of TEMPORARY?",o:["short","permanent","quick","weak"],a:1,why:"Temporary lasts a short time; permanent lasts for ever.",t:2,k:"Antonyms"},
+ {q:"What is the OPPOSITE of ARRIVE?",o:["depart","come","stay","enter"],a:0,why:"Arrive = get there; depart = leave.",t:1,k:"Antonyms"},
+ {q:"What is the OPPOSITE of OPAQUE?",o:["dark","transparent","thick","solid"],a:1,why:"Opaque blocks light; transparent lets it through.",t:3,k:"Antonyms"},
+ {q:"What is the OPPOSITE of CAUTIOUS?",o:["careful","reckless","quiet","slow"],a:1,why:"Reckless = not caring about danger.",t:2,k:"Antonyms"},
+ {q:"What is the OPPOSITE of INCLUDE?",o:["add","exclude","invite","join"],a:1,why:"Exclude = leave out.",t:2,k:"Antonyms"},
+ {q:"What is the OPPOSITE of MAXIMUM?",o:["most","minimum","middle","medium"],a:1,why:"Maximum = the most; minimum = the least.",t:2,k:"Antonyms"},
+ {q:"In 'The wrestler LIFTED the giant', what word class is LIFTED?",o:["noun","verb","adjective","adverb"],a:1,why:"A verb is a doing or being word. 'Lifted' is the action.",t:1,k:"Word classes"},
+ {q:"In 'The ENORMOUS crowd roared', what word class is ENORMOUS?",o:["noun","verb","adjective","adverb"],a:2,why:"An adjective describes a noun — enormous describes the crowd.",t:1,k:"Word classes"},
+ {q:"In 'He climbed the ladder QUICKLY', what word class is QUICKLY?",o:["noun","verb","adjective","adverb"],a:3,why:"An adverb tells you how a verb is done. Many end in -ly.",t:1,k:"Word classes"},
+ {q:"In 'The CHAMPION raised the belt', what word class is CHAMPION?",o:["noun","verb","adjective","adverb"],a:0,why:"A noun names a person, place or thing.",t:1,k:"Word classes"},
+ {q:"In 'The car raced ACROSS the bridge', what word class is ACROSS?",o:["preposition","verb","adjective","pronoun"],a:0,why:"Prepositions show where or when: across, under, before, in.",t:2,k:"Word classes"},
+ {q:"In 'SHE built a castle', what word class is SHE?",o:["noun","pronoun","adjective","conjunction"],a:1,why:"A pronoun stands in for a noun: she, he, it, they.",t:2,k:"Word classes"},
+ {q:"In 'I wanted to play BUT it was raining', what word class is BUT?",o:["conjunction","adverb","noun","preposition"],a:0,why:"Conjunctions join parts of a sentence: and, but, because, although.",t:2,k:"Word classes"},
+ {q:"Which word is a NOUN?",o:["jump","quickly","bridge","green"],a:2,why:"A bridge is a thing, so it is a noun.",t:1,k:"Word classes"},
+ {q:"Which word is an ADVERB?",o:["silently","silent","silence","silencer"],a:0,why:"Silently tells you HOW something is done.",t:2,k:"Word classes"},
+ {q:"Which word is a VERB?",o:["swimmer","swimming pool","swam","swift"],a:2,why:"Swam is the action.",t:1,k:"Word classes"},
+ {q:"Which is a DETERMINER?",o:["the","run","happy","slowly"],a:0,why:"Determiners come before nouns: the, a, an, this, my, some.",t:3,k:"Word classes"},
+ {q:"Which sentence uses THEIR / THERE / THEY'RE correctly?",o:["There going to the park.","Their going to the park.","They're going to the park.","Theyre going to the park."],a:2,why:"They're = they are. Their = belongs to them. There = a place.",t:1,k:"Grammar"},
+ {q:"Which sentence is correct?",o:["The robot lost it's arm.","The robot lost its arm.","The robot lost its' arm.","The robot lost it arm."],a:1,why:"Its = belongs to it. It's = it is.",t:2,k:"Grammar"},
+ {q:"Which sentence uses TO / TOO / TWO correctly?",o:["I have two much homework.","I have too much homework.","I have to much homework.","I have tow much homework."],a:1,why:"Too = also or more than enough. Two = 2. To = towards.",t:1,k:"Grammar"},
+ {q:"Which sentence has the apostrophe in the right place?",o:["The dogs' bone was buried. (one dog)","The dog's bone was buried. (one dog)","The dogs bone was buried. (one dog)","The do'gs bone was buried. (one dog)"],a:1,why:"One owner: dog's. More than one: dogs'.",t:2,k:"Grammar"},
+ {q:"Which sentence is punctuated correctly?",o:["\"Lets go,\" said Seb.","\"Let's go\" said Seb.","\"Let's go,\" said Seb.","Let's go, said Seb."],a:2,why:"Speech marks round the words, a comma before the closing mark, apostrophe in let's (let us).",t:2,k:"Grammar"},
+ {q:"Which sentence needs a QUESTION MARK?",o:["What a goal that was","Where is the key","Pass me the brick","The race starts at ten"],a:1,why:"'Where is the key?' asks something, so it needs a question mark.",t:1,k:"Grammar"},
+ {q:"Which word is spelt with a CAPITAL letter because it is a proper noun?",o:["river","city","birmingham","building"],a:2,why:"Names of people, places, days and months take capitals: Birmingham.",t:1,k:"Grammar"},
+ {q:"Which sentence is in the PAST tense?",o:["Seb mines the diamond.","Seb will mine the diamond.","Seb mined the diamond.","Seb is mining the diamond."],a:2,why:"Mined = already happened.",t:1,k:"Grammar"},
+ {q:"Which sentence has a FRONTED ADVERBIAL?",o:["The car sped away.","After the race, the car sped away.","The car sped away after the race.","Sped away, the car."],a:1,why:"A fronted adverbial starts the sentence and is followed by a comma.",t:3,k:"Grammar"},
+ {q:"Which is a COMMAND?",o:["Can you pass the brick?","Pass the brick.","You passed the brick.","What a brick!"],a:1,why:"Commands start with a verb and tell someone to do something.",t:1,k:"Grammar"},
+ {q:"Which word is the SUBJECT of 'The crowd cheered the champion'?",o:["cheered","the champion","The crowd","the"],a:2,why:"The subject is who does the verb — the crowd did the cheering.",t:3,k:"Grammar"},
+ {q:"Which sentence uses a comma to avoid confusion?",o:["Let's eat Grandad!","Let's eat, Grandad!","Lets eat Grandad","Let's, eat Grandad!"],a:1,why:"Without the comma, Grandad is on the menu.",t:2,k:"Grammar"},
+ {q:"What does the prefix UN- do in UNLOCK?",o:["makes it bigger","makes it the opposite","makes it past tense","makes it plural"],a:1,why:"Un- = not / the opposite of: unlock, unhappy, undo.",t:1,k:"Vocabulary"},
+ {q:"What does the suffix -LESS mean in FEARLESS?",o:["full of","without","again","before"],a:1,why:"-less = without. Fearless = without fear.",t:1,k:"Vocabulary"},
+ {q:"What does the prefix RE- mean in REBUILD?",o:["before","again","not","under"],a:1,why:"Re- = again: rebuild, replay, return.",t:1,k:"Vocabulary"},
+ {q:"The Latin word AQUA means water. Which word comes from it?",o:["aquarium","acorn","acrobat","active"],a:0,why:"Aquarium = a tank of water. Also aquatic, aqueduct.",t:2,k:"Vocabulary"},
+ {q:"The Latin word TERRA means earth/land. Which word comes from it?",o:["terrible","territory","terrier","tennis"],a:1,why:"Territory = an area of land. Also terrain, terrace.",t:3,k:"Vocabulary"},
+ {q:"The Greek word MICRO means small. A microscope lets you see…",o:["far away","small things","in the dark","through walls"],a:1,why:"Micro = small, scope = look at.",t:2,k:"Vocabulary"},
+ {q:"If someone is DETERMINED, they…",o:["give up easily","keep going until they succeed","are always late","are very tall"],a:1,why:"Determined = fixed on reaching a goal.",t:1,k:"Vocabulary"},
+ {q:"What does OBSTACLE mean?",o:["a prize","something in the way","a type of car","a loud noise"],a:1,why:"An obstacle blocks your path — in an obstacle course you climb over them.",t:2,k:"Vocabulary"},
+ {q:"What does PERSEVERE mean?",o:["stop","keep trying even when it's hard","run away","fall asleep"],a:1,why:"Persevere = carry on through difficulty.",t:2,k:"Vocabulary"},
+ {q:"What does RIVAL mean?",o:["a close friend","someone you compete against","a river","a referee"],a:1,why:"A rival is a competitor — like two drivers fighting for first place.",t:2,k:"Vocabulary"},
+ {q:"What does STRATEGY mean?",o:["a plan to achieve something","a type of brick","a mistake","a loud shout"],a:0,why:"A strategy is a careful plan — in games and in battles.",t:2,k:"Vocabulary"},
+ {q:"What does INVISIBLE mean?",o:["cannot be seen","cannot be heard","very bright","very old"],a:0,why:"In- = not, visible = can be seen.",t:1,k:"Vocabulary"},
+ {q:"What does ACCELERATE mean?",o:["slow down","speed up","turn round","stop"],a:1,why:"To accelerate is to go faster — the pedal in a car.",t:2,k:"Vocabulary"},
+ {q:"What does SPECTATOR mean?",o:["a player","a person watching","a referee","a trophy"],a:1,why:"Spectators watch. From Latin spectare, to look.",t:2,k:"Vocabulary"},
+ {q:"What does FORTUNATE mean?",o:["unlucky","lucky","strong","forgotten"],a:1,why:"Fortunate = lucky. Fortuna was the Roman goddess of luck.",t:2,k:"Vocabulary"},
+ {q:"'The wind howled like a wolf' is an example of…",o:["a simile","a metaphor","alliteration","onomatopoeia"],a:0,why:"A simile compares using 'like' or 'as'.",t:1,k:"Figurative language"},
+ {q:"'The classroom was a zoo' is an example of…",o:["a simile","a metaphor","personification","a rhyme"],a:1,why:"A metaphor says something IS something else, with no 'like' or 'as'.",t:2,k:"Figurative language"},
+ {q:"'Big bricks build brilliant buildings' is an example of…",o:["a simile","alliteration","a metaphor","personification"],a:1,why:"Alliteration repeats the same starting sound.",t:1,k:"Figurative language"},
+ {q:"'Crash! Bang! Boom!' are examples of…",o:["similes","metaphors","onomatopoeia","adverbs"],a:2,why:"Onomatopoeia = words that sound like the noise they describe.",t:1,k:"Figurative language"},
+ {q:"'The sun smiled down on the racetrack' is an example of…",o:["a simile","personification","alliteration","a fact"],a:1,why:"Personification gives human actions to non-human things.",t:2,k:"Figurative language"},
+ {q:"'I've told you a MILLION times' is an example of…",o:["a simile","hyperbole (exaggeration)","alliteration","a question"],a:1,why:"Hyperbole exaggerates for effect.",t:3,k:"Figurative language"},
+ {q:"Which sentence is a SIMILE?",o:["The car is a rocket.","The car was as fast as a rocket.","The car zoomed.","Rockets are fast."],a:1,why:"'As fast as' makes it a simile.",t:1,k:"Figurative language"},
+ {q:"What is a SYNONYM?",o:["a word that means the opposite","a word that means the same or nearly the same","a word that rhymes","a word with a capital letter"],a:1,why:"Synonym = same meaning. Antonym = opposite meaning.",t:1,k:"Vocabulary"},
+ {q:"Which word means the same as INQUISITIVE?",o:["curious","tired","wealthy","silent"],a:0,why:"Inquisitive = eager to find out, curious.",t:3,k:"Synonyms"},
+ {q:"Which word means the same as MISCHIEVOUS?",o:["naughty in a playful way","very serious","sleepy","frightened"],a:0,why:"Mischievous = playfully naughty.",t:3,k:"Synonyms"},
+ {q:"Which word means the same as INDUSTRIOUS?",o:["lazy","hard-working","wealthy","noisy"],a:1,why:"Industrious = works hard.",t:3,k:"Synonyms"},
+ {q:"What is the plural of CHILD?",o:["childs","childes","children","childrens"],a:2,why:"Child → children. Some plurals are irregular: mouse → mice, foot → feet.",t:1,k:"Grammar"},
+ {q:"What is the plural of BOX?",o:["boxs","boxes","boxies","box's"],a:1,why:"Words ending in -x, -s, -ch, -sh add -es.",t:1,k:"Grammar"},
+ {q:"Which sentence uses a RELATIVE CLAUSE?",o:["The driver, who had never lost, waved to the crowd.","The driver waved to the crowd.","Waving, the driver smiled.","The crowd waved at the driver."],a:0,why:"'Who had never lost' is a relative clause, starting with who/which/that.",t:3,k:"Grammar"},
+ {q:"What does the word 'modal verb' MIGHT show in 'It MIGHT rain'?",o:["certainty","possibility","the past","a command"],a:1,why:"Modal verbs (might, could, should, must) show how likely or necessary something is.",t:3,k:"Grammar"}
+];
+
+/* ---------- BOSSES ---------- */
+const BOSSES = [
+ {id:"gravel", name:"The Gravel Giant", world:"mine",  hp:8, icon:"🪨", intro:"He blocks the deepest tunnel. Every right answer chips a boulder away.", taunt:["Is that all you've got, miner?","My boulders laugh at you.","You'll never dig this deep."], hurt:["ARGH! That one cracked!","You're chipping me!","Not the diamond pick!"]},
+ {id:"brickster", name:"The Brickster", world:"brick", hp:8, icon:"🧱", intro:"She scrambles the letters of every word. Spell them right and her tower tumbles.", taunt:["Double or single? Guess wrong!","My tower is unbreakable.","Spelling is for losers!"], hurt:["My bricks! My beautiful bricks!","Oof — that word was solid.","Stop spelling so well!"]},
+ {id:"voidbot", name:"Void-Bot 9000", world:"astro", hp:8, icon:"🤖", intro:"A rogue robot who has forgotten all its science. Teach it a lesson.", taunt:["GRAVITY IS A MYTH.","ERROR: HUMAN TOO WEAK.","MY CIRCUITS ARE PERFECT."], hurt:["SYSTEM DAMAGE 20%…","THAT FACT… HURT…","REBOOTING… REBOOTING…"]},
+ {id:"drift", name:"Captain Drift", world:"forza", hp:8, icon:"🏁", intro:"The fastest driver on the track. Beat him on fractions and take the trophy.", taunt:["Eat my dust!","You're in the slow lane, kid.","I was born in pole position."], hurt:["Whoa — you're gaining on me!","My tyres! Not my tyres!","Pit stop! PIT STOP!"]},
+ {id:"wordsmasher", name:"The Word Smasher", world:"words", hp:8, icon:"💪", intro:"The reigning champion of the ring. Only perfect words can pin him.", taunt:["You can't out-word me!","I eat dictionaries for breakfast.","One-two-three? Never!"], hurt:["ONE!","TWO!","He's wobbling, folks!"]},
+ {id:"timelord", name:"The Time Thief", world:"atlas", hp:8, icon:"⏳", intro:"He steals dates and capitals. Get them right and he loses his power.", taunt:["History is MINE.","You don't even know where you are.","1066? Never heard of it."], hurt:["My timeline is cracking!","No! Not the facts!","I'm fading…"]},
+ {id:"grand", name:"The Grand Champion", world:"all", hp:12, icon:"👑", intro:"Every subject at once. Beat the Grand Champion to take the Arena belt.", taunt:["Nobody has ever held my belt.","Jack of all trades, master of none!","The Arena belongs to ME."], hurt:["Impossible!","The belt… is slipping…","Who IS this kid?!"]}
+];
+
+/* ---------- BADGES ---------- */
+const BADGES = [
+ {id:"first",  icon:"🎯", name:"First Steps",      how:"Answer your first question"},
+ {id:"ten",    icon:"🔟", name:"Ten Up",           how:"Answer 10 questions"},
+ {id:"hundred",icon:"💯", name:"Century",          how:"Answer 100 questions"},
+ {id:"fivehun",icon:"🏟️", name:"Arena Regular",    how:"Answer 500 questions"},
+ {id:"combo5", icon:"🔥", name:"On Fire",          how:"5 right in a row"},
+ {id:"combo10",icon:"☄️", name:"Unstoppable",      how:"10 right in a row"},
+ {id:"comeback",icon:"🔁",name:"Comeback Kid",     how:"Get a comeback card right"},
+ {id:"grit",   icon:"🪨", name:"Gritty",           how:"Keep going after 5 'not yet's in one run"},
+ {id:"allworlds",icon:"🌍",name:"World Tour",      how:"Play every world"},
+ {id:"tier3",  icon:"⛏️", name:"Diamond Pick",     how:"Reach difficulty 3 in any world"},
+ {id:"tier5",  icon:"💎", name:"Netherite",        how:"Reach difficulty 5 in any world"},
+ {id:"boss1",  icon:"🥊", name:"Boss Beater",      how:"Beat your first boss"},
+ {id:"bossall",icon:"🏆", name:"Belt Holder",      how:"Beat every world boss"},
+ {id:"grand",  icon:"👑", name:"Grand Champion",   how:"Beat the Grand Champion"},
+ {id:"streak3",icon:"📅", name:"Three-Day Streak", how:"Play 3 days in a row"},
+ {id:"streak7",icon:"🗓️", name:"Week Warrior",     how:"Play 7 days in a row"},
+ {id:"quests10",icon:"📜",name:"Quest Master",     how:"Finish 10 daily quests"},
+ {id:"pb",     icon:"⏱️", name:"Personal Best",    how:"Beat your best race time"},
+ {id:"speller50",icon:"🔤",name:"Word Builder",    how:"Spell 50 words right"},
+ {id:"dad",    icon:"🎖️", name:"Dad's Challenge",  how:"Complete a Dad's Challenge"}
+];
+
+</script>
+<script>
+const CLOUD={endpoint:"https://vestigia-store.mrbeasley930.workers.dev",book:"seb-arena-26"};
+const QS=new URLSearchParams(location.search); const CLS=QS.get("test")?"TEST":"SEB"; const CAND=QS.get("player")||"Seb";
+const KEY=CLOUD.book+"::"+CLS+"::"+CAND, PKEY=CLOUD.book+"::"+CLS+"::_parent";
+const WN={mine:"Block Mine (Maths)",brick:"Brick Builder (Spelling)",astro:"Astro Lab (Science)",forza:"Fraction Raceway",words:"Word Wrestling (Reading & grammar)",atlas:"Atlas Quest (History & geography)"};
+const WE={mine:"⛏️",brick:"🧱",astro:"🤖",forza:"🏎️",words:"💪",atlas:"🗺️"};
+const TIER=["","Wood","Stone","Iron","Diamond","Netherite"];
+const $=id=>document.getElementById(id); const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+let REC=null, PAR={rate:50,redeemedXP:0,ledger:[],focus:null};
+const TABS=[["over","Overview"],["subj","Subjects"],["need","Needs work"],["boss","Bosses & badges"],["bank","iPad time bank"],["dad","Dad's Challenge"],["data","Data"]];
+$("tabs").innerHTML=TABS.map(([id,n],i)=>`<button class="${i?"":"on"}" data-t="${id}" onclick="tab('${id}')">${n}</button>`).join("");
+function tab(id){ document.querySelectorAll(".tabs button").forEach(b=>b.classList.toggle("on",b.dataset.t===id)); document.querySelectorAll(".panel").forEach(p=>p.classList.toggle("on",p.id==="p-"+id)); }
+tab("over");
+async function getKey(k){ const r=await fetch(CLOUD.endpoint+"?key="+encodeURIComponent(k)); if(!r.ok) return null; const j=await r.json(); return j&&j.data?j.data:null; }
+async function putParent(){ const r=await fetch(CLOUD.endpoint,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({key:PKEY,cls:CLS,cand:"_parent",book:CLOUD.book,data:PAR,savedAt:new Date().toISOString()})}); if(!r.ok) alert("Save failed (HTTP "+r.status+")"); return r.ok; }
+async function loadAll(){ $("status").textContent="loading…"; try{ const [rec,par]=await Promise.all([getKey(KEY),getKey(PKEY)]); REC=rec; if(par) PAR=Object.assign(PAR,par); $("status").textContent=rec?`${CAND} · last saved ${fmt(rec.updatedAt)}`:"No record yet — Seb hasn't played."; render(); }catch(e){ $("status").textContent="Couldn't reach the store: "+e.message; } }
+function fmt(iso){ if(!iso) return "—"; const d=new Date(iso); return d.toLocaleDateString("en-GB",{weekday:"short",day:"numeric",month:"short"})+" "+d.toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"}); }
+function dayKey(iso){ const d=new Date(iso); return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
+function rankFor(xp){ let r=RANKS[0],next=null; for(const x of RANKS){ if(xp>=x[0]) r=x; else { next=x; break; } } return {r,next}; }
+function pct(a,b){ return b?Math.round(a/b*100):0; }
+function barHTML(p){ const c=p>=75?"":p>=50?"warn":"bad"; return `<div class="bar"><i class="${c}" style="width:${p}%"></i></div>`; }
+function sessions(log){ const out=[]; let cur=null; log.forEach(e=>{ const t=new Date(e.at).getTime(); if(!cur||t-cur.end>30*60000){ cur={start:t,end:t,n:0,r:0,ws:new Set()}; out.push(cur);} cur.end=t; cur.n++; if(e.ok>0) cur.r++; cur.ws.add(e.w); }); return out; }
+function bankMinutes(){ return Math.max(0,Math.floor(((REC?REC.xp:0)-(PAR.redeemedXP||0))/Math.max(1,PAR.rate||50))); }
+
+function render(){
+  if(!REC){ $("p-over").innerHTML=`<div class="card">No record yet. Once Seb signs in and answers a question, everything appears here.</div>`; renderBank(); renderDad(); return; }
+  const log=REC.log||[]; const {r,next}=rankFor(REC.xp); const secs=Object.values(REC.worlds).reduce((a,w)=>a+(w.secs||0),0);
+  const today=dayKey(new Date().toISOString()); const todayLog=log.filter(e=>dayKey(e.at)===today); const ses=sessions(log);
+  const last14=[]; for(let i=13;i>=0;i--){ const d=new Date(); d.setDate(d.getDate()-i); last14.push(dayKey(d.toISOString())); }
+  const perDay=last14.map(k=>{ const L=log.filter(e=>dayKey(e.at)===k); return {k,n:L.length,r:L.filter(e=>e.ok>0).length}; }); const mx=Math.max(1,...perDay.map(d=>d.n));
+  $("p-over").innerHTML=`
+   <div class="grid">
+    <div class="stat"><b>${r[2]} ${r[1]}</b><small>${REC.xp} XP${next?` · ${next[0]-REC.xp} to ${next[1]}`:""}</small></div>
+    <div class="stat"><b>${REC.streak.days} day${REC.streak.days===1?"":"s"}</b><small>streak · ${REC.playedDays.length} days played in total</small></div>
+    <div class="stat"><b>${REC.answered}</b><small>questions answered · ${pct(REC.right,REC.answered)}% right</small></div>
+    <div class="stat"><b>${Math.round(secs/60)} min</b><small>active time in total · ${Math.round(todayLog.reduce((a,e)=>a+Math.min(60,e.secs||0),0)/60)} min today</small></div>
+    <div class="stat"><b>${bankMinutes()} min</b><small>iPad time banked (rate ${PAR.rate} XP/min)</small></div>
+    <div class="stat"><b>${REC.comebacks}</b><small>comebacks landed · best combo ${REC.bestCombo}</small></div>
+   </div>
+   <div class="card" style="margin-top:14px"><h2>Questions per day (last 14 days)</h2><div class="chart">${perDay.map(d=>`<div title="${d.k}: ${d.n} answered, ${d.r} right"><span>${d.n||""}</span><i style="height:${d.n/mx*100}%"></i></div>`).join("")}</div><div class="axis">${perDay.map(d=>`<span>${d.k.slice(8)}</span>`).join("")}</div></div>
+   <div class="card"><h2>Recent sessions</h2><table><tr><th>When</th><th>Length</th><th>Answered</th><th>Right</th><th>Worlds</th></tr>${ses.slice(-10).reverse().map(s=>`<tr><td>${fmt(new Date(s.start).toISOString())}</td><td>${Math.max(1,Math.round((s.end-s.start)/60000))} min</td><td>${s.n}</td><td>${pct(s.r,s.n)}%</td><td>${[...s.ws].map(w=>WE[w]).join(" ")}</td></tr>`).join("")}</table></div>
+   <div class="card"><h2>How to read this</h2><p class="note">A "right" answer includes second-try successes (the page gives one hint and a second go). First-try accuracy per topic is in Subjects. Difficulty rises after 5 first-try rights out of 6 and drops after 4 misses out of 6, so a steady level with 60–80% accuracy is the sweet spot: challenged but not stuck.</p></div>`;
+
+  // subjects
+  $("p-subj").innerHTML=Object.keys(WN).map(w=>{ const W=REC.worlds[w]; const L=log.filter(e=>e.w===w); const first=L.filter(e=>e.ok===2).length; const topics={};
+    L.forEach(e=>{ const t=topics[e.k]=topics[e.k]||{a:0,r:0,f:0,s:0}; t.a++; if(e.ok>0) t.r++; if(e.ok===2) t.f++; t.s+=Math.min(60,e.secs||0); });
+    const rows=Object.entries(topics).sort((a,b)=>pct(a[1].f,a[1].a)-pct(b[1].f,b[1].a)).map(([k,t])=>`<tr><td>${esc(k)}</td><td>${t.a}</td><td>${pct(t.r,t.a)}%</td><td>${pct(t.f,t.a)}%</td><td>${(t.s/t.a).toFixed(0)}s</td><td>${barHTML(pct(t.f,t.a))}</td></tr>`).join("");
+    return `<div class="card"><h2>${WE[w]} ${WN[w]} <span class="pill">Level ${W.tier} · ${TIER[W.tier]}</span> <span class="pill">${W.answered} answered</span> <span class="pill">${pct(W.right,W.answered)}% right · ${pct(first,L.length)}% first try</span> <span class="pill">${Math.round((W.secs||0)/60)} min</span>${w==="forza"&&W.bestTime?` <span class="pill">PB ${(W.bestTime/1000).toFixed(1)}s</span>`:""}</h2>
+      ${rows?`<table><tr><th>Topic</th><th>Asked</th><th>Right</th><th>First try</th><th>Avg time</th><th></th></tr>${rows}</table>`:`<p class="note">Not played yet.</p>`}</div>`; }).join("");
+
+  // needs work
+  const cutoff=Date.now()-30*864e5; const miss={};
+  log.filter(e=>e.ok<2&&new Date(e.at).getTime()>cutoff).forEach(e=>{ const id=e.w+"|"+e.q; const m=miss[id]=miss[id]||{w:e.w,q:e.q,ans:e.ans,k:e.k,n:0,m0:0,given:[],last:e.at}; m.n++; if(e.ok===0) m.m0++; if(e.given&&!m.given.includes(e.given)) m.given.push(e.given); m.last=e.at; });
+  const fixedSince={}; log.filter(e=>e.ok===2).forEach(e=>{ fixedSince[e.w+"|"+e.q]=e.at; });
+  const list=Object.entries(miss).map(([id,m])=>Object.assign(m,{fixed:fixedSince[id]&&fixedSince[id]>m.last})).sort((a,b)=>b.n-a.n||b.m0-a.m0);
+  const spell=list.filter(m=>m.w==="brick");
+  $("p-need").innerHTML=`<div class="card"><h2>Things to go over (last 30 days)</h2><p class="note">Every question Seb missed on the first try, most-missed first. "Fixed" means he has since got it right first time. Spelling words are also listed separately below — handy for a look-cover-write at the kitchen table.</p>
+    ${list.length?`<table><tr><th>World</th><th>Question</th><th>Answer</th><th>He put</th><th>Missed</th><th>Status</th></tr>${list.slice(0,80).map(m=>`<tr><td>${WE[m.w]}</td><td>${esc(m.q)}<br><span class="mute" style="font-size:.78rem">${esc(m.k)}</span></td><td><b>${esc(m.ans)}</b></td><td class="mute">${esc(m.given.slice(0,3).join(", "))}</td><td>${m.n}× ${m.m0?`<span class="badc">(${m.m0} shown answer)</span>`:""}</td><td>${m.fixed?'<span class="good">Fixed ✓</span>':'<span class="warnc">Open</span>'}</td></tr>`).join("")}</table>`:`<p>Nothing missed recently.</p>`}</div>
+    <div class="card"><h2>Spelling list</h2>${spell.length?`<p>${spell.map(m=>`<span class="pill" style="font-size:1rem;color:var(--ink)">${esc(m.ans)}${m.fixed?" ✓":""}</span>`).join(" ")}</p>`:`<p class="note">No spelling slips yet.</p>`}</div>`;
+
+  // bosses & badges
+  $("p-boss").innerHTML=`<div class="card"><h2>Bosses</h2><table><tr><th>Boss</th><th>World</th><th>Health left</th><th>Tries</th><th>Beaten</th></tr>${BOSSES.map(b=>{ const s=(REC.bosses||{})[b.id]||{}; const hp=s.hp==null?b.hp:s.hp; return `<tr><td>${b.icon} ${esc(b.name)}</td><td>${b.world==="all"?"All":WN[b.world]}</td><td>${s.beaten?"—":hp+"/"+b.hp}</td><td>${s.attempts||0}</td><td>${s.beaten?`<span class="good">×${s.beaten}</span>`:'<span class="mute">not yet</span>'}</td></tr>`; }).join("")}</table></div>
+    <div class="card"><h2>Badges (${REC.badges.length}/${BADGES.length})</h2><p>${BADGES.map(b=>`<span class="pill" style="${REC.badges.includes(b.id)?"color:var(--ink)":"opacity:.45"}">${b.icon} ${b.name}</span>`).join(" ")}</p></div>
+    <div class="card"><h2>Today's quests</h2>${(REC.daily&&REC.daily.quests||[]).map(q=>`<div>${q.done?"✅":"⬜"} ${esc(q.text)} <span class="mute">(${q.n}/${q.target})</span></div>`).join("")||"<p class='note'>None generated yet today.</p>"}</div>`;
+  renderBank(); renderDad();
+  $("p-data").innerHTML=`<div class="card"><h2>Export</h2><div class="row"><button class="pri" onclick="dl()">⬇ Download full JSON</button><button onclick="dlcsv()">⬇ Download answers CSV</button></div><p class="note">The JSON is built to hand to Claude: "Here's Seb's Arena record — what should we work on this week?"</p></div>
+    <div class="card"><h2>Last 60 answers</h2><table><tr><th>When</th><th>World</th><th>Question</th><th>Put</th><th>Answer</th><th>Result</th><th>Secs</th></tr>${log.slice(-60).reverse().map(e=>`<tr><td class="mute">${fmt(e.at)}</td><td>${WE[e.w]}${e.boss?" 🥊":""}${e.cb?" 🔁":""}</td><td>${esc(e.q)}</td><td>${esc(e.given)}</td><td>${esc(e.ans)}</td><td>${e.ok===2?'<span class="good">first try</span>':e.ok===1?'<span class="warnc">second go</span>':'<span class="badc">shown</span>'}</td><td>${e.secs}</td></tr>`).join("")}</table></div>`;
+}
+function renderBank(){
+  const xp=REC?REC.xp:0; const avail=bankMinutes();
+  $("p-bank").innerHTML=`<div class="card"><h2>iPad time bank</h2>
+    <div class="grid"><div class="stat"><b>${xp}</b><small>XP earned in total</small></div><div class="stat"><b>${PAR.redeemedXP||0}</b><small>XP already cashed out</small></div><div class="stat"><b class="good">${avail} min</b><small>available now</small></div></div>
+    <h3>Rate</h3><div class="row"><input type="number" id="rate" value="${PAR.rate}" min="1" style="width:100px"> XP per minute of iPad time <button onclick="saveRate()">Save rate</button></div>
+    <p class="note">A normal 20-minute session earns roughly 400–700 XP, so 50 XP/min gives him about 10 minutes of iPad time for 20 minutes of work. Raise the rate to make it stricter, lower it to be more generous. Changing the rate changes what's available immediately.</p>
+    <h3>Cash out</h3><div class="row"><input type="number" id="cash" value="${Math.min(avail,30)}" min="0" max="${avail}" style="width:100px"> minutes <button class="pri" onclick="cashOut()">Cash out</button></div>
+    <p class="note">Cashing out records the XP as spent. His XP, rank and badges never go down — only the bank does.</p>
+    <h3>Ledger</h3>${(PAR.ledger||[]).length?`<table><tr><th>When</th><th>Minutes</th><th>XP</th></tr>${PAR.ledger.slice().reverse().map(l=>`<tr><td>${fmt(l.at)}</td><td>${l.min}</td><td>${l.xp}</td></tr>`).join("")}</table>`:`<p class="note">Nothing cashed out yet.</p>`}</div>`;
+}
+async function saveRate(){ PAR.rate=Math.max(1,parseInt($("rate").value)||50); if(await putParent()){ render(); $("status").textContent="Rate saved."; } }
+async function cashOut(){ const m=Math.max(0,Math.min(bankMinutes(),parseInt($("cash").value)||0)); if(!m) return; const xp=m*PAR.rate; PAR.redeemedXP=(PAR.redeemedXP||0)+xp; PAR.ledger=(PAR.ledger||[]).concat([{at:new Date().toISOString(),min:m,xp}]); if(await putParent()){ render(); $("status").textContent=`Cashed out ${m} minutes.`; } }
+function renderDad(){
+  const f=PAR.focus; const ws=["mine","brick","astro","forza","words","atlas"]; let prog="";
+  if(f&&f.setAt&&REC){ const sel=f.worlds&&f.worlds.length?f.worlds:ws; const n=(REC.log||[]).filter(e=>e.at>f.setAt&&sel.includes(e.w)).length; const done=REC.dadDone&&REC.dadDone[f.setAt]; prog=`<div class="card"><h2>Current challenge</h2><p><b>${esc(f.text)}</b></p><p>${sel.map(w=>WE[w]+" "+WN[w]).join(" · ")} · target ${f.target} questions · reward ${f.xp} XP · 1.5× XP while it runs</p><p>${done?'<span class="good">Completed ✓</span>':`${Math.min(n,f.target)} / ${f.target} so far`} · set ${fmt(f.setAt)}</p><button class="danger" onclick="clearDad()">Clear challenge</button></div>`; }
+  $("p-dad").innerHTML=prog+`<div class="card"><h2>${f&&f.setAt?"Set a new challenge":"Set a challenge"}</h2><p class="note">This appears on his hub as "Dad's Challenge" with a gold border on the chosen worlds. Questions in those worlds earn 1.5× XP until the target is met, then he gets the reward and a badge. Use it to steer him at what you've seen in Needs work — e.g. "Brick Builder: 30 words this week".</p>
+    <div class="row"><input id="dtext" placeholder="e.g. Crack the 7 and 8 times tables" style="flex:1;min-width:240px" value="${esc(f&&f.text||"")}"></div>
+    <div style="margin:10px 0">${ws.map(w=>`<label class="ck"><input type="checkbox" class="dw" value="${w}" ${f&&f.worlds&&f.worlds.includes(w)?"checked":""}> ${WE[w]} ${WN[w]}</label>`).join("")}</div>
+    <div class="row">Target <input type="number" id="dtarget" value="${f&&f.target||30}" min="5" style="width:90px"> questions · Reward <input type="number" id="dxp" value="${f&&f.xp||100}" min="10" style="width:90px"> XP <button class="pri" onclick="saveDad()">Start challenge</button></div></div>`;
+}
+async function saveDad(){ const text=$("dtext").value.trim(); if(!text) return alert("Give the challenge a name."); const worlds=[...document.querySelectorAll(".dw:checked")].map(c=>c.value); PAR.focus={text,worlds,target:Math.max(5,parseInt($("dtarget").value)||30),xp:Math.max(10,parseInt($("dxp").value)||100),setAt:new Date().toISOString()}; if(await putParent()){ render(); $("status").textContent="Challenge set — it shows on his hub next time it loads."; } }
+async function clearDad(){ PAR.focus=null; if(await putParent()){ render(); } }
+function dl(){ const blob=new Blob([JSON.stringify({record:REC,parent:PAR,exportedAt:new Date().toISOString()},null,1)],{type:"application/json"}); const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="seb-arena-"+new Date().toISOString().slice(0,10)+".json"; a.click(); }
+function dlcsv(){ const rows=[["at","world","topic","question","given","answer","result","secs","tier","boss","comeback"]].concat((REC.log||[]).map(e=>[e.at,e.w,e.k,e.q,e.given,e.ans,e.ok,e.secs,e.tier,e.boss,e.cb])); const csv=rows.map(r=>r.map(v=>'"'+String(v??"").replace(/"/g,'""')+'"').join(",")).join("\n"); const a=document.createElement("a"); a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv"})); a.download="seb-arena-answers.csv"; a.click(); }
+loadAll();
+</script>
+</body></html>
