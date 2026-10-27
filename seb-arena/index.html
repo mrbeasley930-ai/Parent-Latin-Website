@@ -122,6 +122,11 @@ header{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:8px 0 14p
 .opt:active{transform:scale(.98)}
 .opt.right{background:#1b4d2e;border-color:var(--xp)} .opt.notyet{background:#3a2a44;border-color:#8a6aa0;opacity:.75}
 .opt.dim{opacity:.4}
+.wordflash{display:flex;justify-content:center;flex-wrap:wrap;gap:4px;margin:12px 0 6px;animation:flashin .6s ease}
+.wordflash b{font-size:2.2rem;font-weight:700;letter-spacing:1px;background:#0a1222;border:2px solid var(--line);border-radius:10px;padding:4px 10px;min-width:38px;text-align:center;animation:pulse 1.2s ease 3}
+.wordflash b.dbl{color:var(--gold);border-color:var(--gold);background:#2a200f}
+@keyframes flashin{0%{transform:scale(.6);opacity:0}60%{transform:scale(1.08);opacity:1}100%{transform:none}}
+@keyframes pulse{0%,100%{box-shadow:none}50%{box-shadow:0 0 0 4px #ffcd3c55}}
 .cluerow{display:flex;align-items:center;gap:10px;margin-top:14px;flex-wrap:wrap}
 .cluebtn{background:#2a2340;border:1px solid #6a5a9a;color:#e6dcff;border-radius:999px;padding:8px 14px;font-weight:600}
 .cluebtn[disabled]{opacity:.6}
@@ -994,8 +999,10 @@ function logAnswer(world, q, ok, given, secs, boss){
   if(q.usedClue) noteHint(world,q); else noteSecure(world,q,ok===2);
   if(state.log.length>700) state.log=state.log.slice(-700);
 }
+function lockCard(card){ card.querySelectorAll(".opt").forEach(b=>b.disabled=true); const inp=card.querySelector("#ans"), go=card.querySelector("#go"); if(inp){ inp.disabled=true; inp.onkeydown=null; } if(go){ go.disabled=true; go.onclick=null; } }
+function wordFlash(w){ const dbl=doublesIn(w); let html=""; for(let i=0;i<w.length;i++){ const d=(w[i]===w[i+1])||(w[i]===w[i-1]); html+=`<b class="${d?"dbl":""}">${esc(w[i])}</b>`; } return `<div class="wordflash">${html}</div><div class="small center">Look at it. Say it. You'll get it again in a minute.</div>`; }
 function answerRun(given, el){
-  const q=RUN.cur; const ok=isRight(q,given); const fb=$("p-fb"); const secs=(Date.now()-RUN.qStart)/1000;
+  const q=RUN.cur; if(!RUN||q.done) return; const ok=isRight(q,given); const fb=$("p-fb"); const secs=(Date.now()-RUN.qStart)/1000;
   if(q.kind==="mc") $("p-card").querySelectorAll(".opt").forEach(b=>b.disabled=true);
   if(ok){
     SND.good(); if(el&&el.classList) el.classList.add("right");
@@ -1003,7 +1010,7 @@ function answerRun(given, el){
     RUN.combo++; if(RUN.combo>state.bestCombo) state.bestCombo=RUN.combo; let comboTxt="";
     if(RUN.combo>0&&RUN.combo%5===0){ xp+=25; comboTxt=` · 🔥 ${RUN.combo} in a row +25`; questEvent("combo5",RUN.world); }
     if(q.comeback){ xp+=10; state.comebacks++; comboTxt+=" · 🔁 Comeback!"; questEvent("comeback",RUN.world); }
-    RUN.xp+=xp; RUN.results[RUN.n]=first?2:1; state.worlds[RUN.world].xp+=xp;
+    q.done=true; lockCard($("p-card")); RUN.xp+=xp; RUN.results[RUN.n]=first?2:1; state.worlds[RUN.world].xp+=xp;
     logAnswer(RUN.world,q,first?2:1,givenText(q,given),secs); adapt(RUN.world,first,q.usedClue); questEvent("answered",RUN.world); questEvent("right",RUN.world);
     fb.className="fb good on"; fb.innerHTML=`<h3>${first?(q.usedClue?"Worked it out with the clue — nice!":pick(["Nailed it!","Yes!","Boom!","Too easy for you!","Diamond answer!"])):"That's it — second go counts!"}${comboTxt}</h3><div class="why">${q.why}</div><div class="row"><button class="btn ok" id="nx">Next ›</button></div>`;
     addXP(xp); $("p-combo").textContent="🔥 "+RUN.combo; $("p-combo").classList.add("hot","pop"); setTimeout(()=>$("p-combo").classList.remove("pop"),250);
@@ -1017,11 +1024,11 @@ function answerRun(given, el){
     else { const inp=$("p-card").querySelector("#ans"); if(inp){ inp.value=""; inp.focus(); } }
     fb.className="fb hint on"; fb.innerHTML=`<h3>Not yet — have another go</h3><div class="why">💡 ${esc(q.hint)}</div><div class="small mt">Second go still earns most of the XP.</div>`;
   } else {
-    SND.notyet(); RUN.results[RUN.n]=0; RUN.xp+=3; state.worlds[RUN.world].xp+=3;
+    q.done=true; lockCard($("p-card")); SND.notyet(); RUN.results[RUN.n]=0; RUN.xp+=3; state.worlds[RUN.world].xp+=3;
     logAnswer(RUN.world,q,0,givenText(q,given),secs); adapt(RUN.world,false,q.usedClue); questEvent("answered",RUN.world);
-    if(!q.comeback){ const copy=Object.assign({},q,{comeback:true,memo:null,usedClue:false}); RUN.queue.push({q:copy, due:RUN.n+rnd(2,4)}); if(RUN.total<14) RUN.total++; }
+    if(!q.comeback){ const copy=Object.assign({},q,{comeback:true,memo:null,usedClue:false,done:false}); RUN.queue.push({q:copy, due:RUN.n+rnd(2,4)}); if(RUN.total<14) RUN.total++; }
     if(q.kind==="mc"){ $("p-card").querySelectorAll(".opt").forEach(b=>{ if(+b.dataset.i===q.a) b.classList.add("right"); else b.classList.add("dim"); }); }
-    fb.className="fb show on"; fb.innerHTML=`<h3>Here's the answer: <span style="color:var(--gold)">${esc(q.kind==="mc"?q.opts[q.a]:q.accept[0])}</span></h3><div class="why">${q.why}</div><div class="small mt">+3 Grit XP for sticking with it. ${q.comeback?"":"This one comes back as a <b>Comeback card</b> in a minute — get it then for full XP."}</div><div class="row"><button class="btn ok" id="nx">Next ›</button></div>`;
+    fb.className="fb show on"; fb.innerHTML=`<h3>Here's the answer: <span style="color:var(--gold)">${esc(q.kind==="mc"?q.opts[q.a]:q.accept[0])}</span></h3>${RUN.world==="brick"&&q.word?wordFlash(q.word):""}<div class="why">${q.why}</div><div class="small mt">+3 Grit XP for sticking with it. ${q.comeback?"":"This one comes back as a <b>Comeback card</b> in a minute — get it then for full XP."}</div><div class="row"><button class="btn ok" id="nx">Next ›</button></div>`;
     addXP(3,"grit"); $("nx").onclick=()=>{ RUN.n++; nextQ(); }; $("nx").focus(); checkBadges(); persist();
   }
   renderProg(); renderDeco();
@@ -1061,15 +1068,15 @@ function bossQ(){
   $("b-fb").className="fb"; $("b-fb").innerHTML=""; renderQ($("b-card"), q, answerBoss);
 }
 function answerBoss(given, el){
-  const q=BF.cur; const ok=isRight(q,given); const fb=$("b-fb"); const secs=(Date.now()-BF.qStart)/1000; const s=bossState(BF.b.id);
-  if(q.kind==="mc") $("b-card").querySelectorAll(".opt").forEach(b=>b.disabled=true);
+  const q=BF.cur; if(!BF||q.done) return; q.done=true; const ok=isRight(q,given); const fb=$("b-fb"); const secs=(Date.now()-BF.qStart)/1000; const s=bossState(BF.b.id);
+  lockCard($("b-card"));
   logAnswer(q.bw,q,ok?2:0,givenText(q,given),secs,1); questEvent("answered",q.bw); if(ok) questEvent("right",q.bw);
   if(ok){ SND.hit(); BF.hp--; BF.hits++; s.hp=BF.hp; if(el&&el.classList) el.classList.add("right"); const xp=Math.round(XP_BASE[q.tier]*1.2*(q.usedClue?0.6:1)); addXP(xp,"hit"); $("b-speech").textContent=`"${pick(BF.b.hurt)}"`;
     fb.className="fb good on"; fb.innerHTML=`<h3>HIT! ${BF.b.name} takes damage.</h3><div class="why">${q.why}</div><div class="row"><button class="btn ok" id="bnx">${BF.hp<=0?"Finish him ›":"Next ›"}</button></div>`;
     $("bnx").onclick=()=>{ if(BF.hp<=0) bossWin(); else bossQ(); };
   } else { SND.notyet(); BF.shields--; $("b-speech").textContent=`"${pick(BF.b.taunt)}"`;
     if(q.kind==="mc"){ $("b-card").querySelectorAll(".opt").forEach(b=>{ if(+b.dataset.i===q.a) b.classList.add("right"); else b.classList.add("dim"); }); }
-    fb.className="fb show on"; fb.innerHTML=`<h3>Blocked! The answer was <span style="color:var(--gold)">${esc(q.kind==="mc"?q.opts[q.a]:q.accept[0])}</span></h3><div class="why">${q.why}</div><div class="small mt">+3 Grit XP. ${BF.shields>0?`${BF.shields} shield${BF.shields===1?"":"s"} left.`:"Shields down — but every hit you landed stays."}</div><div class="row"><button class="btn ok" id="bnx">${BF.shields<=0?"See what happened ›":"Next ›"}</button></div>`;
+    fb.className="fb show on"; fb.innerHTML=`<h3>Blocked! The answer was <span style="color:var(--gold)">${esc(q.kind==="mc"?q.opts[q.a]:q.accept[0])}</span></h3>${q.bw==="brick"&&q.word?wordFlash(q.word):""}<div class="why">${q.why}</div><div class="small mt">+3 Grit XP. ${BF.shields>0?`${BF.shields} shield${BF.shields===1?"":"s"} left.`:"Shields down — but every hit you landed stays."}</div><div class="row"><button class="btn ok" id="bnx">${BF.shields<=0?"See what happened ›":"Next ›"}</button></div>`;
     addXP(3,"grit"); $("bnx").onclick=()=>{ if(BF.shields<=0) bossEscape(); else bossQ(); };
   }
   renderBossBars(); checkBadges(); persist();
