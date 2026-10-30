@@ -474,7 +474,7 @@ const SCI = [
 
 /* ---------- ATLAS (History & Geography) ---------- */
 const ATLAS = [
- {q:"How many continents are there?",o:["5","6","7","8"],a:2,why:"Africa, Antarctica, Asia, Australia (Oceania), Europe, North America, South America.",t:1,k:"Geography",c:"The big canopy catches lots of air. Which force pushes up against falling objects?"},
+ {q:"How many continents are there?",o:["5","6","7","8"],a:2,why:"Africa, Antarctica, Asia, Australia (Oceania), Europe, North America, South America.",t:1,k:"Geography",c:"Count them: Africa, Antarctica, Asia, Australia (Oceania), Europe, and North and South America count as two."},
  {q:"Which is the largest ocean?",o:["Atlantic","Pacific","Indian","Arctic"],a:1,why:"The Pacific is bigger than all the land on Earth put together.",t:1,k:"Geography",c:"The one between America and Asia — so wide that a flight across it takes most of a day. Its name means 'peaceful'."},
  {q:"What is the capital city of the United Kingdom?",o:["Manchester","Birmingham","London","Edinburgh"],a:2,why:"London is the UK's capital.",t:1,k:"Geography",c:"Where the King lives and Parliament sits, on the river Thames."},
  {q:"What is the capital of Scotland?",o:["Glasgow","Edinburgh","Aberdeen","Dundee"],a:1,why:"Edinburgh, home of the Scottish Parliament.",t:1,k:"Geography",c:"Famous for its castle on a rock and a big festival every August. Not the biggest Scottish city."},
@@ -546,7 +546,7 @@ const ATLAS = [
 /* ---------- WORD WRESTLING (Reading, vocabulary, grammar) ---------- */
 /* kinds: syn (closest meaning), ant (opposite), cls (word class), gram (grammar/punctuation), vocab, fig (figurative) */
 const WORDS = [
- {q:"Which word means almost the same as ENORMOUS?",o:["tiny", "huge", "angry", "quick"],a:1,why:"Enormous = huge, gigantic, massive.",t:1,k:"Synonyms",c:"Tropical = hot. The band either side of the Equator where the sun is strongest."},
+ {q:"Which word means almost the same as ENORMOUS?",o:["tiny", "huge", "angry", "quick"],a:1,why:"Enormous = huge, gigantic, massive.",t:1,k:"Synonyms",c:"Enormous is about size. An enormous elephant is very…"},
  {q:"Which word means almost the same as FURIOUS?",o:["sleepy", "raging", "hungry", "polite"],a:1,why:"Furious is a stronger word for angry.",t:1,k:"Synonyms",c:"Fury is rage. If someone is furious, how do they feel?"},
  {q:"Which word means almost the same as BRAVE?",o:["courageous", "nervous", "careful", "lazy"],a:0,why:"Courageous = brave, fearless, bold.",t:1,k:"Synonyms",c:"A brave knight has courage. Which word has 'courage' hiding in it?"},
  {q:"Which word means almost the same as ANCIENT?",o:["modern", "aged", "broken", "shiny"],a:1,why:"Ancient = from a very long time ago.",t:1,k:"Synonyms",c:"Ancient Rome, ancient Egypt — thousands of years ago."},
@@ -630,6 +630,198 @@ const WORDS = [
 ];
 
 /* ---------- BOSSES ---------- */
+/* ---------- TRICKY FAMILIES (29 Oct 2026) ----------
+   Every question Seb missed or needed a clue on now belongs to a "family": the original plus
+   variants that test the same idea a different way. When a family is tricky, the Arena re-asks
+   a DIFFERENT member each time, so he has to understand it rather than remember the answer.  */
+const V = (k,f,t,q,o,why,c)=>({q,o,a:0,why,t,k,c,f});
+const VARIANTS = {
+ astro:[
+  V("Space","daynight",1,"It is daytime in the UK. Why is it night-time in Australia at the same moment?",["Australia is on the side of the Earth facing away from the Sun","The Moon is covering Australia","The Sun has gone to sleep behind Australia","Australia has thicker clouds"],"The Earth spins. The half facing the Sun has day; the half facing away has night — and Australia is on the other side of the world.","Picture a torch shining on a globe. Can the front and back of the globe both be lit at once?"),
+  V("Space","daynight",1,"How long does the Earth take to spin round once on its axis?",["About 24 hours — one day","One week","One month","One year"],"One spin = one day and one night = about 24 hours.","One full spin gives you one daytime and one night-time. How long is that?"),
+  V("Space","daynight",2,"The Sun seems to travel across the sky from morning to evening. What is really happening?",["The Earth is turning","The Sun is going round the Earth","The wind is pushing the Sun","The Moon is pulling the Sun along"],"The Sun stays put. We are on a spinning Earth, so the Sun only LOOKS as if it moves.","You're on a roundabout: the trees seem to whizz past, but who is really moving?"),
+  V("Space","daynight",2,"Which sentence is TRUE?",["The Earth spins, which gives us day and night","The Sun orbits the Earth once a day","The Moon makes night by blocking the Sun","Night happens when the Sun cools down"],"Day and night come from the Earth spinning on its axis once every 24 hours.","Three of these are old myths. Which one is about the Earth moving?"),
+
+  V("Forces","streamline",2,"Why do racing cars have low, smooth, pointed fronts?",["To cut down air resistance so they go faster","To make them heavier","To catch more air and slow down","To make the engine louder"],"A streamlined shape lets the air slide past, so there is less air resistance.","Think about what the air does when it hits a flat front compared with a pointed one."),
+  V("Forces","streamline",2,"Three sheets of paper weigh the same. Which falls to the floor FASTEST?",["One scrunched into a tight ball","One kept as a flat sheet","One folded into a wide parachute"],"The ball has the smallest surface pushing against the air, so it has the least air resistance.","Air pushes against the surface. Which one has the least surface facing down?"),
+  V("Forces","streamline",2,"Sharks and dolphins have a smooth, streamlined shape. This helps them…",["move through water with less resistance","see in the dark","keep warm","float on the surface"],"Water pushes against things moving through it, just like air. A streamlined body slips through.","Water resistance works like air resistance. What would a smooth, pointed body help with?"),
+  V("Forces","streamline",3,"A skydiver opens a parachute. What happens to the air resistance?",["It increases, so she slows down","It decreases, so she speeds up","It disappears","It turns into gravity"],"The big canopy catches lots of air, which increases air resistance and slows the fall.","A bigger surface hits more air. Does that push up more or less?"),
+
+  V("Forces","friction",2,"Water resistance slows a swimmer down. It is a type of…",["friction","gravity","magnetism","electricity"],"Air resistance and water resistance are both kinds of friction — things rubbing as they move past each other.","Which force happens when things rub or slide past each other?"),
+  V("Forces","friction",2,"Which of these is NOT a kind of friction?",["Gravity","Air resistance","Water resistance","Grip between a tyre and the road"],"Gravity pulls things together from a distance. The others all happen when surfaces rub or push past each other.","Friction needs things to rub or push past each other. Which one works without touching?"),
+  V("Forces","friction",2,"Air resistance pushes on a moving bike in which direction?",["Against the way it is moving","The same way it is moving","Straight up","Straight down"],"Friction forces, including air resistance, always act against the movement and slow things down.","Friction always tries to slow things down. Which way would you push to slow a bike?"),
+
+  V("Space","redplanet",1,"Mars looks red because…",["its surface dust contains rusty iron","it is on fire","it is the closest planet to the Sun","it is covered in red seas"],"Mars is covered in iron-rich dust that has rusted, giving it a red colour.","Think about an old iron nail left out in the rain — what colour does it go?"),
+  V("Space","redplanet",1,"Which planet is fourth from the Sun, straight after Earth?",["Mars","Jupiter","Venus","Saturn"],"Mercury, Venus, Earth, Mars — Mars is fourth.","My Very Easy Method… the fourth word starts with M. (Mercury is the first M.)"),
+  V("Space","redplanet",2,"Which planet is named after the Roman god of war?",["Mars","Jupiter","Neptune","Venus"],"Mars was the Roman god of war. The planet's blood-red colour gave it the name.","The Red Planet — red like blood in a battle."),
+
+  V("Living things","diet",1,"Humans can eat vegetables, fruit, meat and fish. That makes us…",["omnivores","herbivores","carnivores","producers"],"Eating both plants and animals makes humans omnivores.","Omni means 'all'. Do we eat only plants, only meat, or both?"),
+  V("Living things","diet",1,"A lion eats only meat. It is a…",["carnivore","herbivore","omnivore","producer"],"Carnivores eat meat. Carn- means meat (as in chilli con carne).","Think of chilli con CARNE — 'carne' means meat."),
+  V("Living things","diet",1,"Which of these animals is a HERBIVORE?",["A cow","A shark","A wolf","An eagle"],"A cow eats only grass and plants, so it is a herbivore.","Herb = plant. Which animal never eats meat?"),
+  V("Living things","diet",2,"OMNIVORE comes from Latin: omni = all, vorare = to eat. So an omnivore eats…",["plants and animals","only plants","only meat","only insects"],"Omni = all, so an omnivore eats all kinds of food, plants and animals.","The question gives you the Latin. What does 'all' tell you?"),
+
+  V("Materials","thermal",2,"Why do saucepans have plastic or wooden handles?",["They are thermal insulators, so the handle stays cool","They are magnetic","They pass the heat into your hand","They make the pan heavier"],"Plastic and wood are thermal insulators — heat travels through them very slowly.","Which would you rather hold over a hot cooker — metal or wood? Why?"),
+  V("Materials","thermal",2,"Which is the best THERMAL CONDUCTOR (lets heat through quickly)?",["A metal spoon","A wooden spoon","A plastic spoon","A woolly glove"],"Metals are good thermal conductors. A metal spoon in hot soup gets hot quickly.","Leave each spoon in hot soup. Which handle would you NOT want to touch?"),
+  V("Materials","thermal",2,"A cool box keeps drinks cold on a hot day. Its walls are made of…",["foam, a thermal insulator","copper, a thermal conductor","thin metal","glass"],"Thermal insulators stop heat getting through — in or out — so the cold drinks stay cold.","An insulator blocks heat. Does it matter which way the heat is trying to go?"),
+
+  V("Materials","permeable",3,"A rock that does NOT let water soak through it is…",["impermeable","permeable","transparent","magnetic"],"Im- means 'not', so impermeable means water cannot pass through.","Im- at the front of a word means 'not' (impossible, impatient)."),
+  V("Materials","permeable",3,"Rain soaks straight into chalk but sits in puddles on slate. Chalk is…",["permeable","impermeable","opaque","flexible"],"Chalk lets water pass through it, so it is permeable. Slate is impermeable.","Which rock is letting the water through?"),
+  V("Materials","permeable",3,"Which is best for a roof, so that rain does not get in?",["Slate, because it is impermeable","Chalk, because it is permeable","Sandstone, because it soaks up water","Sponge, because it is soft"],"A roof needs an impermeable material so water runs off instead of soaking through.","You want the water to run off, not soak in. Permeable or impermeable?"),
+
+  V("Space","orbit",2,"Which planet takes the LONGEST to go once round the Sun?",["Neptune","Mercury","Earth","Mars"],"Neptune is furthest out, so its trip round the Sun is longest — about 165 Earth years.","The further from the Sun, the bigger the loop. Which planet is furthest out?"),
+  V("Space","orbit",2,"A year on any planet is the time it takes to…",["go once round the Sun","spin round once on its axis","go round its moon","have one night"],"A year = one orbit of the Sun. (One spin on its axis is a day.)","Day = one spin. Year = one…?"),
+  V("Space","orbit",3,"Mercury is much closer to the Sun than Earth. So compared with Earth's year, Mercury's year is…",["shorter","longer","exactly the same","impossible to measure"],"Mercury's path round the Sun is much shorter, so its year is only 88 Earth days.","A small loop or a big loop — which takes less time to go round?")
+ ],
+ atlas:[
+  V("Geography","continents",1,"Which of these is NOT a continent?",["Greenland","Africa","Antarctica","Asia"],"Greenland is a huge island, but it is not a continent. The seven continents are Africa, Antarctica, Asia, Australia (Oceania), Europe, North America and South America.","There are seven continents. One of these is a very big island."),
+  V("Geography","continents",1,"The UK is part of which continent?",["Europe","Asia","North America","Africa"],"The UK is in Europe, along with France, Spain, Germany and Italy.","France is just across the Channel. Which continent is France in?"),
+  V("Geography","continents",1,"Which continent is the biggest?",["Asia","Europe","Africa","Antarctica"],"Asia is the largest continent — it includes China, India and most of Russia.","It contains China, India and most of Russia."),
+  V("Geography","continents",1,"Egypt, Kenya and Nigeria are all countries in…",["Africa","Asia","South America","Europe"],"All three are in Africa.","The pyramids of Egypt are on this continent."),
+
+  V("Geography","ukcountries",1,"Which of these is NOT part of the United Kingdom?",["The Republic of Ireland","Wales","Scotland","Northern Ireland"],"The Republic of Ireland is a separate country. The UK is England, Scotland, Wales and Northern Ireland.","Four countries make up the UK. One option is a different country with Dublin as its capital."),
+  V("Geography","ukcountries",1,"England, Scotland, Wales and ___ make up the UK.",["Northern Ireland","France","Cornwall","the Isle of Wight"],"The fourth country of the UK is Northern Ireland.","It's across the Irish Sea and its capital is Belfast."),
+  V("Geography","ukcountries",2,"Great Britain (the big island) has how many countries on it?",["3","4","2","5"],"England, Scotland and Wales share the island of Great Britain. Northern Ireland is on the island of Ireland, which makes 4 in the UK.","Northern Ireland is NOT on the same island as England."),
+
+  V("Geography","ukcap",1,"Belfast is the capital of…",["Northern Ireland","Scotland","Wales","the Republic of Ireland"],"Belfast is the capital of Northern Ireland, where the Titanic was built.","The Titanic was built here. It's in the UK, across the Irish Sea."),
+  V("Geography","ukcap",2,"Dublin is the capital of…",["the Republic of Ireland","Northern Ireland","Scotland","Wales"],"Dublin is the capital of the Republic of Ireland, a different country from Northern Ireland.","Dublin is NOT in the UK."),
+  V("Geography","ukcap",1,"Cardiff, Edinburgh and Belfast are capitals. Which one is the capital of Scotland?",["Edinburgh","Cardiff","Belfast"],"Edinburgh is Scotland's capital; Cardiff is Wales'; Belfast is Northern Ireland's.","Scotland's capital has a famous castle on a rock."),
+  V("Geography","ukcap",1,"Which capital city goes with Wales?",["Cardiff","Belfast","Edinburgh","Dublin"],"Cardiff is the capital of Wales.","It has a huge rugby stadium in the south of Wales."),
+
+  V("Geography","rivers",1,"The river Nile flows through which country famous for its pyramids?",["Egypt","Italy","India","Brazil"],"The Nile flows north through Egypt into the Mediterranean Sea.","Pharaohs built their pyramids near this river."),
+  V("Geography","rivers",1,"The Amazon rainforest is mostly in which country?",["Brazil","Egypt","China","Australia"],"Most of the Amazon is in Brazil, in South America.","It's in South America, the country famous for football and carnival."),
+  V("Geography","rivers",2,"The Amazon is to South America as the Nile is to…",["Africa","Europe","Asia","North America"],"The Amazon is in South America; the Nile is in Africa.","The Ancient Egyptians farmed beside the Nile. Which continent is Egypt in?"),
+  V("Geography","rivers",1,"Which river is in South America?",["The Amazon","The Nile","The Thames","The Severn"],"The Amazon flows across South America through the world's biggest rainforest.","It flows through the biggest rainforest on Earth."),
+
+  V("Geography","ukrivers",1,"Tower Bridge crosses which river?",["The Thames","The Severn","The Mersey","The Tyne"],"Tower Bridge is in London, over the Thames.","Tower Bridge is in London."),
+  V("Geography","ukrivers",1,"The river Thames flows through which city?",["London","Birmingham","Cardiff","Edinburgh"],"The Thames flows through London and out to the North Sea.","The capital of the UK."),
+  V("Geography","ukrivers",1,"The Houses of Parliament stand beside which river?",["The Thames","The Severn","The Trent","The Avon"],"The Houses of Parliament and Big Ben are on the bank of the Thames in London.","Parliament is in London."),
+
+  V("Geography","rome",1,"Rome is the capital of…",["Italy","Spain","Greece","France"],"Rome is the capital of Italy — once the centre of the Roman Empire.","The Romans came from here."),
+  V("Geography","rome",1,"Venice, Milan and Rome are all in Italy. Which is the capital?",["Rome","Venice","Milan"],"Rome is the capital. Venice is famous for canals; Milan for fashion and football.","The city the Roman Empire was ruled from."),
+  V("Geography","rome",2,"Which capital is matched to the WRONG country?",["Madrid — Italy","Paris — France","Berlin — Germany","Rome — Italy"],"Madrid is the capital of Spain, not Italy. Italy's capital is Rome.","Check each pair. Which city is really in Spain?"),
+
+  V("Geography","watercycle",2,"Water falling from clouds as rain, snow or hail is called…",["precipitation","evaporation","condensation","irrigation"],"Anything that falls out of the clouds is precipitation.","Evaporation goes UP, condensation makes clouds. What is the word for coming DOWN?"),
+  V("Geography","watercycle",2,"Water vapour cooling high in the sky to make clouds is called…",["condensation","precipitation","evaporation","melting"],"When vapour cools it turns back into tiny droplets — condensation. Clouds are made of them.","Like the drops on a cold window."),
+  V("Geography","watercycle",2,"Starting from the sea, which order is right?",["evaporation, condensation, precipitation","condensation, evaporation, precipitation","precipitation, condensation, evaporation","evaporation, precipitation, condensation"],"Water evaporates from the sea, condenses into clouds, then falls as precipitation.","First the Sun heats the sea; then clouds form; then it falls."),
+  V("Geography","watercycle",1,"Hail is a type of…",["precipitation","evaporation","condensation","erosion"],"Hail falls from clouds, so it is precipitation.","It falls out of the clouds."),
+
+  V("History","ww2",1,"The Second World War began in…",["1939","1914","1945","1966"],"WW2 began in September 1939.","It began 21 years after the First World War ended in 1918."),
+  V("History","ww2",1,"The Second World War ended in…",["1945","1939","1918","1953"],"WW2 ended in 1945.","It lasted six years from 1939."),
+  V("History","ww2",2,"German bombing raids on British cities in WW2 were called…",["the Blitz","the Crash","the Flood","the Siege"],"The Blitz (1940–41) — from the German word 'Blitz', lightning.","From a German word meaning lightning."),
+  V("History","ww2",1,"Why were children evacuated in WW2?",["To keep them safe from bombs on the cities","To go on holiday","To work on farms for money","Because schools closed for ever"],"Cities were being bombed, so children were sent to the countryside where it was safer.","Where were the bombs falling — in the cities or the countryside?"),
+  V("History","ww2",2,"How many years did the Second World War last?",["6","4","10","2"],"1939 to 1945 is six years.","Take 1939 away from 1945."),
+
+  V("History","hadrian",2,"Hadrian's Wall runs across which part of Britain?",["The north of England, near Scotland","The south coast","Around London","Cornwall"],"It runs 73 miles across northern England, from coast to coast.","It marked the edge of Roman Britain. Which end of the country did the Romans not control?"),
+  V("History","hadrian",2,"Hadrian's Wall is named after…",["a Roman emperor","a Viking king","an Anglo-Saxon queen","a Tudor king"],"Emperor Hadrian ordered the wall in AD 122.","It was built by the Romans, so who would they name it after?"),
+  V("History","hadrian",1,"Hadrian's Wall was built by the…",["Romans","Vikings","Normans","Victorians"],"The Romans built it, starting in AD 122.","Hadrian was an emperor. Which people had emperors?"),
+
+  V("History","romans",2,"Which emperor sent the army that conquered Britain in AD 43?",["Claudius","Julius Caesar","Nero","Hadrian"],"Claudius invaded in AD 43. Julius Caesar had only visited, in 55 and 54 BC.","Not Caesar — he never conquered it. The emperor's name starts with C, though."),
+  V("History","romans",2,"Julius Caesar came to Britain in 55 BC. What happened?",["He landed but did not conquer it","He conquered all of Britain","He built Hadrian's Wall","He became King of England"],"Caesar fought a few battles and went home. The real conquest came almost 100 years later, in AD 43.","The successful invasion was in AD 43 — so what happened in 55 BC?"),
+  V("History","romans",3,"Which came FIRST?",["Julius Caesar's visit (55 BC)","Claudius's invasion (AD 43)","Boudica's rebellion (AD 60)","Hadrian's Wall (AD 122)"],"BC dates come before AD dates, so 55 BC is first.","BC means before AD 1. Which is the only BC date?"),
+  V("History","romans",2,"The Romans successfully conquered Britain under Claudius in…",["AD 43","55 BC","AD 410","1066"],"AD 43. (55 BC was Caesar's visit, AD 410 is when the Romans left, 1066 is the Normans.)","AD 410 is when they LEFT. 1066 is someone else."),
+
+  V("History","hastings",1,"William the Conqueror came from…",["Normandy, in France","Norway","Rome","Scotland"],"William was Duke of Normandy, in northern France. His people were the Normans.","His people were called the Normans."),
+  V("History","hastings",2,"Which English king was killed at the Battle of Hastings?",["Harold","William","Alfred","Henry VIII"],"King Harold was killed — the story says by an arrow in the eye.","He lost the battle. William won it."),
+  V("History","hastings",1,"The Battle of Hastings in 1066 was won by the…",["Normans","Vikings","Romans","Anglo-Saxons"],"William's Normans beat Harold's Anglo-Saxons.","William came from Normandy."),
+  V("History","hastings",2,"Which famous embroidery tells the story of the Battle of Hastings?",["The Bayeux Tapestry","Magna Carta","The Domesday Book","The Mappa Mundi"],"The Bayeux Tapestry is about 70 metres long and shows the whole story of 1066.","A tapestry is a picture sewn in thread."),
+
+  V("Geography","oceans",1,"Which ocean do you fly over from London to New York?",["Atlantic","Pacific","Indian","Arctic"],"The Atlantic lies between Europe and North America.","Columbus crossed it in 1492."),
+  V("Geography","oceans",2,"The Titanic sank in 1912 in which ocean?",["Atlantic","Pacific","Indian","Southern"],"It was sailing from England to New York, across the Atlantic.","It was sailing from England to New York."),
+  V("Geography","oceans",2,"Which ocean lies between Africa and Australia?",["Indian","Atlantic","Arctic","Pacific"],"The Indian Ocean, named after India, which is on its northern edge.","It's named after a country on its northern edge."),
+
+  V("Geography","brum",1,"Which of these cities is also in the West Midlands?",["Coventry","Manchester","Leeds","Bristol"],"Coventry and Wolverhampton are in the West Midlands with Birmingham.","Which city is just down the road from Birmingham?"),
+  V("Geography","brum",1,"Birmingham is roughly in which part of England?",["The middle","The far north","The south coast","Cornwall"],"Birmingham is near the middle of England — the Midlands.","The region is called the MIDlands."),
+  V("Geography","brum",1,"Birmingham is the ___ biggest city in the UK.",["second","fifth","tenth","first"],"Only London is bigger.","Only one UK city is bigger — the capital."),
+
+  V("History","greece",2,"Democracy means 'rule by the people'. Where was it first tried?",["Athens","Rome","Sparta","Egypt"],"Athens, about 2,500 years ago.","The Greek city named after the goddess Athena."),
+  V("History","greece",2,"Which Greek city was famous for its tough soldiers?",["Sparta","Athens","Olympia","Rome"],"Spartan boys trained as soldiers from the age of seven.","Not the city of democracy — its rival."),
+  V("History","greece",2,"DEMOCRACY comes from Greek: demos = people, kratos = power. So democracy is…",["power held by the people","power held by one king","power held by soldiers","power held by priests"],"Democracy = people power: everyone (well, every male citizen in Athens) gets a vote.","The question gives you the Greek. Put the two parts together.")
+ ],
+ words:[
+  V("Vocabulary","affix",1,"What does -FUL mean in HOPEFUL?",["full of","without","again","not"],"Hopeful = full of hope. (Hopeless = without hope.)","-ful sounds like 'full'."),
+  V("Vocabulary","affix",1,"Which word means 'without care'?",["careless","careful","uncare","recare"],"-less means without, so careless = without care.","Which ending means 'without'?"),
+  V("Vocabulary","affix",2,"What does the prefix PRE- mean in PREVIEW?",["before","again","after","not"],"Pre- means before: a preview is a look before the real thing.","Pre-school comes before school."),
+  V("Vocabulary","affix",1,"What does DIS- do in DISAGREE?",["makes it the opposite","means again","means before","means full of"],"Dis- makes the opposite: disagree, dislike, disappear.","Dislike, disappear, disobey… what does dis- do?"),
+  V("Vocabulary","affix",1,"If a newborn puppy is HELPLESS, it…",["can't look after itself","is full of help","helps again","is very helpful"],"Help + less = without help — it can't manage on its own.","Split it: help + less. What does -less mean?"),
+  V("Vocabulary","affix",1,"Which word means 'play again'?",["replay","unplay","playless","preplay"],"Re- means again: replay, rebuild, rewrite.","Which prefix means 'again'?"),
+
+  V("Grammar","punct",1,"Which sentence needs an EXCLAMATION MARK?",["What a goal that was","The bus is late","Do you like pizza","I have a cat"],"'What a goal that was!' shows strong feeling, so it needs an exclamation mark.","Which one would you shout with excitement?"),
+  V("Grammar","punct",1,"Which sentence should end with a FULL STOP?",["Seb finished the level","Where is my controller","How did you do that","Can we go now"],"It is a statement — it tells you something rather than asking.","Three of these are asking something."),
+  V("Grammar","punct",1,"Which of these is a QUESTION?",["Have you seen my Lego?","Pick up your Lego.","My Lego is red.","What a lot of Lego!"],"It asks something and expects an answer, so it ends with a question mark.","A question expects an answer back."),
+
+  V("Word classes","wordclass",1,"In 'The puppy barked LOUDLY', what word class is LOUDLY?",["adverb","adjective","verb","noun"],"LOUDLY tells you HOW the puppy barked, so it is an adverb.","Does it describe the puppy, or HOW it barked?"),
+  V("Word classes","wordclass",1,"In 'Seb drove the SHINY car', what word class is SHINY?",["adjective","adverb","verb","noun"],"SHINY describes the car (a noun), so it is an adjective.","Does it describe a thing, or how something was done?"),
+  V("Word classes","wordclass",1,"In 'The robot WALKED slowly', what word class is WALKED?",["verb","adverb","adjective","noun"],"WALKED is the action, so it is a verb.","What is the robot doing?"),
+  V("Word classes","wordclass",1,"Which word is an ADJECTIVE?",["brave","bravely","run","castle"],"Brave describes a noun (a brave knight). Bravely is the adverb.","Which one could go in 'the ___ knight'?"),
+  V("Word classes","wordclass",1,"Which word is an ADVERB?",["happily","happy","happiness","laugh"],"Happily tells you how something is done. Many adverbs end in -ly.","Which one could go in 'She sang ___'?"),
+  V("Word classes","wordclass",1,"Many adverbs end in…",["-ly","-ing","-ed","-s"],"Quickly, slowly, loudly, happily — -ly.","Quick → quick__. Slow → slow__."),
+  V("Word classes","wordclass",2,"In 'The tiny mouse ran QUICKLY', which word is the ADJECTIVE?",["tiny","quickly","ran","mouse"],"TINY describes the mouse. QUICKLY is the adverb (how it ran).","Which word describes the mouse itself?"),
+
+  V("Figurative language","figlang",2,"'The leaves danced in the wind' is an example of…",["personification","a simile","alliteration","onomatopoeia"],"Leaves can't really dance — it gives them a human action. That's personification.","Can leaves really dance? Who dances?"),
+  V("Figurative language","figlang",1,"'Her smile was as bright as the sun' is an example of…",["a simile","a metaphor","personification","alliteration"],"It compares using 'as… as', so it is a simile.","Look for 'like' or 'as'."),
+  V("Figurative language","figlang",2,"'Seb is a rocket on the running track' is an example of…",["a metaphor","a simile","onomatopoeia","alliteration"],"It says Seb IS a rocket — no 'like' or 'as' — so it is a metaphor.","Is there a 'like' or 'as'? If not, and it says one thing IS another…"),
+  V("Figurative language","figlang",1,"'Six slippery snakes slid sideways' is an example of…",["alliteration","personification","a metaphor","hyperbole"],"The same first sound (s) is repeated: alliteration.","Say it out loud. What do you notice about the first letters?"),
+  V("Figurative language","figlang",2,"Which sentence uses PERSONIFICATION?",["The old engine coughed and groaned.","The engine was red.","The engine was like a dragon.","Vroom went the engine."],"Coughing and groaning are human actions given to an engine.","Which one makes the engine act like a person?"),
+  V("Figurative language","figlang",2,"Which sentence is a METAPHOR?",["The stadium was a cauldron of noise.","The stadium was as loud as thunder.","The stadium was very big.","Boom! went the drums."],"It says the stadium WAS a cauldron, with no 'like' or 'as'.","Which says one thing IS another thing?"),
+  V("Figurative language","figlang",2,"What is the difference between a simile and a metaphor?",["A simile uses 'like' or 'as'; a metaphor says something IS something else","A metaphor uses 'like' or 'as'; a simile does not","They mean exactly the same","A simile is always about animals"],"Simile: as fast as a rocket. Metaphor: he is a rocket.","SIMile sounds like SIMilar — it says something is similar to something, using like or as."),
+
+  V("Synonyms","odd",2,"Which word means almost the same as ODD?",["peculiar","even","ordinary","friendly"],"Odd, strange, peculiar, weird — all mean unusual.","A peculiar smell is an odd smell."),
+  V("Synonyms","odd",3,"Which word means almost the same as BIZARRE?",["weird","boring","beautiful","quiet"],"Bizarre = very strange, weird.","A bizarre dream doesn't make any sense."),
+  V("Antonyms","odd",2,"What is the OPPOSITE of PECULIAR?",["normal","strange","unusual","odd"],"Peculiar means strange, so the opposite is normal.","Peculiar = strange. Three options mean strange too!"),
+
+  V("Grammar","comma",1,"Which sentence uses commas correctly in a list?",["I bought eggs, milk, bread and jam.","I bought, eggs milk bread and jam.","I bought eggs milk, bread, and, jam.","I, bought eggs milk bread and jam."],"Commas go between the items, with 'and' before the last one.","Commas separate the things in the list."),
+  V("Grammar","comma",2,"Why does 'Let's eat, Grandad!' need its comma?",["Without it, it sounds as if we're eating Grandad","It is a list","It shows a question","It shows speech"],"The comma shows you are talking TO Grandad, not about eating him.","Read it with no comma. Who is for dinner?"),
+  V("Grammar","comma",2,"Which sentence needs a comma to show who is being spoken to?",["Seb come here!","The dog ran.","I like cake.","It is raining."],"Seb, come here! — the comma separates the name of the person you're talking to.","Which one is talking to someone by name?"),
+
+  V("Grammar","its",2,"Which sentence is correct?",["It's raining again.","Its raining again."],"It's = it is. 'It is raining again' makes sense.","Can you say 'it is' instead?"),
+  V("Grammar","its",2,"Which sentence is correct?",["The dog wagged its tail.","The dog wagged it's tail."],"Its (no apostrophe) means 'belonging to it'. 'The dog wagged it is tail' makes no sense.","Try saying 'it is'. Does it still make sense?"),
+  V("Grammar","its",2,"IT'S is short for…",["it is or it has","belonging to it","it was","its own"],"The apostrophe shows missing letters: it's = it is / it has.","An apostrophe can show missing letters, like don't = do not.")
+ ]
+};
+/* Tag the original questions with their family (by the start of the question, or by topic). */
+const FAM_TAG = {
+ astro:[["What causes day and night","daynight"],["Which shape cuts through","streamline"],["The force that makes a parachute","streamline"],["Air resistance is a kind of","friction"],["Friction is a force that","friction"],["Which planet is called the Red Planet","redplanet"],["An animal that eats only plants","diet"],["An animal that eats both","diet"],["Which material is a good THERMAL","thermal"],["A rock that lets water pass","permeable"],["A year on Mercury","orbit"],["How long does the Earth take to orbit","orbit"]],
+ atlas:[["How many continents","continents"],["How many countries make up","ukcountries"],["What is the capital of Northern Ireland","ukcap"],["What is the capital of Scotland","ukcap"],["What is the capital of Wales","ukcap"],["The Amazon river","rivers"],["The river Nile","rivers"],["Which river flows through London","ukrivers"],["The capital of Italy","rome"],["Rain, snow and hail","watercycle"],["In the water cycle","watercycle"],["The Second World War lasted","ww2"],["During WW2","ww2"],["Hadrian's Wall was built","hadrian"],["The Romans invaded Britain","romans"],["Which Roman general first","romans"],["Who won the Battle of Hastings","hastings"],["The Battle of Hastings was in","hastings"],["Which ocean lies between","oceans"],["Which is the largest ocean","oceans"],["Birmingham is in which region","brum"],["Which Ancient Greek city","greece"]],
+ words:[["What does the suffix -LESS","affix"],["What does the prefix RE-","affix"],["What does the prefix UN-","affix"],["Which sentence needs a QUESTION MARK","punct"],["Which word means almost the same as PECULIAR","odd"],["Which sentence uses a comma to avoid","comma"],["Which sentence is correct?","its"]]
+};
+const FAM_BY_TOPIC = { words:{"Word classes":"wordclass","Figurative language":"figlang"} };
+const BANKS = { astro:SCI, atlas:ATLAS, words:WORDS };
+Object.entries(BANKS).forEach(([w,bank])=>{
+  bank.forEach(it=>{ if(it.f) return; const tag=(FAM_TAG[w]||[]).find(([p])=>it.q.startsWith(p)); if(tag) it.f=tag[1]; else if((FAM_BY_TOPIC[w]||{})[it.k]) it.f=FAM_BY_TOPIC[w][it.k]; });
+  bank.push(...VARIANTS[w]);
+});
+/* Spelling families: the tricky word plus cousins with the same pattern (and one contrast word where
+   the pattern is easy to over-apply, e.g. harass vs embarrass). s = a sentence for the "fill the sentence" mode. */
+const SPELL_ADD = [
+ {w:"addition",d:"adding numbers together",t:2,f:"y56",s:"Seven plus five is an ___ sum."},
+ {w:"express",d:"very fast, like a special train",t:2,f:"y56",s:"We caught the ___ train to London."},
+ {w:"committed",d:"promised to do something and stuck to it",t:3,f:"y56",s:"He was ___ to finishing the race."},
+ {w:"toffee",d:"a chewy brown sweet",t:2,f:"dbl",s:"The ___ stuck to my teeth."},
+ {w:"expect",d:"think something will happen",t:2,f:"sgl",s:"I ___ we will win today."},
+ {w:"explain",d:"tell someone how something works",t:2,f:"sgl",s:"Can you ___ how the circuit works?"},
+ {w:"explore",d:"travel around to find out about a place",t:2,f:"sgl",s:"Steve set off to ___ the cave."},
+ {w:"comment",d:"a remark about something",t:2,f:"dbl",s:"She left a nice ___ on my video."},
+ {w:"compass",d:"it points north",t:2,f:"dbl",s:"Use the ___ to find north."},
+ {w:"trespass",d:"go onto land where you are not allowed",t:3,f:"y56",s:"Do not ___ on the farmer's field."},
+ {w:"repetition",d:"doing something again and again",t:3,f:"y56",s:"Practice and ___ help you learn."},
+ {w:"position",d:"the place where something is",t:2,f:"sgl",s:"The car finished in first ___."},
+ {w:"visitor",d:"someone who comes to see you",t:2,f:"sgl",s:"We had a ___ at the door."},
+ {w:"limit",d:"the most that is allowed",t:1,f:"sgl",s:"The speed ___ is 30 mph."}
+];
+SPELL.push(...SPELL_ADD);
+const SPELL_FAM = {
+ address:["address","addition","success","express"],
+ committee:["committee","committed","coffee","toffee"],
+ experiment:["experiment","expect","explain","explore","excellent"],
+ harass:["harass","embarrass","compass","trespass"],
+ communicate:["communicate","community","common","comment"],
+ competition:["competition","repetition","position","definite"],
+ visit:["visit","visitor","limit","habit"]
+};
+const SPELL_SENT = { address:"Write your ___ on the envelope.", committee:"The school ___ planned the summer fair.", experiment:"We did an ___ with magnets.", harass:"Please don't ___ the cat.", communicate:"Astronauts ___ with Earth by radio.", competition:"Seb won the Lego building ___.", visit:"We will ___ Grandma on Sunday.", success:"The party was a big ___.", coffee:"Dad drinks ___ in the morning.", excellent:"That was an ___ goal!", embarrass:"Please don't ___ me in front of my friends.", community:"Our ___ held a street party.", common:"Pigeons are very ___ in cities.", definite:"Is it ___ that we're going?", habit:"Biting your nails is a bad ___." };
+SPELL.forEach(x=>{ if(!x.s&&SPELL_SENT[x.w]) x.s=SPELL_SENT[x.w]; });
+Object.entries(SPELL_FAM).forEach(([fam,ws])=>ws.forEach(w=>{ const it=SPELL.find(x=>x.w===w); if(it) it.fam=fam; }));
+
 const BOSSES = [
  {id:"gravel", name:"The Gravel Giant", world:"mine",  hp:8, icon:"🪨", intro:"He blocks the deepest tunnel. Every right answer chips a boulder away.", taunt:["Is that all you've got, miner?","My boulders laugh at you.","You'll never dig this deep."], hurt:["ARGH! That one cracked!","You're chipping me!","Not the diamond pick!"],c:"Might, could, may — these show that something isn't certain."},
  {id:"brickster", name:"The Brickster", world:"brick", hp:8, icon:"🧱", intro:"She scrambles the letters of every word. Spell them right and her tower tumbles.", taunt:["Double or single? Guess wrong!","My tower is unbreakable.","Spelling is for losers!"], hurt:["My bricks! My beautiful bricks!","Oof — that word was solid.","Stop spelling so well!"]},
@@ -698,7 +890,7 @@ const WORLD_IDS = ["mine","brick","astro","forza","words","atlas"];
 function freshState(){
   return { v:1, name:"", xp:0, answered:0, right:0, bestCombo:0, comebacks:0, spelled:0,
     worlds: Object.fromEntries(WORLD_IDS.map(w=>[w,{answered:0,right:0,tier:1,recent:[],xp:0,runs:0,secs:0,bestTime:null,bestRun:0}])),
-    topics:{}, log:[], badges:[], hinted:{}, bosses:{}, daily:{date:"",quests:[],bonus:false}, questsDone:0,
+    topics:{}, log:[], badges:[], hinted:{}, tricky:{}, bosses:{}, daily:{date:"",quests:[],bonus:false}, questsDone:0,
     streak:{days:0,last:""}, playedDays:[], dadDone:{}, updatedAt:"" };
 }
 let state = freshState();
@@ -813,29 +1005,31 @@ const TIER_NAMES = ["","Wood","Stone","Iron","Diamond","Netherite"];
 const XP_BASE = [0,10,12,15,18,22];
 
 /* --- generators return {kind:'mc'|'type', q, opts?, a? (index), accept? [strings], hint, why, topic, memo?} --- */
+function mcItem(it, world){
+  const idx=shuffle(it.o.map((_,i)=>i)); const opts=idx.map(i=>it.o[i]); const a=idx.indexOf(it.a);
+  return {kind:"mc", q:it.q, opts, a, why:it.why, hint:hintFromWhy(it), topic:it.k, clue:it.c||("Think about "+it.k.toLowerCase()+" and rule out the ones you know are wrong."), fam:it.f||qText(it.q), item:qText(it.q)};
+}
 function mcFromBank(bank, tier, world){
   const maxT = tier<=1?1 : tier<=3?2 : 3; const minT = tier>=5?2 : tier>=4?2 : 1;
   let pool=bank.filter(x=>x.t>=minT&&x.t<=maxT); if(pool.length<8) pool=bank;
   const seen=(state.worlds[world].recentQ||[]); let cand=pool.filter(x=>!seen.includes(x.q)); if(cand.length<4) cand=pool;
-  let it=null; const due=hintedDue(world); if(due.length&&Math.random()<0.35){ const d=pick(due); it=bank.find(x=>qText(x.q)===d.q)||null; }
-  if(!it) it=pick(cand); state.worlds[world].recentQ=[...seen,it.q].slice(-25);
-  const idx=shuffle(it.o.map((_,i)=>i)); const opts=idx.map(i=>it.o[i]); const a=idx.indexOf(it.a);
-  return {kind:"mc", q:it.q, opts, a, why:it.why, hint:hintFromWhy(it), topic:it.k, clue:it.c||("Think about "+it.k.toLowerCase()+" and rule out the ones you know are wrong.")};
+  const it=pick(cand); state.worlds[world].recentQ=[...seen,it.q].slice(-25);
+  return mcItem(it, world);
 }
 function qText(q){ return String(q).replace(/<[^>]+>/g," ").replace(/\s+/g," ").trim().slice(0,90); }
 function hintKey(world,q){ return world+"|"+(q.word||qText(q.q)); }
 function hintedDue(world){ return Object.values(state.hinted||{}).filter(h=>h.w===world&&!h.secure); }
-function noteHint(world,q){ const k=hintKey(world,q); const h=state.hinted[k]=state.hinted[k]||{w:world,q:q.word||qText(q.q),ans:q.word||(q.kind==="mc"?q.opts[q.a]:q.accept[0]),k:q.topic,n:0,ok:0,secure:false,first:new Date().toISOString()}; h.n++; h.ok=0; h.secure=false; h.last=new Date().toISOString(); }
-function noteSecure(world,q,firstTryNoClue){ const h=state.hinted[hintKey(world,q)]; if(!h||h.secure) return; if(firstTryNoClue){ h.ok++; if(h.ok>=2){ h.secure=true; h.securedAt=new Date().toISOString(); setTimeout(()=>toast("🔒 Secure! You've nailed one you needed a clue for."),700); } } else h.ok=0; }
+function noteHint(world,q){ const k=hintKey(world,q); const h=state.hinted[k]=state.hinted[k]||{w:world,q:q.word||qText(q.q),ans:q.word||(q.kind==="mc"?q.opts[q.a]:q.accept[0]),k:q.topic,n:0,ok:0,secure:false,first:new Date().toISOString()}; h.fam=q.fam; h.n++; h.ok=0; h.secure=false; h.last=new Date().toISOString(); }
+function noteSecure(world,q,firstTryNoClue){ Object.values(state.hinted||{}).filter(h=>h.w===world&&!h.secure&&(h.fam?h.fam===q.fam:h.q===(q.word||qText(q.q)))).forEach(h=>{ if(firstTryNoClue){ if(h.lastOk!==q.item){ h.ok++; h.lastOk=q.item; } if(h.ok>=2){ h.secure=true; h.securedAt=new Date().toISOString(); } } else { h.ok=0; h.lastOk=null; } }); }
 function hintFromWhy(it){ const right=it.o[it.a]; const wrong=it.o.filter((_,i)=>i!==it.a); return "It's not \""+pick(wrong)+"\". Think about "+it.k.toLowerCase()+"."; }
 
-function mineGen(t){
-  const K={1:["mul2510","add20","sub20","mul2510"],2:["mul346","add100","sub100","div2510","mul346"],3:["mul789","div346","add3d","sub3d","mulAll"],4:["mul1112","div789","missing","add4d","sub4d","mulAll"],5:["mul2x1","div1112","missing2","add4d","sub4d","sqr","mulAll"]};
-  const k=pick(K[t]); let a,b,q,ans,topic,hint,why;
+const MINE_K={1:["mul2510","add20","sub20","mul2510"],2:["mul346","add100","sub100","div2510","mul346"],3:["mul789","div346","add3d","sub3d","mulAll"],4:["mul1112","div789","missing","add4d","sub4d","mulAll"],5:["mul2x1","div1112","missing2","add4d","sub4d","sqr","mulAll"]};
+function mineGen(t,forceK){
+  const K=MINE_K; const k=forceK||pick(K[t]); let a,b,q,ans,topic,hint,why,long=false;
   const tbl=(set)=>{ a=pick(set); b=rnd(2,12); if(Math.random()<.5){ q=`${a} × ${b}`; } else { q=`${b} × ${a}`; } ans=a*b; topic="Times tables"; hint=`Count up in ${a}s: ${a}, ${a*2}, ${a*3}…`; why=`${a} × ${b} = ${a*b}.`; };
   const div=(set)=>{ a=pick(set); b=rnd(2,12); q=`${a*b} ÷ ${a}`; ans=b; topic="Division facts"; hint=`Think: ${a} × ? = ${a*b}`; why=`${a*b} ÷ ${a} = ${b}, because ${a} × ${b} = ${a*b}.`; };
   const add=(lo,hi)=>{ a=rnd(lo,hi); b=rnd(lo,hi); q=`${a} + ${b}`; ans=a+b; topic="Addition"; hint="Add the biggest place value first, then the rest."; why=`${a} + ${b} = ${a+b}.`; };
-  const sub=(lo,hi)=>{ a=rnd(lo,hi); b=rnd(lo,a); q=`${a} − ${b}`; ans=a-b; topic="Subtraction"; hint=`Count up from ${b} to ${a}.`; why=`${a} − ${b} = ${a-b}.`; };
+  const sub=(lo,hi)=>{ a=rnd(lo,hi); b=rnd(lo,a); const s=rnd(0,3); q=[`${a} − ${b}`,`What is ${b} less than ${a}?`,`The difference between ${a} and ${b}`,`${b} + ? = ${a}`][s]; long=s===1||s===2; ans=a-b; topic="Subtraction"; hint=`Count up from ${b} to ${a}.`; why=`${a} − ${b} = ${a-b}.`; };
   switch(k){
     case "mul2510": tbl([2,5,10]); break; case "mul346": tbl([3,4,6]); break; case "mul789": tbl([7,8,9]); break; case "mul1112": tbl([11,12]); break;
     case "mulAll": tbl([3,4,6,7,8,9,12]); break;
@@ -854,7 +1048,7 @@ function mineGen(t){
     "Missing numbers":`Turn it round. If ? × ${a} = ${a*b}, the question is really ${a*b} ÷ ${a}. If ${a*b} ÷ ? = ${a}, ask what ${a} times gives ${a*b}.`,
     "Written multiplication":`Split the big number into tens and ones: ${Math.floor(a/10)*10} and ${a%10}. Multiply each by ${b}, then add the two answers.`,
     "Square numbers":`A number squared is that number times itself: 3² = 3 × 3 = 9. The square root asks the other way: what times itself gives this?`};
-  return {kind:"type", q:`<span class="big">${q}</span>`, accept:[String(ans)], numeric:true, hint, why, topic, clue:MC[topic]||hint};
+  return {kind:"type", q:long?`<span class="big" style="font-size:1.5em">${q}</span>`:`<span class="big">${q}</span>`, accept:[String(ans)], numeric:true, hint, why, topic, clue:MC[topic]||hint, gk:k, fam:MINE_FAM[k]||k, item:q};
 }
 
 const FORZA_CLUE={"Halves and quarters":"Half means share into 2 equal piles; a quarter means 4 piles (halve it, then halve again). Try splitting the number into tens and ones and halving each.",
@@ -870,22 +1064,22 @@ const FORZA_CLUE={"Halves and quarters":"Half means share into 2 equal piles; a 
  "Adding decimals":"Line up the decimal points and add like money: 0.25 + 0.5 is 25p + 50p.",
  "Fractions to decimals":"¼ = 0.25 (a quarter of a pound is 25p). ½ = 0.5. ¾ = 0.75. ⅕ = 0.2 because 5 × 0.2 = 1."};
 
-function forzaGen(t){
-  const K={1:["half","quarter","eqhalf","cmp1"],2:["fracof","tenths","round10","half2"],3:["equiv","addsame","round100","cmpdec"],4:["pct","improper","adddec","equiv"],5:["pct2","adddiff","round1dp","fractodec"]};
-  const k=pick(K[t]); let q,ans,opts,a,topic,hint,why,kind="type";
+const FORZA_K={1:["half","quarter","eqhalf","cmp1"],2:["fracof","tenths","round10","half2"],3:["equiv","addsame","round100","cmpdec"],4:["pct","improper","adddec","equiv"],5:["pct2","adddiff","round1dp","fractodec"]};
+function forzaGen(t,forceK){
+  const K=FORZA_K; const k=forceK||pick(K[t]); let q,ans,opts,a,topic,hint,why,kind="type",long=0;
   const mc=(arr,right)=>{ kind="mc"; const idx=shuffle(arr.map((_,i)=>i)); opts=idx.map(i=>arr[i]); a=idx.indexOf(right); };
   switch(k){
-    case "half": { const n=rnd(2,20)*2; q=`Half of ${n}`; ans=n/2; topic="Halves and quarters"; hint="Half means ÷ 2."; why=`${n} ÷ 2 = ${n/2}.`; break; }
-    case "half2": { const n=rnd(21,60)*2; q=`Half of ${n}`; ans=n/2; topic="Halves and quarters"; hint=`Half of ${Math.floor(n/20)*20} is ${Math.floor(n/20)*10}; then half the rest.`; why=`${n} ÷ 2 = ${n/2}.`; break; }
-    case "quarter": { const n=rnd(2,15)*4; q=`A quarter of ${n}`; ans=n/4; topic="Halves and quarters"; hint="Halve it, then halve it again."; why=`${n} ÷ 4 = ${n/4}.`; break; }
+    case "half": { const n=rnd(2,20)*2; [q,long]=pick([[`Half of ${n}`,0],[`½ of ${n}`,0],[`${n} ÷ 2`,0],[`${n} cars split into 2 equal teams. How many in each team?`,1],[`Double what number makes ${n}?`,1]]); ans=n/2; topic="Halves and quarters"; hint="Half means ÷ 2 — share into 2 equal piles."; why=`Half of ${n} is ${n/2}, because ${n/2} + ${n/2} = ${n}.`; break; }
+    case "half2": { const n=rnd(21,60)*2; [q,long]=pick([[`Half of ${n}`,0],[`½ of ${n}`,0],[`${n} ÷ 2`,0],[`A track is ${n} km long. How far is it to halfway?`,1],[`Double what number makes ${n}?`,1]]); ans=n/2; topic="Halves and quarters"; hint=`Half of ${Math.floor(n/20)*20} is ${Math.floor(n/20)*10}; then half the rest.`; why=`${n} ÷ 2 = ${n/2}.`; break; }
+    case "quarter": { const n=rnd(2,15)*4; [q,long]=pick([[`A quarter of ${n}`,0],[`¼ of ${n}`,0],[`${n} ÷ 4`,0],[`${n} Lego bricks shared equally between 4 builders. How many each?`,1],[`Halve ${n}, then halve it again.`,1]]); ans=n/4; topic="Halves and quarters"; hint="A quarter: halve it, then halve it again."; why=`Half of ${n} is ${n/2}; half of ${n/2} is ${n/4}. So a quarter of ${n} is ${n/4}.`; break; }
     case "eqhalf": { const d=pick([4,6,8,10,12]); q=`½ = ?/${d}`; ans=d/2; topic="Equivalent fractions"; hint=`What is half of ${d}?`; why=`½ = ${d/2}/${d}: the top and bottom are both multiplied by ${d/2}.`; break; }
-    case "cmp1": { const f=pick([["½","¼"],["¾","½"],["⅓","¼"],["½","⅓"],["⅔","⅓"]]); q=`Which is BIGGER?`; mc([f[0],f[1]],0); topic="Comparing fractions"; hint="Picture a pizza cut into those slices."; why=`${f[0]} is bigger than ${f[1]}.`; break; }
-    case "fracof": { const d=pick([3,4,5]); const n=rnd(1,d-1); const m=rnd(2,10); q=`${n}/${d} of ${d*m}`; ans=n*m; topic="Fractions of amounts"; hint=`Divide by ${d}, then multiply by ${n}.`; why=`${d*m} ÷ ${d} = ${m}; ${m} × ${n} = ${n*m}.`; break; }
-    case "tenths": { const n=rnd(1,9); q=`Which decimal equals ${n}/10?`; mc([`0.${n}`,`${n}.0`,`0.0${n}`,`${n}0`],0); topic="Decimals"; hint="Tenths go in the first place after the decimal point."; why=`${n}/10 = 0.${n}.`; break; }
+    case "cmp1": { const f=pick([["½","¼"],["¾","½"],["⅓","¼"],["½","⅓"],["⅔","⅓"],["⅕","⅛"],["¼","⅙"],["⅖","⅕"],["⅓","⅙"]]); const s=rnd(0,2); if(s===1){ q=`Which is SMALLER?`; mc([f[0],f[1]],1); why=`${f[1]} is smaller than ${f[0]}.`; } else if(s===2){ q=`Two pizzas are the same size. Which slice is BIGGER: ${f[0]} of one pizza or ${f[1]} of the other?`; long=1; mc([f[0],f[1]],0); why=`${f[0]} is bigger than ${f[1]}.`; } else { q=`Which is BIGGER?`; mc([f[0],f[1]],0); why=`${f[0]} is bigger than ${f[1]}.`; } topic="Comparing fractions"; hint="Picture a pizza cut into those slices. More slices = smaller slices."; break; }
+    case "fracof": { const d=pick([3,4,5]); const n=rnd(1,d-1); const m=rnd(2,10); const tot=d*m; [q,long]=pick([[`${n}/${d} of ${tot}`,0],[`Find ${n}/${d} of ${tot}`,0],[`Seb has ${tot} emeralds. He spends ${n}/${d} of them. How many does he spend?`,1],[`A race is ${tot} laps. ${n}/${d} of the laps are done. How many laps is that?`,1]]); ans=n*m; topic="Fractions of amounts"; hint=`Divide by ${d} to find one part, then multiply by ${n}.`; why=`${tot} ÷ ${d} = ${m} (one part); ${m} × ${n} = ${n*m}.`; break; }
+    case "tenths": { const n=rnd(1,9); const s=rnd(0,3); const W=["","One","Two","Three","Four","Five","Six","Seven","Eight","Nine"]; if(s===0){ q=`Which decimal equals ${n}/10?`; mc([`0.${n}`,`${n}.0`,`0.0${n}`,`${n}0`],0); why=`${n}/10 = 0.${n}.`; } else if(s===1){ q=`${W[n]} tenth${n>1?"s":""} written as a decimal`; long=1; mc([`0.${n}`,`${n}.0`,`0.0${n}`,`${n}0`],0); why=`${W[n]} tenth${n>1?"s":""} = ${n}/10 = 0.${n}.`; } else if(s===2){ q=`0.${n} as a fraction`; mc([`${n}/10`,`${n}/100`,`1/${n}`,`${n}/1`],0); why=`The first place after the point is tenths, so 0.${n} = ${n}/10.`; } else { let w=rnd(1,9); if(w===n) w=w%9+1; q=`In ${w}.${n}, what is the ${n} worth?`; long=1; mc([`${n} tenths`,`${n} ones`,`${n} hundredths`,`${n} tens`],0); why=`It is just after the decimal point, so it is ${n} tenths (0.${n}).`; } topic="Decimals"; hint="Tenths go in the first place after the decimal point."; break; }
     case "round10": { const n=rnd(11,199); if(n%10===5) { } ans=Math.round(n/10)*10; q=`Round ${n} to the nearest 10`; topic="Rounding"; hint="Look at the ones digit: 5 or more rounds up."; why=`${n} → ${ans} (ones digit ${n%10}).`; break; }
     case "round100": { const n=rnd(101,1999); ans=Math.round(n/100)*100; q=`Round ${n} to the nearest 100`; topic="Rounding"; hint="Look at the tens digit."; why=`${n} → ${ans}.`; break; }
     case "equiv": { const pairs=[[1,2],[1,3],[2,3],[1,4],[3,4],[2,5],[3,5]]; const [n,d]=pick(pairs); const m=rnd(2,5); q=`${n}/${d} = ?/${d*m}`; ans=n*m; topic="Equivalent fractions"; hint=`${d} × ${m} = ${d*m}, so multiply the top by ${m} too.`; why=`${n}/${d} = ${n*m}/${d*m}.`; break; }
-    case "addsame": { const d=pick([5,6,7,8,9,10]); const x=rnd(1,d-2); const y=rnd(1,d-1-x); q=`${x}/${d} + ${y}/${d}`; mc([`${x+y}/${d}`,`${x+y}/${d*2}`,`${x*y}/${d}`,`${x+y+1}/${d}`],0); topic="Adding fractions"; hint="Same bottom number: just add the tops."; why=`${x}/${d} + ${y}/${d} = ${x+y}/${d}.`; break; }
+    case "addsame": { const d=pick([5,6,7,8,9,10]); const x=rnd(1,d-2); const y=rnd(1,d-1-x); const NM={5:["fifth","fifths"],6:["sixth","sixths"],7:["seventh","sevenths"],8:["eighth","eighths"],9:["ninth","ninths"],10:["tenth","tenths"]}; const nm=v=>v+" "+NM[d][v===1?0:1]; const s=rnd(0,2); q=s===0?`${x}/${d} + ${y}/${d}`:s===1?`${nm(x)} + ${nm(y)}`:`Seb ate ${x}/${d} of a pizza and Dad ate ${y}/${d}. How much of the pizza did they eat altogether?`; long=s>0?1:0; mc([`${x+y}/${d}`,`${x+y}/${d*2}`,`${x*y}/${d}`,`${x+y+1}/${d}`],0); topic="Adding fractions"; hint="Same bottom number: keep the bottom, add the tops."; why=`${x}/${d} + ${y}/${d} = ${x+y}/${d} — the bottom number stays the same.`; break; }
     case "cmpdec": { const p=pick([["0.7","0.65"],["0.5","0.45"],["0.9","0.09"],["0.25","0.2"],["1.1","1.09"],["0.8","0.75"]]); q=`Which is BIGGER?`; mc([p[0],p[1]],0); topic="Comparing decimals"; hint="Compare tenths first, then hundredths."; why=`${p[0]} is bigger than ${p[1]}.`; break; }
     case "pct": { const p=pick([50,25,10]); const n=pick([20,40,60,80,100,120,200]); q=`${p}% of ${n}`; ans=n*p/100; topic="Percentages"; hint=p===50?"50% is a half.":p===25?"25% is a quarter.":"10% is ÷ 10."; why=`${p}% of ${n} = ${ans}.`; break; }
     case "pct2": { const p=pick([5,20,30,75,15]); const n=pick([20,40,60,80,100,120]); q=`${p}% of ${n}`; ans=n*p/100; topic="Percentages"; hint=`Find 10% first (${n/10}), then build it up.`; why=`10% of ${n} is ${n/10}, so ${p}% is ${ans}.`; break; }
@@ -896,14 +1090,17 @@ function forzaGen(t){
     case "fractodec": { const it=pick([["½","0.5"],["¼","0.25"],["¾","0.75"],["⅕","0.2"],["⅒","0.1"],["⅖","0.4"],["⅗","0.6"]]); q=`${it[0]} as a decimal`; ans=it[1]; topic="Fractions to decimals"; hint="¼ is 0.25, so build from that."; why=`${it[0]} = ${it[1]}.`; break; }
   }
   const clue=FORZA_CLUE[topic]||hint;
-  if(kind==="mc") return {kind, q, opts, a, hint, why, topic, clue};
-  return {kind:"type", q:`<span class="big">${q}</span>`, accept:[String(ans)], numeric:true, hint, why, topic, clue};
+  const meta={gk:k, fam:FORZA_FAM[k]||k, item:q};
+  if(kind==="mc") return Object.assign({kind, q:long?`<span style="font-size:1.25em">${q}</span>`:q, opts, a, hint, why, topic, clue}, meta);
+  return Object.assign({kind:"type", q:long?`<span class="big" style="font-size:1.5em">${q}</span>`:`<span class="big">${q}</span>`, accept:[String(ans)], numeric:true, hint, why, topic, clue}, meta);
 }
 
 function misspellings(w){
   const out=new Set(); const C=/[b-df-hj-np-tv-z]/, V=/[aeiouy]/;
   for(let i=0;i<w.length-1;i++){ if(w[i]===w[i+1]&&C.test(w[i])) out.add(w.slice(0,i)+w.slice(i+1)); }
   for(let i=1;i<w.length-1;i++){ const c=w[i]; if(C.test(c)&&w[i-1]!==c&&w[i+1]!==c&&V.test(w[i-1])&&V.test(w[i+1])) out.add(w.slice(0,i)+c+w.slice(i)); }
+  for(let i=1;i<w.length;i++){ const c=w[i]; if(/[lntsprm]/.test(c)&&V.test(w[i-1])&&w[i-1]!==c&&w[i+1]!==c&&(i===w.length-1||!V.test(w[i+1]))) out.add(w.slice(0,i)+c+w.slice(i)); }
+  if(/^ex/.test(w)) out.add("es"+w.slice(2));
   if(/ie/.test(w)) out.add(w.replace("ie","ei")); if(/ei/.test(w)) out.add(w.replace("ei","ie"));
   if(/ary$/.test(w)) out.add(w.replace(/ary$/,"ery")); if(/ery$/.test(w)) out.add(w.replace(/ery$/,"ary"));
   if(/ant$/.test(w)) out.add(w.replace(/ant$/,"ent")); if(/ent$/.test(w)) out.add(w.replace(/ent$/,"ant"));
@@ -914,32 +1111,109 @@ function doublesIn(w){ const d=[]; for(let i=0;i<w.length-1;i++) if(w[i]===w[i+1
 function brickGen(t){
   const tmap={1:[1],2:[1,2],3:[2],4:[2,3],5:[3]}; let pool=SPELL.filter(x=>tmap[t].includes(x.t));
   const seen=(state.worlds.brick.recentQ||[]); let cand=pool.filter(x=>!seen.includes(x.w)); if(cand.length<5) cand=pool;
-  let it=null; const due=hintedDue("brick"); if(due.length&&Math.random()<0.35){ const d=pick(due); it=SPELL.find(x=>x.w===d.q)||null; }
-  if(!it) it=pick(cand); state.worlds.brick.recentQ=[...seen,it.w].slice(-30);
+  const it=pick(cand); state.worlds.brick.recentQ=[...seen,it.w].slice(-30);
+  return brickItem(it,t);
+}
+function brickItem(it,t,avoidMode,forceMode,tried){
   const w=it.w; const dbl=doublesIn(w);
   const pos=dbl.length?(w.indexOf(dbl[0])<w.length/3?"near the start":w.indexOf(dbl[0])>2*w.length/3?"near the end":"in the middle"):"";
   const sylls=Math.max(1,(w.match(/[aeiouy]+/g)||[]).length);
   const clueWord=`Say it slowly in ${sylls} part${sylls===1?"":"s"} and write what you hear. ${dbl.length===0?"There are NO double letters in this word.":dbl.length===1?`There is ONE double letter, ${pos}.`:`There are ${dbl.length} double letters.`} It starts with "${w.slice(0,2)}".`;
   const clueGap=`Listen to the vowel just before the gap. A SHORT vowel sound (as in hop, bit, cut) usually needs a double letter after it; a LONG vowel sound (as in hope, bite, cute) usually doesn't. ${it.d.charAt(0).toUpperCase()+it.d.slice(1)}.`;
   const whyLine = dbl.length? `<b>${w}</b> — double ${dbl.map(d=>d[0]).join(" and double ")}: ${w.toUpperCase()}.` : `<b>${w}</b> — no double letters in this one. ${w.toUpperCase()}.`;
-  const modes = t<=1?["pick","pick","gap"] : t<=2?["pick","gap","type"] : t<=3?["gap","type","type"] : ["type","type","gap"];
-  const mode=pick(modes);
-  if(mode==="pick"){
-    const wrong=shuffle(misspellings(w)).slice(0,2); if(wrong.length<2) return brickGen(t);
-    const opts=shuffle([w,...wrong]); return {kind:"mc", q:`Which spelling is right?<br><small class="small">${esc(it.d)}</small>`, opts, a:opts.indexOf(w), why:whyLine, hint:dbl.length?`Listen for the short vowel sound — it needs a double letter after it.`:`Say it slowly: no doubled letters here.`, topic:"Spelling: choose", word:w, clue:clueWord};
+  let modes = t<=1?["pick","pick","gap"] : t<=2?["pick","gap","type"] : t<=3?["gap","type","type"] : ["type","type","gap"];
+  if(it.s) modes=modes.concat(["sentence"]);
+  if(avoidMode&&modes.some(m=>m!==avoidMode)) modes=modes.filter(m=>m!==avoidMode);
+  const mode=forceMode||pick(modes);
+  const meta={fam:it.fam||w, item:w+":"+mode, mode, word:w};
+  const fallback=()=>{ const done=[...(tried||[]),mode]; const next=["gap","pick","sentence"].find(m=>m!==avoidMode&&!done.includes(m)&&(m!=="sentence"||it.s))||"type"; return brickItem(it,t,avoidMode,next,done); };
+  if(mode==="pick"||mode==="sentence"){
+    const wrong=shuffle(misspellings(w)).slice(0,2); if(wrong.length<1) return fallback();
+    const opts=shuffle([w,...wrong]);
+    const q = mode==="pick" ? `Which spelling is right?<br><small class="small">${esc(it.d)}</small>`
+      : `Which spelling fits the sentence?<div style="font-size:1.3em;margin:10px 0">${esc(it.s).replace("___","<span style='color:var(--gold)'>_____</span>")}</div>`;
+    return Object.assign({kind:"mc", q, opts, a:opts.indexOf(w), why:whyLine, hint:dbl.length?`Listen for the short vowel sound — it needs a double letter after it.`:`Say it slowly: no doubled letters here.`, topic:mode==="pick"?"Spelling: choose":"Spelling: in a sentence", clue:clueWord}, meta);
   }
   if(mode==="gap"){
     let i=-1; const C=/[b-df-hj-np-tv-z]/, V=/[aeiouy]/;
     if(dbl.length){ const d=pick(dbl); i=w.indexOf(d); const shown=w.slice(0,i)+"__"+w.slice(i+2); const opts=shuffle([d, d[0]]);
-      return {kind:"mc", q:`Fill the gap:<span class="big">${shown.replace("__","<span style='color:var(--gold)'>__</span>")}</span><small class="small">${esc(it.d)}</small>`, opts, a:opts.indexOf(d), why:whyLine, hint:"Short vowel before it? Then it's usually doubled.", topic:"Spelling: double or single", word:w, clue:clueGap}; }
+      return Object.assign({kind:"mc", q:`Fill the gap:<span class="big">${shown.replace("__","<span style='color:var(--gold)'>__</span>")}</span><small class="small">${esc(it.d)}</small>`, opts, a:opts.indexOf(d), why:whyLine, hint:"Short vowel before it? Then it's usually doubled.", topic:"Spelling: double or single", clue:clueGap}, meta); }
     const spots=[]; for(let k=1;k<w.length-1;k++){ if(C.test(w[k])&&w[k-1]!==w[k]&&w[k+1]!==w[k]&&V.test(w[k-1])&&V.test(w[k+1])) spots.push(k); }
-    if(!spots.length) return brickGen(t); i=pick(spots); const c=w[i]; const shown=w.slice(0,i)+"__"+w.slice(i+1); const opts=shuffle([c, c+c]);
-    return {kind:"mc", q:`Fill the gap:<span class="big">${shown.replace("__","<span style='color:var(--gold)'>__</span>")}</span><small class="small">${esc(it.d)}</small>`, opts, a:opts.indexOf(c), why:whyLine, hint:"Only one of these letters is needed.", topic:"Spelling: double or single", word:w, clue:clueGap};
+    if(!spots.length) return fallback(); i=pick(spots); const c=w[i]; const shown=w.slice(0,i)+"__"+w.slice(i+1); const opts=shuffle([c, c+c]);
+    return Object.assign({kind:"mc", q:`Fill the gap:<span class="big">${shown.replace("__","<span style='color:var(--gold)'>__</span>")}</span><small class="small">${esc(it.d)}</small>`, opts, a:opts.indexOf(c), why:whyLine, hint:"Only one of these letters is needed.", topic:"Spelling: double or single", clue:clueGap}, meta);
   }
-  return {kind:"type", memo:w, q:`Now type it:<br><small class="small">${esc(it.d)} · ${w.length} letters</small>`, accept:[w], hint:dbl.length?`Remember the double ${dbl.map(d=>d[0]).join(" and ")}. ${w.length} letters.`:`No double letters. It starts with ${w[0].toUpperCase()}.`, why:whyLine, topic:"Spelling: write", word:w, clue:clueWord};
+  return Object.assign({kind:"type", memo:w, q:`Now type it:<br><small class="small">${esc(it.d)} · ${w.length} letters</small>`, accept:[w], hint:dbl.length?`Remember the double ${dbl.map(d=>d[0]).join(" and ")}. ${w.length} letters.`:`No double letters. It starts with ${w[0].toUpperCase()}.`, why:whyLine, topic:"Spelling: write", clue:clueWord}, meta);
 }
 
 const GENS = { mine:mineGen, forza:forzaGen, brick:brickGen, astro:t=>mcFromBank(SCI,t,"astro"), words:t=>mcFromBank(WORDS,t,"words"), atlas:t=>mcFromBank(ATLAS,t,"atlas") };
+
+/* ---------- TRICKY FAMILIES ----------
+   A question he misses (or needs a clue for) marks its whole family as tricky. Tricky families come
+   back about 2 questions in 5, always as a DIFFERENT member (new wording, new numbers, a cousin word
+   or a different spelling task). A family is cracked after 2 first-try, no-clue rights on 2 different
+   versions. Comeback cards in a run are also a sibling, never a copy. */
+const MINE_FAM={mul2510:"tbl",mul346:"tbl",mul789:"tbl",mul1112:"tbl",mulAll:"tbl",div2510:"div",div346:"div",div789:"div",div1112:"div",add20:"add",add100:"add",add3d:"add",add4d:"add",sub20:"sub",sub100:"sub",sub3d:"sub",sub4d:"sub",missing:"missing",missing2:"missing",mul2x1:"mul2x1",sqr:"sqr"};
+const FORZA_FAM={half2:"half"};
+function famOfK(world,k){ return world==="mine"?(MINE_FAM[k]||k):(FORZA_FAM[k]||k); }
+function kForFam(world,fam,t){ const K=world==="mine"?MINE_K:FORZA_K; const all=[...new Set(Object.values(K).flat())].filter(k=>famOfK(world,k)===fam); if(!all.length) return null; const near=(K[t]||[]).filter(k=>all.includes(k)); return pick(near.length?near:all); }
+function trickyDue(world){ return Object.values(state.tricky||{}).filter(r=>r.w===world&&!r.secure); }
+function variantFor(world,fam,avoidItem,t,avoidMode){
+  if(world==="mine"||world==="forza"){ const k=kForFam(world,fam,t); if(!k) return null; let q=null; for(let i=0;i<6;i++){ q=GENS[world](t,k); if(q.item!==avoidItem) break; } return q; }
+  if(world==="brick"){ const mem=SPELL.filter(x=>(x.fam||x.w)===fam); if(!mem.length) return null;
+    const lastW=(avoidItem||"").split(":")[0]; const target=mem.find(x=>x.w===fam);
+    let it=(target&&Math.random()<0.5)?target:pick(mem.length>1?mem.filter(x=>x.w!==lastW):mem);
+    return brickItem(it,t,it.w===lastW?avoidMode:null); }
+  const bank=BANKS[world]; if(!bank) return null; const mem=bank.filter(x=>(x.f||qText(x.q))===fam); if(!mem.length) return null;
+  const r=(state.tricky||{})[world+"|"+fam]; const seen=(r&&r.seen)||[];
+  const other=mem.filter(x=>qText(x.q)!==avoidItem); const fresh=other.filter(x=>!seen.includes(qText(x.q)));
+  return mcItem(pick(fresh.length?fresh:other.length?other:mem), world);
+}
+function genQ(world,t){
+  const recent=(RUN&&RUN.famRecent)||[];
+  const due=trickyDue(world).filter(r=>!recent.includes(r.fam));
+  if(due.length&&Math.random()<0.4){ const r=pick(due); const q=variantFor(world,r.fam,r.lastItem,t,r.lastMode); if(q){ q.tricky=true; return q; } }
+  return GENS[world](t);
+}
+function siblingOf(world,q){
+  let s=null;
+  if(world==="brick"){ const it=SPELL.find(x=>x.w===q.word); if(it) s=brickItem(it,q.tier||1,q.mode); }
+  else s=variantFor(world,q.fam,q.item,q.tier||1);
+  if(!s){ s=Object.assign({},q,{memo:null}); if(s.kind==="mc"){ const idx=shuffle(q.opts.map((_,i)=>i)); s.opts=idx.map(i=>q.opts[i]); s.a=idx.indexOf(q.a); } }
+  s.tier=q.tier; return Object.assign(s,{comeback:true,usedClue:false,done:false});
+}
+function noteTricky(world,q,ok){
+  if(!q.fam) return; state.tricky=state.tricky||{}; const key=world+"|"+q.fam; let r=state.tricky[key]; const now=new Date().toISOString();
+  const clean=ok===2&&!q.usedClue;
+  if(!clean){ r=state.tricky[key]=r||{w:world,fam:q.fam,n:0,ok:0,okItems:[],secure:false,seen:[],first:now}; r.n++; r.ok=0; r.okItems=[]; if(r.secure){ r.secure=false; delete r.securedAt; } }
+  else if(!r||r.secure) return;
+  else if(!r.okItems.includes(q.item)){ r.okItems.push(q.item); r.ok=r.okItems.length; }
+  r.label=q.word||qText(q.q); r.ans=q.kind==="mc"?q.opts[q.a]:q.accept[0]; r.k=q.topic; r.last=now; r.lastItem=q.item; r.lastMode=q.mode||null;
+  if(!r.seen.includes(q.item)){ r.seen.push(q.item); if(r.seen.length>15) r.seen.shift(); }
+  if(clean&&r.ok>=2){ r.secure=true; r.securedAt=now; setTimeout(()=>toast("🎯 Cracked it! Two different versions right first time."),900); }
+}
+function famFromLog(e){
+  if(e.f) return e.f;
+  if(BANKS[e.w]){ const it=BANKS[e.w].find(x=>qText(x.q)===e.q); return it?(it.f||qText(it.q)):e.q; }
+  if(e.w==="brick"){ const it=SPELL.find(x=>x.w===e.q); return it?(it.fam||it.w):e.q; }
+  if(e.w==="forza"){ if(e.k==="Halves and quarters") return /quarter|¼|÷ 4/.test(e.q)?"quarter":"half";
+    if(e.k==="Adding fractions"){ const m=String(e.q).match(/(\d+)\/(\d+) \+ (\d+)\/(\d+)/); return m&&m[2]===m[4]?"addsame":"adddiff"; }
+    if(e.k==="Rounding") return /nearest 100/.test(e.q)?"round100":/decimal/.test(e.q)?"round1dp":"round10";
+    return {"Comparing fractions":"cmp1","Decimals":"tenths","Fractions of amounts":"fracof","Equivalent fractions":"equiv","Percentages":"pct","Mixed numbers":"improper","Adding decimals":"adddec","Comparing decimals":"cmpdec","Fractions to decimals":"fractodec"}[e.k]||e.k; }
+  if(e.w==="mine") return {"Times tables":"tbl","Division facts":"div","Addition":"add","Subtraction":"sub","Missing numbers":"missing","Written multiplication":"mul2x1","Square numbers":"sqr"}[e.k]||e.k;
+  return e.q;
+}
+/* One-off: turn everything he has found tricky so far into tricky families (29 Oct 2026). Clue items that
+   were marked secure only by answering the identical question again are reopened, to be re-tested with variants. */
+function seedTricky(){
+  if(state.trickySeed>=1) return; state.tricky=state.tricky||{};
+  (state.log||[]).forEach(e=>{ if(e.ok===2&&!e.hint) return; const fam=famFromLog(e); const key=e.w+"|"+fam;
+    const r=state.tricky[key]=state.tricky[key]||{w:e.w,fam,n:0,ok:0,okItems:[],secure:false,seen:[],first:e.at};
+    r.n++; r.label=e.q; r.ans=e.ans; r.k=e.k; r.last=e.at;
+    const mode=e.w==="brick"?({"Spelling: write":"type","Spelling: double or single":"gap","Spelling: choose":"pick"}[e.k]||null):null;
+    r.lastItem=e.w==="brick"?e.q+":"+mode:e.q; r.lastMode=mode; if(!r.seen.includes(r.lastItem)) r.seen.push(r.lastItem); });
+  Object.values(state.hinted||{}).forEach(h=>{ h.fam=h.fam||famFromLog({w:h.w,q:h.q,k:h.k}); if(h.secure){ h.secure=false; h.ok=0; h.lastOk=null; h.reopened=new Date().toISOString(); delete h.securedAt; } });
+  state.trickySeed=1;
+}
 
 /* ---------- adaptive tier ---------- */
 function adapt(world, ok, usedClue){
@@ -953,7 +1227,7 @@ function adapt(world, ok, usedClue){
 let RUN=null, clockT=null;
 function startWorld(id){
   touchDay(); const w=state.worlds[id];
-  RUN={world:id, n:0, total:10, results:[], xp:0, combo:0, notyet:0, queue:[], cur:null, attempt:0, start:Date.now(), qStart:0, ores:[]};
+  RUN={world:id, n:0, total:10, results:[], xp:0, combo:0, notyet:0, queue:[], famRecent:[], cur:null, attempt:0, start:Date.now(), qStart:0, ores:[]};
   $("p-world").textContent=WORLDS[id].em+" "+WORLDS[id].name+" · "+TIER_NAMES[w.tier];
   $("p-clock").style.display=id==="forza"?"inline":"none";
   go("play"); nextQ();
@@ -970,7 +1244,8 @@ function nextQ(){
   if(RUN.n>=RUN.total) return finishRun();
   let q=null;
   if(RUN.queue.length && RUN.queue[0].due<=RUN.n){ q=RUN.queue.shift().q; q.comeback=true; }
-  else { const t=state.worlds[RUN.world].tier; q=GENS[RUN.world](t); q.tier=t; }
+  else { const t=state.worlds[RUN.world].tier; q=genQ(RUN.world,t); q.tier=t; }
+  RUN.famRecent=[...(RUN.famRecent||[]),q.fam].slice(-3);
   antiPattern(q); RUN.cur=q; RUN.attempt=0; RUN.qStart=Date.now(); renderProg(); renderDeco(); $("p-fb").className="fb"; $("p-fb").innerHTML="";
   if(RUN.world==="forza"&&!clockT) clockT=setInterval(tickClock,100);
   renderQ($("p-card"), q, answerRun);
@@ -1005,8 +1280,9 @@ function logAnswer(world, q, ok, given, secs, boss){
   const w=state.worlds[world]; w.answered++; if(ok>0) w.right++; w.secs+=Math.min(60,secs);
   const tk=q.topic||"General"; state.topics[tk]=state.topics[tk]||{a:0,r:0}; state.topics[tk].a++; if(ok>0) state.topics[tk].r++;
   if(world==="brick"&&ok>0) state.spelled++;
-  state.log.push({at:new Date().toISOString(), w:world, k:tk, q:q.word||q.q.replace(/<[^>]+>/g," ").replace(/\s+/g," ").trim().slice(0,90), ok, given:String(given).slice(0,40), ans:q.kind==="mc"?q.opts[q.a]:q.accept[0], secs:Math.round(secs), tier:q.tier||0, boss:boss||0, cb:q.comeback?1:0, hint:q.usedClue?1:0});
+  state.log.push({at:new Date().toISOString(), w:world, k:tk, q:q.word||q.q.replace(/<[^>]+>/g," ").replace(/\s+/g," ").trim().slice(0,90), ok, given:String(given).slice(0,40), ans:q.kind==="mc"?q.opts[q.a]:q.accept[0], secs:Math.round(secs), tier:q.tier||0, boss:boss||0, cb:q.comeback?1:0, hint:q.usedClue?1:0, f:q.fam||""});
   if(q.usedClue) noteHint(world,q); else noteSecure(world,q,ok===2);
+  noteTricky(world,q,ok);
   if(state.log.length>700) state.log=state.log.slice(-700);
 }
 function lockCard(card){ card.querySelectorAll(".opt").forEach(b=>b.disabled=true); const inp=card.querySelector("#ans"), go=card.querySelector("#go"); if(inp){ inp.disabled=true; inp.onkeydown=null; } if(go){ go.disabled=true; go.onclick=null; } }
@@ -1036,9 +1312,9 @@ function answerRun(given, el){
   } else {
     q.done=true; lockCard($("p-card")); SND.notyet(); RUN.results[RUN.n]=0; RUN.xp+=3; state.worlds[RUN.world].xp+=3;
     logAnswer(RUN.world,q,0,givenText(q,given),secs); adapt(RUN.world,false,q.usedClue); questEvent("answered",RUN.world);
-    if(!q.comeback){ const copy=Object.assign({},q,{comeback:true,memo:null,usedClue:false,done:false}); RUN.queue.push({q:copy, due:RUN.n+rnd(2,4)}); if(RUN.total<14) RUN.total++; }
+    if(!q.comeback){ const copy=siblingOf(RUN.world,q); RUN.queue.push({q:copy, due:RUN.n+rnd(2,4)}); if(RUN.total<14) RUN.total++; }
     if(q.kind==="mc"){ $("p-card").querySelectorAll(".opt").forEach(b=>{ if(+b.dataset.i===q.a) b.classList.add("right"); else b.classList.add("dim"); }); }
-    fb.className="fb show on"; fb.innerHTML=`<h3>Here's the answer: <span style="color:var(--gold)">${esc(q.kind==="mc"?q.opts[q.a]:q.accept[0])}</span></h3>${RUN.world==="brick"&&q.word?wordFlash(q.word):""}<div class="why">${q.why}</div><div class="small mt">+3 Grit XP for sticking with it. ${q.comeback?"":"This one comes back as a <b>Comeback card</b> in a minute — get it then for full XP."}</div><div class="row"><button class="btn ok" id="nx">Next ›</button></div>`;
+    fb.className="fb show on"; fb.innerHTML=`<h3>Here's the answer: <span style="color:var(--gold)">${esc(q.kind==="mc"?q.opts[q.a]:q.accept[0])}</span></h3>${RUN.world==="brick"&&q.word?wordFlash(q.word):""}<div class="why">${q.why}</div><div class="small mt">+3 Grit XP for sticking with it. ${q.comeback?"":"A similar one comes back as a <b>Comeback card</b> in a minute — get it then for full XP."}</div><div class="row"><button class="btn ok" id="nx">Next ›</button></div>`;
     addXP(3,"grit"); $("nx").onclick=()=>{ RUN.n++; nextQ(); }; $("nx").focus(); checkBadges(); persist();
   }
   renderProg(); renderDeco();
@@ -1132,7 +1408,7 @@ async function signIn(name){
   IDENTITY={cls:CLS,cand:name}; load(); setSync("busy");
   const [cloud]=await Promise.all([cloudPull(), pullParent()]);
   if(cloud&&cloud.v&&(!state.updatedAt||(cloud.updatedAt||"")>state.updatedAt)) state=Object.assign(freshState(),cloud);
-  state.name=name; $("gate").classList.remove("on"); setSync(cloud?"ok":"bad");
+  state.name=name; seedTricky(); $("gate").classList.remove("on"); setSync(cloud?"ok":"bad");
   ensureDaily(); checkBadges(); go("hub"); persist();
   if(CLS==="TEST") $("subtitle").textContent="TEST MODE — nothing here counts";
 }

@@ -464,6 +464,7 @@ function render(){
     <div class="stat"><b>${bankMinutes()} min</b><small>iPad time banked (rate ${PAR.rate} XP/min)</small></div>
     <div class="stat"><b>${REC.comebacks}</b><small>comebacks landed · best combo ${REC.bestCombo}</small></div>
     <div class="stat"><b>${Object.values(REC.hinted||{}).filter(h=>!h.secure).length}</b><small>clue items still open · ${Object.values(REC.hinted||{}).filter(h=>h.secure).length} made secure</small></div>
+    <div class="stat"><b>${Object.values(REC.tricky||{}).filter(r=>!r.secure).length}</b><small>tricky patterns to crack · ${Object.values(REC.tricky||{}).filter(r=>r.secure).length} cracked</small></div>
    </div>
    <div class="card" style="margin-top:14px"><h2>Questions per day (last 14 days)</h2><div class="chart">${perDay.map(d=>`<div title="${d.k}: ${d.n} answered, ${d.r} right"><span>${d.n||""}</span><i style="height:${d.n/mx*100}%"></i></div>`).join("")}</div><div class="axis">${perDay.map(d=>`<span>${d.k.slice(8)}</span>`).join("")}</div></div>
    <div class="card"><h2>Recent sessions</h2><table><tr><th>When</th><th>Length</th><th>Answered</th><th>Right</th><th>Worlds</th></tr>${ses.slice(-10).reverse().map(s=>`<tr><td>${fmt(new Date(s.start).toISOString())}</td><td>${Math.max(1,Math.round((s.end-s.start)/60000))} min</td><td>${s.n}</td><td>${pct(s.r,s.n)}%</td><td>${[...s.ws].map(w=>WE[w]).join(" ")}</td></tr>`).join("")}</table></div>
@@ -484,8 +485,15 @@ function render(){
   const spell=list.filter(m=>m.w==="brick");
   const H=Object.values(REC.hinted||{}).sort((x,y)=>(x.secure-y.secure)||(y.n-x.n)||((y.last||"")>(x.last||"")?1:-1));
   const open=H.filter(h=>!h.secure), sec=H.filter(h=>h.secure);
+  const TR=Object.values(REC.tricky||{}).sort((x,y)=>(x.secure-y.secure)||(y.n-x.n)||((y.last||"")>(x.last||"")?1:-1));
+  const trOpen=TR.filter(r=>!r.secure), trSec=TR.filter(r=>r.secure);
+  const trRows=arr=>arr.map(r=>`<tr><td>${WE[r.w]}</td><td>${esc(r.k||r.fam)}<br><span class="mute" style="font-size:.78rem">latest: ${esc(r.label||"")} → <b>${esc(r.ans||"")}</b></span></td><td>${r.n}×</td><td>${(r.seen||[]).length}</td><td class="mute">${fmt(r.last)}</td><td>${r.secure?'<span class="good">Cracked ✓</span>':`<span class="warnc">${r.ok||0}/2</span>`}</td></tr>`).join("");
+  const trHead=`<tr><th>World</th><th>Pattern</th><th>Missed / clued</th><th>Versions met</th><th>Last</th><th>Status</th></tr>`;
+  const trickyCard=`<div class="card"><h2>🎯 Tricky patterns</h2><p class="note">Anything he got wrong first time or needed a clue for. The Arena re-asks each pattern as a <b>different version</b> every time: new wording or a new angle on the same fact, new numbers in maths and fractions, a cousin word or a different task in spelling. That's about 2 questions in 5 in that world. Comeback cards in a run are a similar question, not a copy. A pattern is cracked when he gets <b>two different versions</b> right first time without a clue.</p>
+    ${trOpen.length?`<h3>Still to crack (${trOpen.length})</h3><table>${trHead}${trRows(trOpen)}</table>`:`<p>Nothing tricky open.</p>`}
+    ${trSec.length?`<h3>Cracked (${trSec.length})</h3><table>${trHead}${trRows(trSec)}</table>`:""}</div>`;
   const hintRows=arr=>arr.map(h=>`<tr><td>${WE[h.w]}</td><td>${esc(h.q)}<br><span class="mute" style="font-size:.78rem">${esc(h.k)}</span></td><td><b>${esc(h.ans)}</b></td><td>${h.n}×</td><td class="mute">${fmt(h.last)}</td><td>${h.secure?'<span class="good">Secure ✓</span>':`<span class="warnc">${h.ok}/2 clean rights</span>`}</td></tr>`).join("");
-  $("p-need").innerHTML=`<div class="card"><h2>💡 Clues used — material he hasn't met yet</h2><p class="note">Every question where he pressed Clue. These are the gaps: the Arena keeps re-asking them (about one question in three in that world) until he gets each one right first time, without a clue, twice — then it's marked Secure. Open items are the list for the next content update.</p>
+  $("p-need").innerHTML=`${trickyCard}<div class="card"><h2>💡 Clues used — material he hasn't met yet</h2><p class="note">Every question where he pressed Clue. These are the gaps. Each one is now part of a tricky pattern (above), so it comes back as a different version. It's marked Secure after two first-try, no-clue rights on that pattern. Open items are the list for the next content update.</p>
     ${open.length?`<h3>Still open (${open.length})</h3><table><tr><th>World</th><th>Question</th><th>Answer</th><th>Clues</th><th>Last</th><th>Status</th></tr>${hintRows(open)}</table>`:`<p>No open clue items.</p>`}
     ${sec.length?`<h3>Now secure (${sec.length})</h3><table><tr><th>World</th><th>Question</th><th>Answer</th><th>Clues</th><th>Last</th><th>Status</th></tr>${hintRows(sec)}</table>`:""}
     <div class="row" style="margin-top:10px"><button onclick="copyOpenHints()">Copy the open list for Claude</button></div></div>
